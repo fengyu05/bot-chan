@@ -1,0 +1,28 @@
+import logging
+import signal
+
+import structlog
+from slack_bolt.adapter.socket_mode import SocketModeHandler
+
+from botchan.app import app
+from botchan.settings import LOG_LEVEL, SLACK_APP_LEVEL_TOKEN
+
+logger = structlog.get_logger(__name__)
+
+
+def start_server(port: int = 3000) -> None:
+    logging.basicConfig(level=getattr(logging, LOG_LEVEL))
+
+    # Registery cleanup on SIGNT
+    signal.signal(signal.SIGINT, cleanup)
+
+    logger.info("starting server at", port=port)
+    handler = SocketModeHandler(app_token=SLACK_APP_LEVEL_TOKEN, app=app)
+    handler.start()
+
+
+def cleanup(signal, frame) -> None:
+    logger.info("closing the server")
+    # Do something
+    logger.info("server closed with cleanup")
+    exit(0)

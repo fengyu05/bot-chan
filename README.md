@@ -58,7 +58,7 @@ Want to customize your chatbot? Bot-chan offers flexibility to tailor it to your
 
 ### Intention
 Botchan use intention module to decide whether and how to reply to a certain message. The framework just apply the chat intetion
-to all messages. If you want to extended it, add your code in [message_intent.py](./botchat/message_intent.py) and [agent.py](./botchat/agent.py) message handler registration.
+to all messages. If you want to extended it, add your code in [message_intent.py](./botchan/message_intent.py) and [agent.py](./botchan/agent.py) message handler registration.
 
 ### Bot personality
 You may config the name and the personality via prompting in [here](https://github.com/fengyu05/bot-chan/blob/main/botchan/prompt.py#L15). 

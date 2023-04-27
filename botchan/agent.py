@@ -32,10 +32,12 @@ class Agent:
         self.bot_user_id = slack_auth.get_bot_user_id(self.slack_client)
 
         self.hanlders = [
+            # fmt: off
             MessageEventHandler(
                 accept_intentions=[MessageIntent.CHAT],
-                handler_func=lambda x: self._chat(x),
+                handler_func=lambda x: self._chat(x), # pylint: disable=unnecessary-lambda  
             ),
+            # fmt: on
         ]
 
     def _get_llm_chain(
@@ -69,7 +71,7 @@ class Agent:
             prompt=PromptTemplate(
                 input_variables=prompt.input_variables, template=prompt.template
             ),
-            verbose=False, # Turn this on if we need verbose logs for the prompt
+            verbose=False,  # Turn this on if we need verbose logs for the prompt
             memory=ConversationBufferWindowMemory(
                 k=prompt.memory_buffer,
                 input_key=prompt.input_key,  # The key of the input variables that to be kept in memero

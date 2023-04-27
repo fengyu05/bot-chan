@@ -1,5 +1,6 @@
 import logging
 import signal
+import sys
 
 import structlog
 from slack_bolt.adapter.socket_mode import SocketModeHandler
@@ -21,8 +22,8 @@ def start_server(port: int = 3000) -> None:
     handler.start()
 
 
-def cleanup(signal, frame) -> None:
+def cleanup(sig, frame) -> None:  # pylint: disable=unused-argument
     logger.info("closing the server")
     # Do something
     logger.info("server closed with cleanup")
-    exit(0)
+    sys.exit(0)

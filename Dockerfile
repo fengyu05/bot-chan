@@ -11,5 +11,6 @@ RUN poetry install && rm -rf /root/.cache/pypoetry
 # Activate the virtualenv.
 ENV PATH "/app/py/projects/botchan/.venv/bin:$PATH"
 
-COPY botchan ./
+ADD botchan ./botchan
+
 RUN poetry install

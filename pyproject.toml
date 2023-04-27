@@ -3,7 +3,6 @@ name = "botchan"
 version = "0.1.0"
 description = ""
 authors = ["ZF"]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"

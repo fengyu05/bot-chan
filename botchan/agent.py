@@ -1,7 +1,7 @@
 from typing import Optional
 
 import structlog
-from langchain import ConversationChain, LLMChain, OpenAI, PromptTemplate
+from langchain import LLMChain, OpenAI, PromptTemplate
 from langchain.memory import ConversationBufferWindowMemory
 from slack_sdk import WebClient
 
@@ -69,7 +69,7 @@ class Agent:
             prompt=PromptTemplate(
                 input_variables=prompt.input_variables, template=prompt.template
             ),
-            verbose=True,
+            verbose=False, # Turn this on if we need verbose logs for the prompt
             memory=ConversationBufferWindowMemory(
                 k=prompt.memory_buffer,
                 input_key=prompt.input_key,  # The key of the input variables that to be kept in memero

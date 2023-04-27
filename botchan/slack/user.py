@@ -1,4 +1,3 @@
-from typing import Optional
 import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -8,7 +7,7 @@ from .data_model import UserProfile
 logger = structlog.getLogger(__name__)
 
 
-def get_user_profile(client, user_id) -> UserProfile:
+def get_user_profile(client: WebClient, user_id) -> UserProfile:
     try:
         response = client.users_profile_get(user=user_id)
         if not response["ok"]:

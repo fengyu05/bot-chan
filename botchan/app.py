@@ -1,15 +1,10 @@
-from typing import Any
-
 import structlog
 from slack_bolt import App
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
 
 from botchan.agent import Agent
 from botchan.settings import SLACK_APP_OAUTH_TOKENS_FOR_WS
 from botchan.slack.client import create_slack_client
 from botchan.slack.data_model import (
-    AppMentionEvent,
     MessageChangeEvent,
     MessageCreateEvent,
     MessageDeleteEvent,
@@ -29,7 +24,6 @@ app = App(
 @app.event("message")
 def handle_message_events(event: dict) -> None:
     """Handle message to the bot."""
-    logger.debug("message event", _event=event)
     message_event = MessageEvent(**event)
     if message_event.subtype == "message_created":
         message_event = MessageCreateEvent(**event)

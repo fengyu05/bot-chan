@@ -5,7 +5,6 @@ import datetime
 import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from .auth import get_bot_user_id
 from .data_model import Message
 import toolz as T
 
@@ -50,15 +49,6 @@ class MessagesFetcher:
         Returns:
             list[Message]: A list of message objects representing the matching messages.
         """
-        logger.debug(
-            "fetching message",
-            channel_id=channel_id,
-            thread_ts=thread_ts,
-            user_id=user_id,
-            oldest_ts=oldest_ts,
-            latest_ts=latest_ts,
-            mentioned_user_id=mentioned_user_id,
-        )
         try:
             # Use 'conversations_reply' if thread_ts is specified otherwise 'conversations_history'
             _api = (
@@ -85,7 +75,6 @@ class MessagesFetcher:
             if user_id:
                 filters_function += [T.partial(Message.is_from_userid, user_id=user_id)]
 
-            # logger.debug("messages", messages=response['messages'])
             messages = T.pipe(
                 response["messages"],
                 # 'apply Message.from_dict to each element' as a lamabda func

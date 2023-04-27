@@ -64,6 +64,11 @@ Add and edit emoji reactions
 Then go to `OAuth Tokens for Your Workspace` section click install to your workspace.
 Now, you will get a token please save it.
 
+## Enable send
+
+Go to `App Home => Show Tabs` check the following.
+`Allow users to send Slash commands and messages from the messages tab`
+
 ## Enable socket mode
 Go to Socket Mode section, click enable socket mode.
 
@@ -89,5 +94,14 @@ im:history
 ```
 
 You're done Slack App configuration. Remember everytime you change something here, you need to click `Reinstall to your workspace` to have it applied.
+
+
+# How to setup OpenAI API Token
+
+Simplify to to OpenAI developer page click generate a token.
+
+
+# Code structure 
+
 
 

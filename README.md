@@ -1,11 +1,12 @@
 # Introduction
-Welcome to Bot-chan! This is a minimal framework for a Slack AI Chatbot that provides easy setup instructions and customization options.
+Welcome to Bot-chan! This is a minimal but fully functional framework for a Slack AI Chatbot that is easy setup and customize.
+The author made Botchan open source in order to help those who are interested in creating their own chatbot application but don't know where to begin.
 
 ## Spotlights
 
 As a Slack Chatbot application, Botchan has the following features.
 
-- Reposonse to IM(direct message) or `@` mentioned in publich channels.
+- Reposonse to IM(direct message) or `@` mentioned in public channels.
 - Engage in interactive conversions.
 - Per thread(slack dicussion thread) memory.
 - Customzied bot personality(via preconfig prompt).
@@ -40,18 +41,18 @@ But if you prefer, you may choose to install requirements without Docker. Bot-ch
 
 ## Development
 
-To start developing with Bot-chan, run the command `docker-compose up -d`. Logs can be reviewed with `docker-compose logs`.
+To start developing with Bot-chan, run the command `docker-compose up --build -d`. Logs can be reviewed with `docker-compose logs`.
 
 ## Customization
 
 Want to customize your chatbot? Bot-chan offers flexibility to tailor it to your specific needs.
 
-## Security and privicay practices.
+## Security and privicay reminder.
 
-- Botchan does not persist any information from Slack, but instead just relies on the Slack History API to read messages.
+- Botchan does not store any information from Slack, but instead uses the Slack History API to read messages.
+- It is important to be aware that if you need to log any chat messages, the author suggests only doing so when the debug flag is on. 
+- The repository is not designed to be secure for production use, so use it at your own risk.
 
-
-Thank you.
 
 
 

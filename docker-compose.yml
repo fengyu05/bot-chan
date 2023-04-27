@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  botchan:
+    build:
+      dockerfile: Dockerfile
+    env_file:
+      - env.dev
+    command: poetry run cli start
+    ports:
+      - 3000:3000

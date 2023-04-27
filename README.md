@@ -44,7 +44,7 @@ But if you prefer, you may choose to install requirements without Docker. Bot-ch
 
 To start developing with Bot-chan, run the command `docker-compose up --build -d`. Logs can be reviewed with `docker-compose logs`.
 
-## Productionize
+## Deployment
 
 Botchan is fully functional running on your local dev machine or laptop.
 If you are looking at optional to turn it into a 24/7 online bot here are some suggetions.

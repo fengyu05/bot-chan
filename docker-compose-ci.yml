@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  lint:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - './botchan:/app/py/projects/botchan/botchan'  # Mount the code for quick development
+      - './tests:/app/py/projects/botchan/tests'
+    command: poetry run pylint botchan tests
+

@@ -28,16 +28,6 @@ class MessageEvent(BaseModel):
     def thread_message_id(self):
         return f"{self.channel}|{self.thread_ts or self.ts}"
 
-    @property
-    def message_user(self):
-        """user on the MessageEvent(create event) or the MessageEvent.message(change event)"""
-        return self.user or self.message.user
-
-    @property
-    def message_text(self):
-        """text on the MessageEvent(create event) or the MessageEvent.message(change event)"""
-        return self.text or self.message.text
-
     def is_user_mentioned(self, user_id: str) -> bool:
         return f"<@{user_id}>" in self.text
 
@@ -52,6 +42,14 @@ class MessageChangeEvent(MessageEvent):
     message: Optional[Message]
     previous_message: Optional[Message]
     hidden: bool
+
+    @property
+    def user(self):
+        return self.message.user
+
+    @property
+    def text(self):
+        return self.message.text
 
 
 class MessageDeleteEvent(MessageChangeEvent):

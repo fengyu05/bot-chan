@@ -58,7 +58,7 @@ Add and edit emoji reactions
 Then go to `OAuth Tokens for Your Workspace` section click install to your workspace.
 Now, you will get a token please save it.
 
-## Enable send
+## Enable bot messages tab
 
 Go to `App Home => Show Tabs` check the following.
 `Allow users to send Slash commands and messages from the messages tab`

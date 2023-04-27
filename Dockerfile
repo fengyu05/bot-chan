@@ -6,11 +6,15 @@ WORKDIR /app/py/projects/botchan
 COPY pyproject.toml \
      poetry.lock \
      ./
-RUN poetry install && rm -rf /root/.cache/pypoetry
+# `--no-root` means "install all dependencies but not the project
+RUN poetry install --no-interaction --no-root && rm -rf /root/.cache/pypoetry
 
 # Activate the virtualenv.
 ENV PATH "/app/py/projects/botchan/.venv/bin:$PATH"
 
+# Install the app
 ADD botchan ./botchan
+RUN poetry install --no-interaction
 
-RUN poetry install
+# Misc stuff
+ADD .pylintrc ./.pylintrc

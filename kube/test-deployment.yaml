@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: botchan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: botchan
+  template:
+    metadata:
+      labels:
+        app: botchan
+    spec:
+      containers:
+      - name: botchan
+        image: hyperspacetech/botchan
+        command: ["poetry", "run", "cli", "start"]
+        ports:
+        - containerPort: 3000
+        env:
+          # Token of OAUTH for the workspace
+          - name: SLACK_APP_OAUTH_TOKENS_FOR_WS
+            valueFrom:
+              configMapKeyRef:
+                name: env-configmap
+                key: SLACK_APP_OAUTH_TOKENS_FOR_WS
+          - name: SLACK_APP_LEVEL_TOKEN
+            valueFrom:
+              configMapKeyRef:
+                name: env-configmap
+                key: SLACK_APP_LEVEL_TOKEN
+          - name: OPENAI_API_KEY
+            valueFrom:
+              configMapKeyRef:
+                name: env-configmap
+                key: OPENAI_API_KEY
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: env-configmap
+# data:
+# Use the kubectl create configmap --from-env-file command to populate this section
+# e.g kubectl create configmap env-configmap --from-env-file=./env.dev

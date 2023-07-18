@@ -8,7 +8,7 @@ from slack_sdk import WebClient
 from botchan.message_event_handler import MessageEventHandler
 from botchan.message_intent import MessageIntent, get_message_intent
 from botchan.prompt import Prompt
-from botchan.settings import BOT_NAME
+from botchan.settings import BOT_NAME, OPENAI_GPT_MODEL_ID
 from botchan.slack import auth as slack_auth
 from botchan.slack import chat as slack_chat
 from botchan.slack import reaction as slack_reaction
@@ -67,7 +67,10 @@ class Agent:
     def _new_llm_chain(self, intent: MessageIntent) -> LLMChain:
         prompt = Prompt.from_intent(intent)
         llm_chain = LLMChain(
-            llm=OpenAI(temperature=0),
+            llm=OpenAI(
+                model_name=OPENAI_GPT_MODEL_ID,
+                temperature=0,
+            ),
             prompt=PromptTemplate(
                 input_variables=prompt.input_variables, template=prompt.template
             ),
@@ -91,9 +94,7 @@ class Agent:
         )
 
     def _should_reply(self, message_event: MessageCreateEvent) -> bool:
-        return message_event.channel_type == "im" or self._thread_mentioned(
-            message_event
-        )
+        return message_event.channel_type == "im" or message_event.is_user_mentioned(self.bot_user_id)
 
     def _thread_mentioned(self, message_event: MessageCreateEvent) -> bool:
         if message_event.thread_ts == None:

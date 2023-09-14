@@ -1,3 +1,4 @@
+# pylint: disable=unnecessary-lambda
 from typing import Optional
 
 import structlog
@@ -6,7 +7,11 @@ from langchain.memory import ConversationBufferWindowMemory
 from slack_sdk import WebClient
 
 from botchan.message_event_handler import MessageEventHandler
-from botchan.message_intent import MessageIntent, get_message_intent
+from botchan.message_intent import (
+    MessageIntent,
+    get_message_intent,
+    remove_emoji_prefix,
+)
 from botchan.prompt import Prompt
 from botchan.settings import BOT_NAME, OPENAI_GPT_MODEL_ID
 from botchan.slack import auth as slack_auth
@@ -14,6 +19,9 @@ from botchan.slack import chat as slack_chat
 from botchan.slack import reaction as slack_reaction
 from botchan.slack.data_model import Message, MessageCreateEvent, MessageEvent
 from botchan.slack.messages_fetcher import MessagesFetcher
+from botchan.mrkl import create_default_agent
+from botchan.buffer_callback import BufferCallbackHandler
+
 
 logger = structlog.getLogger(__name__)
 
@@ -30,13 +38,18 @@ class Agent:
         self.llm_chain_pool = {}  # keyed by thread_message_id
         self.fetcher = MessagesFetcher(self.slack_client)
         self.bot_user_id = slack_auth.get_bot_user_id(self.slack_client)
+        self.mrkl_agent = create_default_agent()
 
         self.hanlders = [
             # fmt: off
-            MessageEventHandler(
+            MessageEventHandler(  ## Handle diaglog chat
                 accept_intentions=[MessageIntent.CHAT],
-                handler_func=lambda x: self._chat(x), # pylint: disable=unnecessary-lambda  
+                handler_func=lambda x: self._chat(x),  
             ),
+            MessageEventHandler(  ## Handle mrkl agent behaviors
+                accept_intentions=[MessageIntent.MRKL_AGENT],
+                handler_func=lambda x: self._chain_of_thought(x),
+            )
             # fmt: on
         ]
 
@@ -94,7 +107,9 @@ class Agent:
         )
 
     def _should_reply(self, message_event: MessageCreateEvent) -> bool:
-        return message_event.channel_type == "im" or message_event.is_user_mentioned(self.bot_user_id)
+        return message_event.channel_type == "im" or message_event.is_user_mentioned(
+            self.bot_user_id
+        )
 
     def _thread_mentioned(self, message_event: MessageCreateEvent) -> bool:
         if message_event.thread_ts == None:
@@ -122,6 +137,22 @@ class Agent:
             human_input=message_event.text, bot_name=BOT_NAME, philosophy_style="modern"
         )
         slack_chat.reply_to_message(self.slack_client, message_event, output)
+
+    def _chain_of_thought(self, message_event: MessageEvent) -> None:
+        text_buffer = BufferCallbackHandler()
+        result = self.mrkl_agent.run(
+            remove_emoji_prefix(message_event.text), callbacks=[text_buffer]
+        )
+        tool_names = ",".join(map(lambda x: x.name, self.mrkl_agent.tools))
+
+        slack_chat.reply_to_message(
+            self.slack_client,
+            message_event,
+            f"In COT mode!\n:toolbox: Available tools [{tool_names}]\n\n Thought:\n {text_buffer.summary()}",
+        )
+        slack_chat.reply_to_message(
+            self.slack_client, message_event, f":check: {result}"
+        )
 
     def register_handlers(self, handlers: list[MessageEventHandler]) -> None:
         self.hanlders.extend(handlers)

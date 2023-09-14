@@ -28,3 +28,4 @@ def create_default_agent(
         tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
     )
     return mrkl
+

@@ -1,10 +1,12 @@
 # pylint: disable=abstract-method
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from langchain.callbacks import StdOutCallbackHandler
 
 
 class BufferCallbackHandler(StdOutCallbackHandler):
-    thought_buffer = []
+    def __init__(self, color: Optional[str] = None) -> None:
+        super().__init__(color)
+        self.thought_buffer = []
 
     def on_chain_end(self, outputs: Dict[str, Any], **kwargs: Any) -> Any:
         if "text" in outputs:

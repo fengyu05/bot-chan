@@ -71,9 +71,14 @@ Want to customize your chatbot? Bot-chan offers the flexibility to tailor it to 
 Botchan uses an intention module to decide whether and how to reply to a certain message. The framework just applies the chat intention
 to all messages. If you want to extend it, add your code in [message_intent.py](./botchan/message_intent.py) and [agent.py](./botchan/agent.py) message handler registration.
 
+### Chain of Thought mode
+
+Botchan can use a chain of thought mode to break down the thinking process and show it in its chat. To engage Chain-ot-thought mode, start a message with prefix `:thought:`. You may upload a customized slack emoji for it.
 
 ### Using tools
-Botchan uses some preconfig lang-chain tools in the chain of thought mode. If you want to add more tools or customize then, edit them [here](). 
+Botchan uses some preconfig lang-chain tools in the chain of thought mode. If you want to add more tools or customize then, edit them [here](https://github.com/fengyu05/bot-chan/blob/master/botchan/agents/mrkl.py#L8).  Some tools may require API keys to be set in the env. 
+
+
 
 ### Bot personality
 You may configure the name and the personality via prompting in [here](https://github.com/fengyu05/bot-chan/blob/main/botchan/prompt.py#L15). 

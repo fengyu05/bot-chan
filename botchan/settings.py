@@ -20,3 +20,6 @@ OPENAI_GPT_MODEL_ID = os.environ.get("OPENAI_GPT_MODEL_ID", "gpt-3.5-turbo")
 
 # SERPAPI API KEY
 SERPAPI_API_KEY = os.environ.get("SERPAPI_API_KEY", None)
+
+# NEWS API KEY
+NEWS_API_KEY = os.environ.get("NEWS_API_KEY", None)

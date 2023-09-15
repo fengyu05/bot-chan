@@ -10,12 +10,14 @@ class MessageIntent(Enum):
     CHAT = 1
     REPORT = 2
     MRKL_AGENT = 3  ## using chain-of-thought agent, all tools
+    QA_INTERNET = 4  ## QA with internet dataset
     # Add more intent here
 
 
 _EMOJI_INTENT_MAP = {
     MessageIntent.REPORT: ["report"],
     MessageIntent.MRKL_AGENT: ["thought", "chains"],
+    MessageIntent.QA_INTERNET: ["qa"],
 }
 
 _INTENT_BY_EMOJI = {

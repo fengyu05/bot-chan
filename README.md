@@ -24,6 +24,17 @@ As a Slack Chatbot application, Botchan has the following features.
     <td><img width="300" alt="Screenshot 2023-04-27 at 11 58 07 AM" src="https://user-images.githubusercontent.com/7340368/234968622-c4e8df1d-4c88-4ee4-b63b-a9411ea05cb1.png"></td>
 
  </tr>
+ <tr>
+    <td>Looking math with LLM</td>
+    <td>Checing Arxiv</td>
+    <td>Doing google search</td>
+ </tr>
+    <td><img width="768" alt="Screenshot 2023-09-15 at 12 02 42 PM" src="https://github.com/fengyu05/bot-chan/assets/7340368/2447d5b4-c674-45b5-977d-b282470b4047">
+</td>
+    <td><img width="755" alt="Screenshot 2023-09-15 at 11 59 44 AM" src="https://github.com/fengyu05/bot-chan/assets/7340368/596f8464-fc52-4742-9b10-834233ffd8da">
+</td>
+    <td><img width="769" alt="Screenshot 2023-09-15 at 11 58 59 AM" src="https://github.com/fengyu05/bot-chan/assets/7340368/c27a6ca3-da3b-4ba2-bc19-4610d65d7e25">
+</td> 
 </table></code>
 
 
@@ -46,32 +57,36 @@ To start developing with Bot-chan, run the command `docker-compose up --build -d
 
 ## Deployment
 
-Botchan is fully functional running on your local dev machine or laptop.
-If you are looking at optional to turn it into a 24/7 online bot here are some suggetions.
+Botchan is fully functional and running on your local dev machine or laptop.
+If you are looking at optional to turn it into a 24/7 online bot here are some suggestions.
 
-  - Deploying the application in a cloud Kubenetes environment is recommended since it is already containerized.
+  - Deploying the application in a cloud Kubernetes environment is recommended since it is already containerized.
   - Deploy on serverless env like Heroku.
 
 ## Customization
 
-Want to customize your chatbot? Bot-chan offers flexibility to tailor it to your specific needs.
+Want to customize your chatbot? Bot-chan offers the flexibility to tailor it to your specific needs.
 
 ### Intention
-Botchan use intention module to decide whether and how to reply to a certain message. The framework just apply the chat intetion
-to all messages. If you want to extended it, add your code in [message_intent.py](./botchan/message_intent.py) and [agent.py](./botchan/agent.py) message handler registration.
+Botchan uses an intention module to decide whether and how to reply to a certain message. The framework just applies the chat intention
+to all messages. If you want to extend it, add your code in [message_intent.py](./botchan/message_intent.py) and [agent.py](./botchan/agent.py) message handler registration.
+
+
+### Using tools
+Botchan uses some preconfig lang-chain tools in the chain of thought mode. If you want to add more tools or customize then, edit them [here](). 
 
 ### Bot personality
-You may config the name and the personality via prompting in [here](https://github.com/fengyu05/bot-chan/blob/main/botchan/prompt.py#L15). 
-The mapping is by intent. So you can create different bot prompting for different usecase or even have mutiply bots. 
+You may configure the name and the personality via prompting in [here](https://github.com/fengyu05/bot-chan/blob/main/botchan/prompt.py#L15). 
+The mapping is by intent. So you can create different bot prompting for different use cases or even have multiple bots. 
 
 ### Slack event handling
 
-Botchat only subcribe to Slack message events. If you want to subcribe to other event and do sth cool. Make your change in the [app.py](https://github.com/fengyu05/bot-chan/blob/main/botchan/app.py#L39). 
+Botchat only subscribes to Slack message events. If you want to subscribe to other events and do sth cool. Make your change in the [app.py](https://github.com/fengyu05/bot-chan/blob/main/botchan/app.py#L39). 
 
-## Security and privicay reminder.
+## Security and privacy reminder.
 
-- Botchan does not store any information from Slack, but instead uses the Slack History API to read messages.
-- It is important to be aware that if you need to log any chat messages, the author suggests only doing so when the debug flag is on. 
+- Botchan does not store any information from Slack but instead uses the Slack History API to read messages.
+- It is essential to be aware that if you need to log chat messages, the author suggests only doing so when the debug flag is on. 
 - The repository is not designed to be secure for production use, so use it at your own risk.
 
 

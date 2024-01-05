@@ -1,5 +1,6 @@
 # pylint: disable=abstract-method
 from typing import Any, Dict, List, Optional
+
 from langchain.callbacks import StdOutCallbackHandler
 
 

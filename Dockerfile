@@ -18,3 +18,7 @@ RUN poetry install --no-interaction
 
 # Misc stuff
 ADD .pylintrc ./.pylintrc
+ADD ./bin /app/bin/
+
+# Add index doc
+ADD ./doc2index /doc2index

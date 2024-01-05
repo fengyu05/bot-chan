@@ -1,12 +1,14 @@
 """ Messages Fetcher.
 """
-from typing import Callable, Optional, Union
 import datetime
+from typing import Callable, Optional, Union
+
 import structlog
+import toolz as T
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+
 from .data_model import Message
-import toolz as T
 
 logger = structlog.getLogger(__name__)
 

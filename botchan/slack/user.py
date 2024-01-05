@@ -1,8 +1,9 @@
 import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from .exception import SlackResponseError
+
 from .data_model import UserProfile
+from .exception import SlackResponseError
 
 logger = structlog.getLogger(__name__)
 

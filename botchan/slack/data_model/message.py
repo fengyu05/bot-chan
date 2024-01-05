@@ -1,7 +1,9 @@
 from typing import List, Optional
+
 from pydantic import BaseModel
-from .bot_profile import BotProfile
+
 from .block import RichTextBlock
+from .bot_profile import BotProfile
 
 
 class Message(BaseModel):

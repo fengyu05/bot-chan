@@ -4,11 +4,11 @@ from botchan.constants import GPT_3_MODEL_NAME
 
 # App config
 ENV = os.environ.get("ENV", "dev")
-APP_NAME = os.environ.get("APP_NAME", "Zygarde")
+APP_NAME = os.environ.get("APP_NAME", "botchan")
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
 # Bot config
-BOT_NAME = "Zygarde"
+BOT_NAME = os.environ.get("BOT_NAME", APP_NAME)
 
 # Slack credential
 SLACK_APP_OAUTH_TOKENS_FOR_WS = os.environ.get("SLACK_APP_OAUTH_TOKENS_FOR_WS")
@@ -36,5 +36,8 @@ KNOWLEDGE_FOLDER = os.environ.get("KNOWLEDGE_FOLDER", "/doc2index/test")
 
 # Accept knowledge file extention
 KNOWLEDGE_ACCEPT_PATTERN = [".txt", ".md"]
+
+# Default tools to load
+MARK_LOAD_TOOLS = os.environ.get("DEFAULT_LOAD_TOOLS", "llm-math,wikipedia,arxiv").split(",")
 
 ## End of knowledge indexing setting

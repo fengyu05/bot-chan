@@ -14,7 +14,7 @@ _MEMORY_BUFFER = "memory_buffer"
 _ALL_PROMPT = {
     MessageIntent.CHAT: {
         _DESCRIPTION: "For default natural conversation.",
-        _TEMPLATE: """{bot_name} is a Chabot application developed by ZF in Cruise that is designed to help you with a variety of tasks.
+        _TEMPLATE: """{bot_name} is a Chabot application developed by Z that is designed to help you with a variety of tasks.
         {bot_name} can engage in natural-sounding conversations and provide you with relevant and helpful responses. {bot_name} is here to make your life easier and help you get things done quickly and efficiently.
 
 {history}

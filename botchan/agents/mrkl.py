@@ -11,9 +11,9 @@ DEFAULT_LOAD_TOOLS = [
     "wikipedia",
     "arxiv",
     # news
-    # "news-api",
+    "news-api",
     # search
-    # "serpapi",  # search via serp api
+    "serpapi",  # search via serp api
 ]
 
 
@@ -21,7 +21,7 @@ def create_default_agent(tools: list = None):
     llm = OpenAI(temperature=0)
     if tools is None:  # load default tools
         tools = load_tools(
-            DEFAULT_LOAD_TOOLS, llm=llm, news_api_key=settings.NEWS_API_KEY
+            settings.MARK_LOAD_TOOLS, llm=llm, news_api_key=settings.NEWS_API_KEY
         )
 
     mrkl = initialize_agent(

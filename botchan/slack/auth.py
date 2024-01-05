@@ -1,5 +1,6 @@
-import structlog
 from functools import cache
+
+import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 

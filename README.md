@@ -94,10 +94,3 @@ Botchat only subscribes to Slack message events. If you want to subscribe to oth
 - It is essential to be aware that if you need to log chat messages, the author suggests only doing so when the debug flag is on. 
 - The repository is not designed to be secure for production use, so use it at your own risk.
 
-
-
-
-
-
-
-

@@ -5,8 +5,63 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    env_file:
+      - env.dev
     volumes:
-      - './botchan:/app/py/projects/botchan/botchan'  # Mount the code for quick development
+      - './botchan:/app/py/projects/botchan/botchan'  # Mounted code for quick development
       - './tests:/app/py/projects/botchan/tests'
     command: poetry run pylint botchan tests
 
+  fmt:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - env.dev
+    volumes:
+      - './botchan:/app/py/projects/botchan/botchan'  # Mounted code for edit in-place
+      - './tests:/app/py/projects/botchan/tests'  # Mounted code for edit in-place
+    command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Apply isort"
+          poetry run isort --profile black botchan tests
+          echo "Aplly black"
+          poetry run black botchan tests
+          echo "change owner to $CURRENT_UID"
+          chown -R $CURRENT_UID botchan tests
+
+
+
+  index:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - env.dev
+    volumes:
+      - './doc2index:/doc2index'  # Mounted index folder for for edit inplace
+      - './botchan:/app/py/projects/botchan/botchan'  # Mounted code for quick development
+    command: 
+        - /bin/sh
+        - -c
+        - |
+          poetry run cli index --confirm
+          chown -R $CURRENT_UID /doc2index/
+
+  index-prod:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - env.prod
+    volumes:
+      - './doc2index:/doc2index'  # Mounted index folder for for edit inplace
+      - './botchan:/app/py/projects/botchan/botchan'  # Mounted code for quick development
+    command: 
+        - /bin/sh
+        - -c
+        - |
+          poetry run cli index
+          chown -R $CURRENT_UID /doc2index/

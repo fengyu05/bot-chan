@@ -1,8 +1,6 @@
 from langchain import OpenAI
+from langchain.agents import AgentType, initialize_agent, load_tools
 
-from langchain.agents import initialize_agent
-from langchain.agents import AgentType
-from langchain.agents import load_tools, initialize_agent
 from botchan import settings
 
 DEFAULT_LOAD_TOOLS = [
@@ -19,9 +17,12 @@ DEFAULT_LOAD_TOOLS = [
 ]
 
 
-def create_default_agent():
+def create_default_agent(tools: list = None):
     llm = OpenAI(temperature=0)
-    tools = load_tools(DEFAULT_LOAD_TOOLS, llm=llm, news_api_key=settings.NEWS_API_KEY)
+    if tools is None:  # load default tools
+        tools = load_tools(
+            settings.MARK_LOAD_TOOLS, llm=llm, news_api_key=settings.NEWS_API_KEY
+        )
 
     mrkl = initialize_agent(
         tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True

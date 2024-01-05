@@ -3,21 +3,21 @@
 import structlog
 from slack_sdk import WebClient
 
+from botchan.agents.chat_agent import MultiThreadChatAgent
+from botchan.agents.mrkl import create_default_agent
+from botchan.buffer_callback import BufferCallbackHandler
 from botchan.message_event_handler import MessageEventHandler
 from botchan.message_intent import (
     MessageIntent,
     get_message_intent,
     remove_emoji_prefix,
 )
+from botchan.settings import KNOWLEDGE_FOLDER
 from botchan.slack import auth as slack_auth
 from botchan.slack import chat as slack_chat
 from botchan.slack import reaction as slack_reaction
 from botchan.slack.data_model import MessageCreateEvent, MessageEvent
 from botchan.slack.messages_fetcher import MessagesFetcher
-from botchan.agents.mrkl import create_default_agent
-from botchan.agents.chat import MultiThreadChatAgent
-from botchan.buffer_callback import BufferCallbackHandler
-
 
 logger = structlog.getLogger(__name__)
 
@@ -38,6 +38,11 @@ class Agent:
         self.chat_agent = MultiThreadChatAgent(
             bot_user_id=self.bot_user_id, fetcher=self.fetcher
         )
+        self.tech_chat_agent = MultiThreadChatAgent(
+            bot_user_id=self.bot_user_id,
+            fetcher=self.fetcher,
+            knowledge_folder=KNOWLEDGE_FOLDER,
+        )
 
         self.hanlders = [
             # fmt: off
@@ -45,6 +50,10 @@ class Agent:
                 accept_intentions=[MessageIntent.CHAT],
                 handler_func=lambda x: self._chat(x),  
             ),
+            MessageEventHandler(  ## Handle diaglog chat
+                accept_intentions=[MessageIntent.TECH_CHAT],
+                handler_func=lambda x: self._tech_chat(x),  
+            ),            
             MessageEventHandler(  ## Handle mrkl agent behaviors
                 accept_intentions=[MessageIntent.MRKL_AGENT],
                 handler_func=lambda x: self._chain_of_thought(x),
@@ -72,6 +81,12 @@ class Agent:
     ## agent handle functions
     def _chat(self, message_event: MessageEvent) -> None:
         output = self.chat_agent.run(
+            message_event, message_intent=get_message_intent(message=message_event)
+        )
+        slack_chat.reply_to_message(self.slack_client, message_event, output)
+
+    def _tech_chat(self, message_event: MessageEvent) -> None:
+        output = self.tech_chat_agent.run(
             message_event, message_intent=get_message_intent(message=message_event)
         )
         slack_chat.reply_to_message(self.slack_client, message_event, output)

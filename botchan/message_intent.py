@@ -2,6 +2,7 @@ import re
 from enum import Enum
 from typing import Union
 
+from botchan.settings import DEFAULT_INTENTION
 from botchan.slack.data_model import Message, MessageEvent
 
 
@@ -9,12 +10,21 @@ class MessageIntent(Enum):
     UNKNOWN = 0
     CHAT = 1
     REPORT = 2
-    MRKL_AGENT = 3  ## using chain-of-thought agent, all tools
-    QA_INTERNET = 4  ## QA with internet dataset
-    # Add more intent here
+    MRKL_AGENT = 3
+    QA_INTERNET = 4
+    TECH_CHAT = 5
+
+    @staticmethod
+    def from_str(label):
+        for intent in MessageIntent:
+            if label == intent.name.lower():
+                return intent
+        raise NotImplementedError("The provided label does not match any MessageIntent")
 
 
 _EMOJI_INTENT_MAP = {
+    MessageIntent.CHAT: ["wave", "chat", "speech_balloon"],
+    MessageIntent.TECH_CHAT: ["tech", "technologist", "know"],
     MessageIntent.REPORT: ["report"],
     MessageIntent.MRKL_AGENT: ["thought", "chains"],
     MessageIntent.QA_INTERNET: ["qa"],
@@ -30,7 +40,7 @@ def get_message_intent(message: Union[Message, MessageEvent]):
     for emoji in _INTENT_BY_EMOJI:
         if text.startswith(f":{emoji}:"):
             return _INTENT_BY_EMOJI[emoji]
-    return MessageIntent.CHAT
+    return MessageIntent.from_str(DEFAULT_INTENTION)
 
 
 def remove_emoji_prefix(text: str) -> str:

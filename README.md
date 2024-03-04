@@ -9,12 +9,42 @@ As a Slack Chatbot application, Botchan has the following features.
 
 - Reposonse to IM(direct message) or `@` mentioned in public channels.
 - Engage in interactive conversions.
-- Per thread(slack dicussion thread) memory.
-- Customzied bot personality(via preconfig prompt).
+- Retrieval-augmented Generation.
+- Index knowledge from text messages, web base url and uploaded PDF.
+- Capable of using tools: like proactive invlove Google search and Wiki lookup.
 
 <code><table>
   <tr>
-    <td>Chat with the Botchan</td>
+    <td>Learn knowledge from PDF</td>
+    <td>Learn from WEB url</td>
+    <td>Learn from pinned messages</td>
+  </tr>
+  <tr>
+    <td><div>
+      <p><img width="699" alt="Screenshot 2024-03-04 at 12 50 17 PM" src="https://github.com/fengyu05/bot-chan/assets/7340368/3dd164bc-b0b7-4baa-a07c-35d060d5a355">
+</p>
+      <p><img width="746" alt="Screenshot 2024-03-04 at 12 57 22 PM" src="https://github.com/fengyu05/bot-chan/assets/7340368/ed73fd83-4dbc-4b01-bce3-04a1718e3d60">
+</p>
+    </div></td>
+    <td><div>
+      <p><img width="715" alt="Screenshot 2024-03-04 at 9 38 54 AM" src="https://github.com/fengyu05/bot-chan/assets/7340368/ac1021b6-f26b-42df-91ad-64dcacc91842">
+</p>
+      <p><img width="752" alt="Screenshot 2024-03-04 at 9 39 02 AM" src="https://github.com/fengyu05/bot-chan/assets/7340368/e48efdfb-6c52-494c-8b0d-4582fb9ede33">
+</p>
+    </div></td>
+    <td>
+      <div>
+        <p><img width="721" alt="rag1" src="https://github.com/fengyu05/bot-chan/assets/7340368/e80c2677-508a-4882-8292-55c5a6563b3e">
+</p>
+        <p><img width="378" alt="rag2" src="https://github.com/fengyu05/bot-chan/assets/7340368/51705f64-fee7-4f08-b78a-342b1765c3aa">
+</p>
+        <p><img width="337" alt="rag3" src="https://github.com/fengyu05/bot-chan/assets/7340368/f3b47444-9dba-4cc7-8771-33316ae40570">
+</p>
+      </div>
+    </td>
+ </tr>
+ <tr>
+    <td>Know ledge</td>
     <td>Help summary messages or posts in place</td>
     <td>Help writing code</td>
   </tr>

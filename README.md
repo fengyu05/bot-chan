@@ -44,7 +44,7 @@ As a Slack Chatbot application, Botchan has the following features.
     </td>
  </tr>
  <tr>
-    <td>Know ledge</td>
+    <td>Context awareness</td>
     <td>Help summary messages or posts in place</td>
     <td>Help writing code</td>
   </tr>

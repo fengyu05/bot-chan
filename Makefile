@@ -25,13 +25,13 @@ server:  ## start prod server
 server-dev:  ## start dev server
 	docker-compose up --build app-dev
 
-test-cli:  ## run test cli
+test-cli:  # run test cli
 	docker-compose run test
 
 shell: # shell backend
 	docker-compose up -d --build shell
 
-bash: shell  ## Connect tool shell
+bash: shell  ## Connect to a bash within the docker image
 	docker-compose exec shell bash
 
 
@@ -39,13 +39,13 @@ bash: shell  ## Connect tool shell
 ci-shell: # shell backend
 	docker-compose -f docker-compose-ci.yml up -d shell
 
-ci-bash: ci-shell  ## Connect tool shell
+ci-bash: ci-shell  ## Connect to a bash within the tool image(faster), for running task like `poetry lock`
 	docker-compose -f docker-compose-ci.yml exec shell bash
 
-lint:  ## lint
+lint:  ## Lint the code folder
 	docker-compose -f docker-compose-ci.yml run lint
 
-fmt:  ## apply py fmt
+fmt:  ## Apply python formater(will edit the code)
 	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-ci.yml run fmt
 
 

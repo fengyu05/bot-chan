@@ -21,7 +21,7 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 OPENAI_GPT_MODEL_ID = os.environ.get("OPENAI_GPT_MODEL_ID", GPT_3_MODEL_NAME)
 
 # Default intention to use without mapping
-DEFAULT_INTENTION = os.environ.get("DEFAULT_INTENTION", "chat")
+DEFAULT_INTENTION = os.environ.get("DEFAULT_INTENTION", "CHAT")
 
 # SERPAPI API KEY, optional
 SERPAPI_API_KEY = os.environ.get("SERPAPI_API_KEY", None)
@@ -38,6 +38,11 @@ KNOWLEDGE_FOLDER = os.environ.get("KNOWLEDGE_FOLDER", "/doc2index/test")
 KNOWLEDGE_ACCEPT_PATTERN = [".txt", ".md"]
 
 # Default tools to load
-MARK_LOAD_TOOLS = os.environ.get("DEFAULT_LOAD_TOOLS", "llm-math,wikipedia,arxiv").split(",")
+MARK_LOAD_TOOLS = os.environ.get(
+    "DEFAULT_LOAD_TOOLS", "llm-math,wikipedia,arxiv"
+).split(",")
+
+# Default tmp path
+TMP_PATH = os.environ.get("TMP", "/tmp/")
 
 ## End of knowledge indexing setting

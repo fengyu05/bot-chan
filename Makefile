@@ -25,14 +25,27 @@ server:  ## start prod server
 server-dev:  ## start dev server
 	docker-compose up --build app-dev
 
+test-cli:  ## run test cli
+	docker-compose run test
+
+shell: # shell backend
+	docker-compose up -d --build shell
+
+bash: shell  ## Connect tool shell
+	docker-compose exec shell bash
+
+
+## CI tool targets below
+ci-shell: # shell backend
+	docker-compose -f docker-compose-ci.yml up -d shell
+
+ci-bash: ci-shell  ## Connect tool shell
+	docker-compose -f docker-compose-ci.yml exec shell bash
+
 lint:  ## lint
 	docker-compose -f docker-compose-ci.yml run lint
 
 fmt:  ## apply py fmt
 	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-ci.yml run fmt
 
-index:  ## create index
-	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-ci.yml run index
 
-index-prod:  ## create index
-	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-ci.yml run index-prod

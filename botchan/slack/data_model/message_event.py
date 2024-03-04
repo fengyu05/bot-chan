@@ -1,8 +1,9 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from .block import RichTextBlock
+from .file_object import FileObject
 from .message import Message
 
 
@@ -60,3 +61,15 @@ class MessageDeleteEvent(MessageChangeEvent):
 
 class AppMentionEvent(MessageEvent):
     pass
+
+
+class MessageFileShareEvent(MessageEvent):
+    client_msg_id: str
+    files: List[FileObject]
+    upload: bool
+
+    @validator("files", each_item=True)
+    def validate_file(self, v):
+        if not isinstance(v, FileObject):
+            raise ValueError("Each item in 'files' must be an instance of FileObject")
+        return v

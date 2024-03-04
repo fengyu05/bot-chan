@@ -1,22 +1,23 @@
 # pylint: disable=unnecessary-lambda
+# pylint: disable=unused-argument
+from typing import Union
 
 import structlog
 from slack_sdk import WebClient
 
-from botchan.agents.chat_agent import MultiThreadChatAgent
-from botchan.agents.mrkl import create_default_agent
+from botchan.agents.knowledge_agent import KnowledgeChatAgent
+from botchan.agents.mrkl_agent import create_default_agent
 from botchan.buffer_callback import BufferCallbackHandler
 from botchan.message_event_handler import MessageEventHandler
-from botchan.message_intent import (
-    MessageIntent,
-    get_message_intent,
-    remove_emoji_prefix,
-)
-from botchan.settings import KNOWLEDGE_FOLDER
+from botchan.message_intent import MessageIntent, remove_emoji_prefix
 from botchan.slack import auth as slack_auth
 from botchan.slack import chat as slack_chat
 from botchan.slack import reaction as slack_reaction
-from botchan.slack.data_model import MessageCreateEvent, MessageEvent
+from botchan.slack.data_model import (
+    MessageCreateEvent,
+    MessageEvent,
+    MessageFileShareEvent,
+)
 from botchan.slack.messages_fetcher import MessagesFetcher
 
 logger = structlog.getLogger(__name__)
@@ -35,28 +36,22 @@ class Agent:
 
         # Config all agents
         self.mrkl_agent = create_default_agent()
-        self.chat_agent = MultiThreadChatAgent(
-            bot_user_id=self.bot_user_id, fetcher=self.fetcher
-        )
-        self.tech_chat_agent = MultiThreadChatAgent(
-            bot_user_id=self.bot_user_id,
-            fetcher=self.fetcher,
-            knowledge_folder=KNOWLEDGE_FOLDER,
-        )
+        self.knowledge_chat_agent = KnowledgeChatAgent()
 
         self.hanlders = [
             # fmt: off
             MessageEventHandler(  ## Handle diaglog chat
                 accept_intentions=[MessageIntent.CHAT],
-                handler_func=lambda x: self._chat(x),  
+                handler_func=lambda event, intent: self._chat(event, intent),
             ),
-            MessageEventHandler(  ## Handle diaglog chat
-                accept_intentions=[MessageIntent.TECH_CHAT],
-                handler_func=lambda x: self._tech_chat(x),  
+            MessageEventHandler(  ## Handle knowledge learning
+                accept_intentions=[MessageIntent.KNOW],
+                handler_func=lambda event, intent: self._learn_knowledge(event, intent),  
+                cant_handle_func=lambda event, intent: self._show_howto_learn(event, intent),
             ),            
             MessageEventHandler(  ## Handle mrkl agent behaviors
                 accept_intentions=[MessageIntent.MRKL_AGENT],
-                handler_func=lambda x: self._chain_of_thought(x),
+                handler_func=lambda event, intent: self._chain_of_thought(event, intent),
             )
             # fmt: on
         ]
@@ -69,29 +64,19 @@ class Agent:
             self.bot_user_id
         )
 
-    def receive_message(self, message_event: MessageCreateEvent) -> None:
-        # IM or mentioned
-        if self._should_reply(message_event):
+    def receive_message(
+        self, message_event: Union[MessageCreateEvent, MessageFileShareEvent]
+    ) -> None:
+        if self._should_reply(message_event):  # IM or mentioned
             slack_reaction.add_reaction(
                 client=self.slack_client, event=message_event, reaction_name="eyes"
             )
             for handler in self.hanlders:
-                handler.handle(message_event)
+                handler.handle(message_event=message_event)
 
-    ## agent handle functions
-    def _chat(self, message_event: MessageEvent) -> None:
-        output = self.chat_agent.run(
-            message_event, message_intent=get_message_intent(message=message_event)
-        )
-        slack_chat.reply_to_message(self.slack_client, message_event, output)
-
-    def _tech_chat(self, message_event: MessageEvent) -> None:
-        output = self.tech_chat_agent.run(
-            message_event, message_intent=get_message_intent(message=message_event)
-        )
-        slack_chat.reply_to_message(self.slack_client, message_event, output)
-
-    def _chain_of_thought(self, message_event: MessageEvent) -> None:
+    def _chain_of_thought(
+        self, message_event: MessageEvent, intent: MessageIntent
+    ) -> None:
         text_buffer = BufferCallbackHandler()
         result = self.mrkl_agent.run(
             remove_emoji_prefix(message_event.text), callbacks=[text_buffer]
@@ -106,3 +91,27 @@ class Agent:
         slack_chat.reply_to_message(
             self.slack_client, message_event, f":check: {result}"
         )
+
+    def _learn_knowledge(
+        self, message_event: MessageEvent, intent: MessageIntent
+    ) -> None:
+        self.knowledge_chat_agent.learn_knowledge(message_event)
+        slack_chat.reply_to_message(
+            self.slack_client,
+            message_event,
+            "Thank you for providing the information. I've learn it and keep them in my knowledge database.",
+        )
+
+    def _show_howto_learn(
+        self, message_event: MessageEvent, intent: MessageIntent
+    ) -> None:
+        if intent == MessageIntent.UNKNOWN:
+            slack_chat.reply_to_message(
+                self.slack_client,
+                message_event,
+                "Start message with emoji :rem:(rem), :know:(know), :learn:(learn) to teach me new knowledge.",
+            )
+
+    def _chat(self, message_event: MessageEvent, intent: MessageIntent) -> None:
+        output = self.knowledge_chat_agent.qa(message_event.text)
+        slack_chat.reply_to_message(self.slack_client, message_event, output)

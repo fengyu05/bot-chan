@@ -9,6 +9,7 @@ from botchan.slack.data_model import (
     MessageCreateEvent,
     MessageDeleteEvent,
     MessageEvent,
+    MessageFileShareEvent,
 )
 
 logger = structlog.get_logger(__name__)
@@ -32,6 +33,9 @@ def handle_message_events(event: dict) -> None:
         message_event = MessageChangeEvent(**event)
     elif message_event.subtype == "message_deleted":
         message_event = MessageDeleteEvent(**event)
+    elif message_event.subtype == "file_share":
+        message_event = MessageFileShareEvent(**event)
+        agent.receive_message(message_event=message_event)
     else:
         logger.info("message subtype has not handle", subtype=message_event.subtype)
 

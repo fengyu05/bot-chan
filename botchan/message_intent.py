@@ -12,7 +12,7 @@ class MessageIntent(Enum):
     REPORT = 2
     MRKL_AGENT = 3
     QA_INTERNET = 4
-    TECH_CHAT = 5
+    KNOW = 6
 
     @staticmethod
     def from_str(label):
@@ -24,9 +24,9 @@ class MessageIntent(Enum):
 
 _EMOJI_INTENT_MAP = {
     MessageIntent.CHAT: ["wave", "chat", "speech_balloon"],
-    MessageIntent.TECH_CHAT: ["tech", "technologist", "know"],
+    MessageIntent.KNOW: ["know", "learn", "rem"],
     MessageIntent.REPORT: ["report"],
-    MessageIntent.MRKL_AGENT: ["thought", "chains"],
+    MessageIntent.MRKL_AGENT: ["thought", "chains", "cot"],
     MessageIntent.QA_INTERNET: ["qa"],
 }
 
@@ -37,10 +37,12 @@ _INTENT_BY_EMOJI = {
 
 def get_message_intent(message: Union[Message, MessageEvent]):
     text = message.text
+    if text == "":
+        return MessageIntent.UNKNOWN
     for emoji in _INTENT_BY_EMOJI:
         if text.startswith(f":{emoji}:"):
             return _INTENT_BY_EMOJI[emoji]
-    return MessageIntent.from_str(DEFAULT_INTENTION)
+    return MessageIntent.from_str(DEFAULT_INTENTION.strip().lower())
 
 
 def remove_emoji_prefix(text: str) -> str:

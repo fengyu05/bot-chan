@@ -1,4 +1,5 @@
 from .channel_type import ChannelType
+from .file_object import FileObject
 from .message import Message
 from .message_event import (
     AppMentionEvent,
@@ -6,6 +7,7 @@ from .message_event import (
     MessageCreateEvent,
     MessageDeleteEvent,
     MessageEvent,
+    MessageFileShareEvent,
 )
 from .response import MessageResponse, ReactionResponse
 from .user_profile import UserProfile

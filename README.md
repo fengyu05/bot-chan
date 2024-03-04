@@ -20,7 +20,8 @@ As a Slack Chatbot application, Botchan has the following features.
     <td>Learn from pinned messages</td>
   </tr>
   <tr>
-    <td><img width="330" alt="Screenshot 2024-03-04 at 2 37 58 PM" src="https://github.com/fengyu05/bot-chan/assets/7340368/e6ea9635-a512-4257-8ef3-73e2a0f903a2">
+    <td><img width="708" alt="Screenshot 2024-03-04 at 2 42 28 PM" src="https://github.com/fengyu05/bot-chan/assets/7340368/07303090-0f6b-47db-a473-ac83b62359cf">
+
 </td>
     <td><div>
       <p><img width="715" alt="Screenshot 2024-03-04 at 9 38 54 AM" src="https://github.com/fengyu05/bot-chan/assets/7340368/ac1021b6-f26b-42df-91ad-64dcacc91842">

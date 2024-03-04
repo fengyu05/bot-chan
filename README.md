@@ -9,12 +9,42 @@ As a Slack Chatbot application, Botchan has the following features.
 
 - Reposonse to IM(direct message) or `@` mentioned in public channels.
 - Engage in interactive conversions.
-- Per thread(slack dicussion thread) memory.
-- Customzied bot personality(via preconfig prompt).
+- Retrieval-augmented Generation.
+- Index knowledge from text messages, web base url and uploaded PDF.
+- Capable of using tools: like proactive invlove Google search and Wiki lookup.
 
 <code><table>
   <tr>
-    <td>Chat with the Botchan</td>
+    <td>Learn knowledge from PDF</td>
+    <td>Learn from WEB url</td>
+    <td>Learn from pinned messages</td>
+  </tr>
+  <tr>
+    <td><div>
+      <p><img width="699" alt="Screenshot 2024-03-04 at 12 50 17 PM" src="https://github.com/fengyu05/bot-chan/assets/7340368/3dd164bc-b0b7-4baa-a07c-35d060d5a355">
+</p>
+      <p><img width="746" alt="Screenshot 2024-03-04 at 12 57 22 PM" src="https://github.com/fengyu05/bot-chan/assets/7340368/ed73fd83-4dbc-4b01-bce3-04a1718e3d60">
+</p>
+    </div></td>
+    <td><div>
+      <p><img width="715" alt="Screenshot 2024-03-04 at 9 38 54 AM" src="https://github.com/fengyu05/bot-chan/assets/7340368/ac1021b6-f26b-42df-91ad-64dcacc91842">
+</p>
+      <p><img width="752" alt="Screenshot 2024-03-04 at 9 39 02 AM" src="https://github.com/fengyu05/bot-chan/assets/7340368/e48efdfb-6c52-494c-8b0d-4582fb9ede33">
+</p>
+    </div></td>
+    <td>
+      <div>
+        <p><img width="721" alt="rag1" src="https://github.com/fengyu05/bot-chan/assets/7340368/e80c2677-508a-4882-8292-55c5a6563b3e">
+</p>
+        <p><img width="378" alt="rag2" src="https://github.com/fengyu05/bot-chan/assets/7340368/51705f64-fee7-4f08-b78a-342b1765c3aa">
+</p>
+        <p><img width="337" alt="rag3" src="https://github.com/fengyu05/bot-chan/assets/7340368/f3b47444-9dba-4cc7-8771-33316ae40570">
+</p>
+      </div>
+    </td>
+ </tr>
+ <tr>
+    <td>Context awareness</td>
     <td>Help summary messages or posts in place</td>
     <td>Help writing code</td>
   </tr>
@@ -63,33 +93,43 @@ If you are looking at optional to turn it into a 24/7 online bot here are some s
   - Deploying the application in a cloud Kubernetes environment is recommended since it is already containerized.
   - Deploy on serverless env like Heroku.
 
-## Customization
 
-Want to customize your chatbot? Bot-chan offers the flexibility to tailor it to your specific needs.
+
+## Developer guide
+
+### Tooling
+
+Run make to see help tips
+```
+===== All tasks =====
+build                build image
+server               start prod server
+server-dev           start dev server
+bash                 Connect to a bash within the docker image
+ci-bash              Connect to a bash within the tool image(faster), for running task like `poetry lock`
+lint                 Lint the code folder
+fmt                  Apply python formater(will edit the code)
+```
+
+### Updating dependencies
+
+Method 1. With local poetry install:
+
+edit `pyproject.toml` and run `poetry lock`
+
+Method 2. Run `make ci-bash` to get a ci bash shell; then same with above.
+ 
+### Customization
+Want to customize your chatbot? Bot-chan offers the flexibility to tailor it to your specific needs. See [settings.py](./botchan/settings.py)
+You can use a env file if you are deploying it with docker or kube.
 
 ### Intention
 Botchan uses an intention module to decide whether and how to reply to a certain message. The framework just applies the chat intention
 to all messages. If you want to extend it, add your code in [message_intent.py](./botchan/message_intent.py) and [agent.py](./botchan/agent.py) message handler registration.
 
-### Chain of Thought mode
-
-Botchan can use a chain of thought mode to break down the thinking process and show it in its chat. To engage Chain-ot-thought mode, start a message with prefix `:thought:`. You may upload a customized slack emoji for it.
-
-### Using tools
-Botchan uses some preconfig lang-chain tools in the chain of thought mode. If you want to add more tools or customize then, edit them [here](https://github.com/fengyu05/bot-chan/blob/master/botchan/agents/mrkl.py#L8).  Some tools may require API keys to be set in the env. 
-
-
-
-### Bot personality
-You may configure the name and the personality via prompting in [here](https://github.com/fengyu05/bot-chan/blob/main/botchan/prompt.py#L15). 
-The mapping is by intent. So you can create different bot prompting for different use cases or even have multiple bots. 
-
 ### Slack event handling
-
-Botchat only subscribes to Slack message events. If you want to subscribe to other events and do sth cool. Make your change in the [app.py](https://github.com/fengyu05/bot-chan/blob/main/botchan/app.py#L39). 
+Botchat only subscribes to Slack message events. If you want to subscribe to other events and do sth cool. Make your change in the [app.py](https://github.com/fengyu05/bot-chan/blob/main/botchan/app.py#L39).
 
 ## Security and privacy reminder.
-
-- Botchan does not store any information from Slack but instead uses the Slack History API to read messages.
 - It is essential to be aware that if you need to log chat messages, the author suggests only doing so when the debug flag is on. 
 - The repository is not designed to be secure for production use, so use it at your own risk.

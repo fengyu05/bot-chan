@@ -5,7 +5,7 @@ from typing import Union
 import structlog
 from slack_sdk import WebClient
 
-from botchan.agents.knowledge_agent import KnowledgeChatAgent
+from botchan.agents.knowledge_agent import KnowledgeChatAgent, ResultType
 from botchan.agents.mrkl_agent import create_default_agent
 from botchan.buffer_callback import BufferCallbackHandler
 from botchan.message_event_handler import MessageEventHandler
@@ -113,5 +113,11 @@ class Agent:
             )
 
     def _chat(self, message_event: MessageEvent, intent: MessageIntent) -> None:
-        output = self.knowledge_chat_agent.qa(message_event.text)
+        result_type, output = self.knowledge_chat_agent.qa(message_event.text)
+        if result_type == ResultType.RETRIEVAL:
+            slack_chat.reply_to_message(
+                self.slack_client,
+                message_event,
+                "We found a doc in our knowledge base to related to your question.",
+            )
         slack_chat.reply_to_message(self.slack_client, message_event, output)

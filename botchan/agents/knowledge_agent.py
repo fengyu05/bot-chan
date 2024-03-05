@@ -1,5 +1,9 @@
+from enum import Enum
+from typing import Tuple
+
 import structlog
 
+from botchan.agents.chat_agent import ChatAgent
 from botchan.rag.knowledge_base import KnowledgeBase
 from botchan.rag.knowledge_doc import Doc, DocKind
 from botchan.slack.data_model import FileObject, MessageEvent
@@ -8,12 +12,21 @@ from botchan.utt.regex import extract_all_urls
 logger = structlog.getLogger(__name__)
 
 
+class ResultType(Enum):
+    RETRIEVAL = 1
+    FALLBACK = 2
+
+
 class KnowledgeChatAgent:
     def __init__(self) -> None:
         self.base = KnowledgeBase()
+        self.fallball_agent = ChatAgent()
 
-    def qa(self, text: str) -> str:
-        return self.base.chain.invoke(text)
+    def qa(self, text: str) -> Tuple[ResultType, str]:
+        if self.base.has_hit(text):
+            return ResultType.RETRIEVAL, self.base.chain.invoke(text)
+        else:
+            return ResultType.FALLBACK, self.fallball_agent.qa(text)
 
     def learn_knowledge(self, message_event: MessageEvent) -> None:
         logger.debug("learn knowledge", message_event=message_event)

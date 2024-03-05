@@ -45,4 +45,9 @@ MARK_LOAD_TOOLS = os.environ.get(
 # Default tmp path
 TMP_PATH = os.environ.get("TMP", "/tmp/")
 
+# Embedding base retrival sim score threshold
+EMBEDDING_SIM_SCORE_THESHOLD = float(
+    os.environ.get("EMBEDDING_SIM_SCORE_THESHOLD", 0.4)
+)
+
 ## End of knowledge indexing setting

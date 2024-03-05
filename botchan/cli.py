@@ -1,4 +1,5 @@
 # pylint: disable=C0415
+# pylint: disable=unused-import
 """CLI entrypoint."""
 import click
 
@@ -19,6 +20,7 @@ def start() -> None:
 def test() -> None:
     from botchan.rag.knowledge_base import KnowledgeBase
     from botchan.rag.knowledge_doc import Doc, DocKind
+    from botchan.agents.chat_agent import ChatAgent
 
     base = KnowledgeBase()
     base.index_doc(
@@ -29,4 +31,5 @@ def test() -> None:
             )
         ]
     )
+    base.has_hit("What is image synthesis")
     print(base.chain.invoke("What is image synthesis"))

@@ -69,7 +69,7 @@ class MessageFileShareEvent(MessageEvent):
     upload: bool
 
     @validator("files", each_item=True)
-    def validate_file(cls, v):
+    def validate_file(cls, v):  # pylint: disable=no-self-argument
         if not isinstance(v, FileObject):
             raise ValueError("Each item in 'files' must be an instance of FileObject")
         return v

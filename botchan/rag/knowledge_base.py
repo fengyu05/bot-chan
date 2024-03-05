@@ -11,27 +11,30 @@ from langchain.chains.base import Chain
 from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from botchan.rag.knowledge_doc import Doc, DocKind
-from botchan.settings import OPENAI_GPT_MODEL_ID
+from botchan.settings import EMBEDDING_SIM_SCORE_THESHOLD, OPENAI_GPT_MODEL_ID
 from botchan.utt.files import download_slack_downloadable
 
 logger = structlog.getLogger(__name__)
 
 _CHUNK_SIZE = 1000
 _CHUNK_OVERLAP = 200
+_EMBEDDING_SIM_SCORE_THESHOLD = 0.5
 
 
 class KnowledgeBase:
     def __init__(self, debug: bool = False) -> None:
         self.vectorstore = FAISS.from_texts([""], embedding=OpenAIEmbeddings())
-        self.chain = self._create_chain()
+        self.chain = self._create_rag_chain()
+        self.fallback_chain = self._create_fallback_chain()
         self._debug = debug
 
-    def _create_chain(self) -> Chain:
+    def _create_rag_chain(self) -> Chain:
         retriever = self.vectorstore.as_retriever()
         prompt = hub.pull("rlm/rag-prompt")
         llm = ChatOpenAI(model_name=OPENAI_GPT_MODEL_ID, temperature=0)
@@ -48,7 +51,27 @@ class KnowledgeBase:
             | llm
             | StrOutputParser()
         )
+
         return chain
+
+    def _create_fallback_chain(self) -> Chain:
+        prompt = ChatPromptTemplate.from_template(
+            "Please follow the instruction from users. {question}"
+        )
+        llm = ChatOpenAI(model_name=OPENAI_GPT_MODEL_ID, temperature=0)
+        chain = prompt | llm | StrOutputParser()
+        return chain
+
+    def has_hit(self, text: str) -> bool:
+        """return whether there are doc in vectorstore that close to the text embedding."""
+        docs_and_scores = self.vectorstore.similarity_search_with_score(query=text, k=5)
+        # EMBEDDING_SIM_SCORE_THESHOLD is distant, the small the closer
+        filtered_doc = [
+            doc
+            for doc, score in docs_and_scores
+            if score < EMBEDDING_SIM_SCORE_THESHOLD
+        ]
+        return len(filtered_doc) > 0
 
     def index_web(
         self,

@@ -23,6 +23,9 @@ OPENAI_GPT_MODEL_ID = os.environ.get("OPENAI_GPT_MODEL_ID", GPT_3_MODEL_NAME)
 # Default intention to use without mapping
 DEFAULT_INTENTION = os.environ.get("DEFAULT_INTENTION", "CHAT")
 
+# ChAT_MODE, SIMPLE|RAG
+CHAT_MODE = os.environ.get("CHAT_MODE", "SIMPLE")
+
 # SERPAPI API KEY, optional
 SERPAPI_API_KEY = os.environ.get("SERPAPI_API_KEY", None)
 

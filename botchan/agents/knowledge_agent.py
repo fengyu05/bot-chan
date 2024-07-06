@@ -11,6 +11,7 @@ from botchan.utt.regex import extract_all_urls
 
 logger = structlog.getLogger(__name__)
 
+from botchan.settings import CHAT_MODE
 
 class ResultType(Enum):
     RETRIEVAL = 1
@@ -23,7 +24,7 @@ class KnowledgeChatAgent:
         self.fallball_agent = ChatAgent()
 
     def qa(self, text: str) -> Tuple[ResultType, str]:
-        if self.base.has_hit(text):
+        if CHAT_MODE == "RAG" and self.base.has_hit(text):
             return ResultType.RETRIEVAL, self.base.chain.invoke(text)
         else:
             return ResultType.FALLBACK, self.fallball_agent.qa(text)

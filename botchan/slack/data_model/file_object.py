@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -24,9 +25,33 @@ class FileObject(BaseModel):
     url_private: str
     url_private_download: str
     media_display_type: str
-    thumb_pdf: str
-    thumb_pdf_w: int
-    thumb_pdf_h: int
+    thumb_64: Optional[str]
+    thumb_80: Optional[str]
+    thumb_360: Optional[str]
+    thumb_360_w: Optional[int]
+    thumb_360_h: Optional[int]
+    thumb_480: Optional[str]
+    thumb_480_w: Optional[int]
+    thumb_480_h: Optional[int]
+    thumb_160: Optional[str]
+    thumb_720: Optional[str]
+    thumb_720_w: Optional[int]
+    thumb_720_h: Optional[int]
+    thumb_800: Optional[str]
+    thumb_800_w: Optional[int]
+    thumb_800_h: Optional[int]
+    thumb_960: Optional[str]
+    thumb_960_w: Optional[int]
+    thumb_960_h: Optional[int]
+    thumb_1024: Optional[str]
+    thumb_1024_w: Optional[int]
+    thumb_1024_h: Optional[int]
+    original_w: Optional[int]
+    original_h: Optional[int]
+    thumb_tiny: Optional[str]
+    thumb_pdf: Optional[str]
+    thumb_pdf_w: Optional[int]
+    thumb_pdf_h: Optional[int]
     permalink: str
     permalink_public: str
     has_rich_preview: bool

@@ -1,6 +1,6 @@
 import os
 
-from botchan.constants import GPT_3_MODEL_NAME
+from botchan.constants import GPT_4O
 
 # App config
 ENV = os.environ.get("ENV", "dev")
@@ -18,7 +18,7 @@ SLACK_APP_LEVEL_TOKEN = os.environ.get("SLACK_APP_LEVEL_TOKEN")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # OPENAI GPT MODEL ID
-OPENAI_GPT_MODEL_ID = os.environ.get("OPENAI_GPT_MODEL_ID", GPT_3_MODEL_NAME)
+OPENAI_GPT_MODEL_ID = os.environ.get("OPENAI_GPT_MODEL_ID", GPT_4O)
 
 # Default intention to use without mapping
 DEFAULT_INTENTION = os.environ.get("DEFAULT_INTENTION", "CHAT")

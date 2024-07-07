@@ -1,6 +1,7 @@
 import uuid
 from functools import lru_cache
-
+import httpx
+import base64
 import requests
 
 from botchan.settings import SLACK_APP_OAUTH_TOKENS_FOR_WS, TMP_PATH
@@ -27,3 +28,9 @@ def download_slack_downloadable(
         f.write(response.content)
 
     return local_path
+
+def base64_encode_slack_image(url: str, token: str = SLACK_APP_OAUTH_TOKENS_FOR_WS) -> str:
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(url, headers=headers, timeout=60)
+    response.raise_for_status()
+    return base64.b64encode(response.content).decode("utf-8")

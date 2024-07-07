@@ -25,6 +25,8 @@ app = App(
 @app.event("message")
 def handle_message_events(event: dict) -> None:
     """Handle message to the bot."""
+    # Uncomment for debug
+    # logger.debug("Message event", message_event=event)
     message_event = MessageEvent(**event)
     if message_event.subtype == "message_created":
         message_event = MessageCreateEvent(**event)
@@ -34,6 +36,7 @@ def handle_message_events(event: dict) -> None:
     elif message_event.subtype == "message_deleted":
         message_event = MessageDeleteEvent(**event)
     elif message_event.subtype == "file_share":
+        
         message_event = MessageFileShareEvent(**event)
         agent.receive_message(message_event=message_event)
     else:

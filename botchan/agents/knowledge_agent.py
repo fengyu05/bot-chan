@@ -23,11 +23,12 @@ class KnowledgeChatAgent:
         self.base = KnowledgeBase()
         self.fallball_agent = ChatAgent()
 
-    def qa(self, text: str) -> Tuple[ResultType, str]:
+    def qa(self, message_event: MessageEvent) -> Tuple[ResultType, str]:
+        text = message_event.text
         if CHAT_MODE == "RAG" and self.base.has_hit(text):
             return ResultType.RETRIEVAL, self.base.chain.invoke(text)
         else:
-            return ResultType.FALLBACK, self.fallball_agent.qa(text)
+            return ResultType.FALLBACK, self.fallball_agent.qa(message_event)
 
     def learn_knowledge(self, message_event: MessageEvent) -> None:
         logger.debug("learn knowledge", message_event=message_event)

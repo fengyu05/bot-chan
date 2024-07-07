@@ -113,7 +113,7 @@ class Agent:
             )
 
     def _chat(self, message_event: MessageEvent, intent: MessageIntent) -> None:
-        result_type, output = self.knowledge_chat_agent.qa(message_event.text)
+        result_type, output = self.knowledge_chat_agent.qa(message_event)
         if result_type == ResultType.RETRIEVAL:
             slack_chat.reply_to_message(
                 self.slack_client,

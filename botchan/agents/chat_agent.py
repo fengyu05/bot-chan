@@ -49,10 +49,10 @@ class ChatAgent:
         Returns:
             str: The generated response.
         """
-        if message_event.files:
+        if message_event.has_files():
             return self.qa_with_image(message_event)
 
-        logger.debug("chat agent qa invoke", text=message_event.textt)
+        logger.debug("chat agent qa invoke", text=message_event.text)
         response = self.chain.invoke(input=message_event.text)
         logger.debug("chat response", response=response)
         return response["response"]
@@ -75,13 +75,8 @@ class ChatAgent:
         images_data = self._process_image(message_event)
 
         message = HumanMessage(
-            content=[
-                {"type": "text", "text": message_event.text},
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{images_data[0]}"},
-                },
-            ],
+            content=message_event.text,
+            image=images_data[0]
         )
         response = self.chain.invoke([message])
         logger.debug("chat response", response=response)
@@ -149,7 +144,8 @@ class ChatAgent:
             if self._accept_image_filetype(file_object)
         ]
 
-        return [base64_encode_slack_image(f.url_private_download) for f in files]
+        #return [base64_encode_slack_image(f.url_private_download) for f in files]
+        return [upload_from_url(f.url_private_download, f.name).id for f in files]
 
     def _accept_image_filetype(self, file_object: FileObject) -> bool:
         return file_object.filetype.lower() in ("png", "jpg", "jpeg", "gif")

@@ -318,12 +318,16 @@ python-versions = ">=3.7"
 test = ["pytest (>=6)"]
 
 [[package]]
-name = "faiss-gpu"
-version = "1.7.2"
+name = "faiss-cpu"
+version = "1.8.0.post1"
 description = "A library for efficient similarity search and clustering of dense vectors."
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
+
+[package.dependencies]
+numpy = ">=1.0,<2.0"
+packaging = "*"
 
 [[package]]
 name = "fake-useragent"
@@ -866,7 +870,7 @@ sympy = "*"
 
 [[package]]
 name = "openai"
-version = "1.13.3"
+version = "1.35.10"
 description = "The official Python library for the openai API"
 category = "main"
 optional = false
@@ -1543,7 +1547,7 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "50d4987bd274f96063fc3e21284317d04acfa2f5bd09ff5164373c081e1b245c"
+content-hash = "8efbbd8777d4717e13d2877e92ac43d22fee25a3828a371943452872d7bf738b"
 
 [metadata.files]
 aiohttp = [
@@ -1983,12 +1987,33 @@ exceptiongroup = [
     {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
     {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
 ]
-faiss-gpu = [
-    {file = "faiss_gpu-1.7.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c98abc1aac06cb4cb94de223b3186bd4a60d15fd3cae42271604168abc081ca5"},
-    {file = "faiss_gpu-1.7.2-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:38796433b2fe43f3a602be18668969af615a3a898e897366e6997b409b0deeab"},
-    {file = "faiss_gpu-1.7.2-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:040a413be699077931b781e470468c6b5084342c5d5773ce8d916f04b25d8c9c"},
-    {file = "faiss_gpu-1.7.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e85a6bc975b2f233eb056584f33bbce8613c453c9024c099052a423eebabee23"},
-    {file = "faiss_gpu-1.7.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3ca9bfa2fda868f438a2f05c1d5aed53021bfaa55b25fd3ae666d2da201f3caf"},
+faiss-cpu = [
+    {file = "faiss_cpu-1.8.0.post1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:fd84721eb599aa1da19b1b36345bb8705a60bb1d2887bbbc395a29e3d36a1a62"},
+    {file = "faiss_cpu-1.8.0.post1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:b78ff9079d15fd0f156bf5dd8a2975a8abffac1854a86ece263eec1500a2e836"},
+    {file = "faiss_cpu-1.8.0.post1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9de25c943d1789e35fe06a20884c88cd32aedbb1a33bb8da2238cdea7bd9633f"},
+    {file = "faiss_cpu-1.8.0.post1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:adae0f1b144e7216da696f14bc4991ca4300c94baaa59247c3d322588e661c95"},
+    {file = "faiss_cpu-1.8.0.post1-cp310-cp310-win_amd64.whl", hash = "sha256:00345290680a444a4b4cb2d98a3844bb5c401a2160fee547c7631d759fd2ec3e"},
+    {file = "faiss_cpu-1.8.0.post1-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:8d4bade10cb63e9f9ff261751edd7eb097b1f4bf30be4d0d25d6f688559d795e"},
+    {file = "faiss_cpu-1.8.0.post1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:20bd43eca3b7d77e71ea56b7a558cc28e900d8abff417eb285e2d92e95d934d4"},
+    {file = "faiss_cpu-1.8.0.post1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8542a87743a7f94ac656fd3e9592ad57e58b04d961ad2fe654a22a8ca59defdb"},
+    {file = "faiss_cpu-1.8.0.post1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ed46928de3dc20170b10fec89c54075a11383c2aaf4f119c63e0f6ae5a507d74"},
+    {file = "faiss_cpu-1.8.0.post1-cp311-cp311-win_amd64.whl", hash = "sha256:4fa5fc8ea210b919aa469e27d6687e50052db906e7fec3f2257178b1384fa18b"},
+    {file = "faiss_cpu-1.8.0.post1-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:96aec0d08a3099883af3a9b6356cfe736e8bd879318a940a27e9d1ae6f33d788"},
+    {file = "faiss_cpu-1.8.0.post1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:92b06147fa84732ecdc965922e8ef50dc7011ef8be65821ff4abb2118cb5dce0"},
+    {file = "faiss_cpu-1.8.0.post1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:709ef9394d1148aef70dbe890edbde8c282a4a2e06a8b69ab64f65e90f5ba572"},
+    {file = "faiss_cpu-1.8.0.post1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:327a9c30971bf72cd8392b15eb4aff5d898c453212eae656dfaa3ba555b9ca0c"},
+    {file = "faiss_cpu-1.8.0.post1-cp312-cp312-win_amd64.whl", hash = "sha256:8756f1d93faba56349883fa2f5d47fe36bb2f11f789200c6b1c691ef805485f2"},
+    {file = "faiss_cpu-1.8.0.post1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:f4a3045909c447bf1955b70083891e80f2c87c5427f20cae25245e08ec5c9e52"},
+    {file = "faiss_cpu-1.8.0.post1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:8842b7fc921ca1fafdb0845f2ba029e79df04eebae72ab135239f93478a9b7a2"},
+    {file = "faiss_cpu-1.8.0.post1-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9d5a9799634e32c3862d5436d1e78112ed9a38f319e4523f5916e55d86adda8f"},
+    {file = "faiss_cpu-1.8.0.post1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2a70923b0fbbb40f647e20bcbcbfd472277e6d84bb23ff12d2a94b6841806b55"},
+    {file = "faiss_cpu-1.8.0.post1-cp38-cp38-win_amd64.whl", hash = "sha256:ce652df3c4dd50c88ac9235d072f30ce60694dc422c5f523bbbcab320e8f3097"},
+    {file = "faiss_cpu-1.8.0.post1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:83ef04b17b19189dd6601a941bdf4bfa9de0740dbcd80305aeba51a1b1955f80"},
+    {file = "faiss_cpu-1.8.0.post1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:c50c8697077470ede7f1939ef8dc8a846ec19cf1893b543f6b67f9af03b0a122"},
+    {file = "faiss_cpu-1.8.0.post1-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:98ce428a7a67fe5c64047280e5e12a8dbdecf7002f9d127b26cf1db354e9fe76"},
+    {file = "faiss_cpu-1.8.0.post1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5f3b36b80380bae523e3198cfb4a137867055945ce7bf10d18fe9f0284f2fb47"},
+    {file = "faiss_cpu-1.8.0.post1-cp39-cp39-win_amd64.whl", hash = "sha256:4fcc67a2353f08a20c1ab955de3cde14ef3b447761b26244a5aa849c15cbc9b3"},
+    {file = "faiss_cpu-1.8.0.post1.tar.gz", hash = "sha256:5686af34414678c3d49c4fa8d774df7156e9cb48d7029071e56230e74b01cc13"},
 ]
 fake-useragent = [
     {file = "fake-useragent-1.4.0.tar.gz", hash = "sha256:5426e4015d8ccc5bb25f64d3dfcfd3915eba30ffebd31b86b60dc7a4c5d65528"},
@@ -2551,8 +2576,8 @@ onnxruntime = [
     {file = "onnxruntime-1.17.1-cp39-cp39-win_amd64.whl", hash = "sha256:f7e9f7fb049825cdddf4a923cfc7c649d84d63c0134315f8e0aa9e0c3004672c"},
 ]
 openai = [
-    {file = "openai-1.13.3-py3-none-any.whl", hash = "sha256:5769b62abd02f350a8dd1a3a242d8972c947860654466171d60fb0972ae0a41c"},
-    {file = "openai-1.13.3.tar.gz", hash = "sha256:ff6c6b3bc7327e715e4b3592a923a5a1c7519ff5dd764a83d69f633d49e77a7b"},
+    {file = "openai-1.35.10-py3-none-any.whl", hash = "sha256:962cb5c23224b5cbd16078308dabab97a08b0a5ad736a4fdb3dc2ffc44ac974f"},
+    {file = "openai-1.35.10.tar.gz", hash = "sha256:85966949f4f960f3e4b239a659f9fd64d3a97ecc43c44dc0a044b5c7f11cccc6"},
 ]
 orjson = [
     {file = "orjson-3.9.15-cp310-cp310-macosx_10_15_x86_64.macosx_11_0_arm64.macosx_10_15_universal2.whl", hash = "sha256:d61f7ce4727a9fa7680cd6f3986b0e2c732639f46a5e0156e550e35258aa313a"},

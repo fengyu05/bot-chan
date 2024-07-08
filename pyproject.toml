@@ -19,13 +19,13 @@ langchain = "^0.1.10"
 langchain-community = "^0.0.25"
 langchainhub = "^0.1.14"
 langchain-openai = "^0.0.8"
-openai = "^1.13.3"
 chromadb = "^0.3.29"
 bs4 = "^0.0.2"
 numexpr = "^2.9.0"
-faiss-gpu = "^1.7.2"  # use faiss-cpu if you don't have access to gpu
 fake-useragent = "^1.4.0"
 pypdf = "^4.1.0"
+openai = "^1.35.10"
+faiss-cpu = "^1.8.0.post1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

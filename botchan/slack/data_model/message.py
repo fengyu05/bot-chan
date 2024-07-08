@@ -39,3 +39,8 @@ class Message(BaseModel):
 
     def message_link(self, channel: str) -> str:
         return f"https://{self.team}.slack.com/archives/{channel}/p{self.ts}"
+
+    @property
+    def has_files(self) -> bool:
+        return hasattr(self, 'files') and self.files
+            

@@ -1,11 +1,11 @@
-import openai
 import requests
 import uuid
 from typing import Optional
 from pathlib import Path
-from openai import OpenAI
 from openai.types import FileObject
 import structlog
+
+from botchan.openai import CLIENT as client
 
 logger = structlog.getLogger(__name__)
 
@@ -21,7 +21,6 @@ def upload_file(file_path: str) -> FileObject:
         Optional[FileObject]: The file object if the upload is successful, otherwise None.
     """
     try:
-        client = OpenAI()
         return client.files.create(
             file=Path(file_path),
             purpose="fine-tune",

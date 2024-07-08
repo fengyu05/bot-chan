@@ -34,6 +34,9 @@ class MessageEvent(BaseModel):
     def is_user_mentioned(self, user_id: str) -> bool:
         return f"<@{user_id}>" in self.text
 
+    @property
+    def has_files(self) -> bool:
+        return hasattr(self, 'files') and self.files
 
 class MessageCreateEvent(MessageEvent):
     client_msg_id: str

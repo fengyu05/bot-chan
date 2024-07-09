@@ -49,7 +49,7 @@ class ChatAgent:
         Returns:
             str: The generated response.
         """
-        if message_event.has_files():
+        if message_event.has_files:
             return self.qa_with_image(message_event)
 
         logger.debug("chat agent qa invoke", text=message_event.text)
@@ -124,7 +124,7 @@ class ChatAgent:
         self, memeory_type: MemoryType, k: Optional[int] = None
     ) -> ConversationChain:
         prompt_template = ChatPromptTemplate.from_template(
-            prompt_bank.CONVERSATION_BOT_1
+            prompt_bank.CONVERSATION_BOT_WITH_FORMATTED_HISTORY_1
         )
         llm = ChatOpenAI(model_name=OPENAI_GPT_MODEL_ID, temperature=0)
         memory = self._create_buffer_memory(

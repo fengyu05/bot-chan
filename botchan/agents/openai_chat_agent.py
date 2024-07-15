@@ -1,19 +1,16 @@
-from typing import Optional, Any
-from enum import Enum
-
+from typing import Any
+from collections import OrderedDict
 import structlog
+
 import botchan.agents.prompt_bank as prompt_bank
-from botchan.openai.files import upload_from_url
 from botchan.slack.data_model import FileObject, MessageEvent
-from botchan.settings import OPENAI_GPT_MODEL_ID, BOT_NAME
+from botchan.settings import OPENAI_GPT_MODEL_ID
 from botchan.utt.files import base64_encode_slack_image
 from botchan.openai import CLIENT as client
 from botchan.openai.chat_utils import get_message_from_response
+from botchan.openai.common import VISION_INPUT_SUPPORT_TYPE
 
 logger = structlog.getLogger(__name__)
-
-from collections import OrderedDict
-from datetime import datetime, timedelta
 
 
 class OpenAiChatAgent:
@@ -107,4 +104,4 @@ class OpenAiChatAgent:
         return data
 
     def _accept_image_filetype(self, file_object: FileObject) -> bool:
-        return file_object.filetype.lower() in ("png", "jpg", "jpeg", "gif")
+        return file_object.filetype.lower() in VISION_INPUT_SUPPORT_TYPE

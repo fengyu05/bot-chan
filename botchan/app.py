@@ -2,7 +2,7 @@ import structlog
 from slack_bolt import App
 
 from botchan.agent import Agent
-from botchan.app_home import CONFIG_SETTINGS, publish_home, open_modal
+from botchan.app_home import CONFIG_SETTINGS, publish_home
 from botchan.settings import SLACK_APP_OAUTH_TOKENS_FOR_WS
 from botchan.slack.client import create_slack_client
 from botchan.slack.data_model import (
@@ -25,8 +25,7 @@ app = App(
 @app.event("message")
 def handle_message_events(event: dict) -> None:
     """Handle message to the bot."""
-    # Uncomment for debug
-    # logger.debug("Message event", message_event=event)
+    logger.debug("Message event", message_event=event)
     message_event = MessageEvent(**event)
     if message_event.subtype == "message_created":
         message_event = MessageCreateEvent(**event)
@@ -59,7 +58,7 @@ def update_home_tab(client, event):
 
 # This handles the form submission from the modal
 @app.view("config_view")
-def handle_view_submission(ack, body, view, logger):
+def handle_view_submission(ack, body, view):
     ack()
     CONFIG_SETTINGS["setting_1"] = view["state"]["values"]["config_block_1"]["setting_1"]["value"]
     CONFIG_SETTINGS["setting_1"] = view["state"]["values"]["config_block_2"]["setting_2"]["value"]
@@ -68,5 +67,5 @@ def handle_view_submission(ack, body, view, logger):
     logger.info(f"Config submitted by user {user}: {CONFIG_SETTINGS}")
     
     # Update the home tab after saving the new settings
-    update_home_tab(app.client, {"user": user}, logger)
+    update_home_tab(app.client, {"user": user})
 

@@ -27,9 +27,12 @@ pypdf = "^4.1.0"
 openai = "^1.35.10"
 faiss-cpu = "^1.8.0.post1"
 
+
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 pylint = "^2.17.3"
+pytest = "^8.2.2"
+
 
 [build-system]
 requires = ["poetry-core"]

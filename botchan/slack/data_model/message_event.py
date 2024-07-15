@@ -18,6 +18,16 @@ class MessageEvent(BaseModel):
     text: Optional[str]
     event_ts: str
     thread_ts: Optional[str] = None  # only in reply message
+    files: Optional[List[FileObject]] = None
+    upload: Optional[bool] = None
+    display_as_bot: Optional[bool] = None
+    client_msg_id: Optional[str] = None
+
+    @validator("files", each_item=True)
+    def validate_file(cls, v):  # pylint: disable=no-self-argument
+        if not isinstance(v, FileObject):
+            raise ValueError("Each item in 'files' must be an instance of FileObject")
+        return v
 
     @property
     def is_thread_root(self):
@@ -36,7 +46,7 @@ class MessageEvent(BaseModel):
 
     @property
     def has_files(self) -> bool:
-        return hasattr(self, 'files') and self.files
+        return self.files is not None and len(self.files) > 0
 
 class MessageCreateEvent(MessageEvent):
     client_msg_id: str

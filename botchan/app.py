@@ -50,24 +50,24 @@ def handle_message_events(event: dict) -> None:
 #     logger.debug("app_mention event parsed", mention_event=mention_event)
 
 
-@app.event("app_home_opened")
-def update_home_tab(client, event):
-    publish_home(client=client, event=event)
+# @app.event("app_home_opened")
+# def update_home_tab(client, event):
+#     publish_home(client=client, event=event)
 
 
-# This handles the form submission from the modal
-@app.view("config_view")
-def handle_view_submission(ack, body, view):
-    ack()
-    CONFIG_SETTINGS["setting_1"] = view["state"]["values"]["config_block_1"][
-        "setting_1"
-    ]["value"]
-    CONFIG_SETTINGS["setting_1"] = view["state"]["values"]["config_block_2"][
-        "setting_2"
-    ]["value"]
+# # This handles the form submission from the modal
+# @app.view("config_view")
+# def handle_view_submission(ack, body, view):
+#     ack()
+#     CONFIG_SETTINGS["setting_1"] = view["state"]["values"]["config_block_1"][
+#         "setting_1"
+#     ]["value"]
+#     CONFIG_SETTINGS["setting_1"] = view["state"]["values"]["config_block_2"][
+#         "setting_2"
+#     ]["value"]
 
-    user = body["user"]["id"]
-    logger.info(f"Config submitted by user {user}: {CONFIG_SETTINGS}")
+#     user = body["user"]["id"]
+#     logger.info(f"Config submitted by user {user}: {CONFIG_SETTINGS}")
 
-    # Update the home tab after saving the new settings
-    update_home_tab(app.client, {"user": user})
+#     # Update the home tab after saving the new settings
+#     update_home_tab(app.client, {"user": user})

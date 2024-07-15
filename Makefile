@@ -36,7 +36,7 @@ test: # shell backend
 
 ## CI tool targets below
 ci-shell: # shell backend
-	docker-compose -f docker-compose-ci.yml up -d shell
+	docker-compose -f docker-compose-ci.yml up --build -d shell
 
 ci-bash: ci-shell  ## Connect to a bash within the tool image(faster), for running task like `poetry lock`
 	docker-compose -f docker-compose-ci.yml exec shell bash

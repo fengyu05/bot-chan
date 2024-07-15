@@ -1,14 +1,15 @@
-from typing import Any
 from collections import OrderedDict
+from typing import Any
+
 import structlog
 
 import botchan.agents.prompt_bank as prompt_bank
-from botchan.slack.data_model import FileObject, MessageEvent
-from botchan.settings import OPENAI_GPT_MODEL_ID
-from botchan.utt.files import base64_encode_slack_image
 from botchan.openai import CLIENT as client
 from botchan.openai.chat_utils import get_message_from_response
 from botchan.openai.common import VISION_INPUT_SUPPORT_TYPE
+from botchan.settings import OPENAI_GPT_MODEL_ID
+from botchan.slack.data_model import FileObject, MessageEvent
+from botchan.utt.files import base64_encode_slack_image
 
 logger = structlog.getLogger(__name__)
 

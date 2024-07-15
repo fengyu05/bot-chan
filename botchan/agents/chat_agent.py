@@ -1,22 +1,23 @@
-from typing import Optional
 from enum import Enum
+from typing import Optional
 
 import structlog
-from langchain_core.language_models.base import BaseLanguageModel
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
 from langchain.chains import ConversationChain
 from langchain.memory import (
     ConversationBufferMemory,
-    ConversationSummaryMemory,
     ConversationBufferWindowMemory,
     ConversationSummaryBufferMemory,
+    ConversationSummaryMemory,
 )
+from langchain_core.language_models.base import BaseLanguageModel
+from langchain_core.messages import HumanMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.openai.files import upload_from_url
+from botchan.settings import BOT_NAME, OPENAI_GPT_MODEL_ID
 from botchan.slack.data_model import FileObject, MessageEvent
-from botchan.settings import OPENAI_GPT_MODEL_ID, BOT_NAME
 from botchan.utt.files import base64_encode_slack_image
 
 logger = structlog.getLogger(__name__)
@@ -74,10 +75,7 @@ class ChatAgent:
         logger.debug("chat agent qa invoke with image", text=message_event.text)
         images_data = self._process_image(message_event)
 
-        message = HumanMessage(
-            content=message_event.text,
-            image=images_data[0]
-        )
+        message = HumanMessage(content=message_event.text, image=images_data[0])
         response = self.chain.invoke([message])
         logger.debug("chat response", response=response)
         return response["response"]
@@ -144,7 +142,7 @@ class ChatAgent:
             if self._accept_image_filetype(file_object)
         ]
 
-        #return [base64_encode_slack_image(f.url_private_download) for f in files]
+        # return [base64_encode_slack_image(f.url_private_download) for f in files]
         return [upload_from_url(f.url_private_download, f.name).id for f in files]
 
     def _accept_image_filetype(self, file_object: FileObject) -> bool:

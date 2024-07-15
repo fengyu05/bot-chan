@@ -48,6 +48,7 @@ class MessageEvent(BaseModel):
     def has_files(self) -> bool:
         return self.files is not None and len(self.files) > 0
 
+
 class MessageCreateEvent(MessageEvent):
     client_msg_id: str
     blocks: List[RichTextBlock] = []

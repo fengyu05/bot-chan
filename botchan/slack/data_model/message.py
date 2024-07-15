@@ -39,6 +39,3 @@ class Message(BaseModel):
 
     def message_link(self, channel: str) -> str:
         return f"https://{self.team}.slack.com/archives/{channel}/p{self.ts}"
-
-
-            

@@ -27,7 +27,7 @@ services:
         - |
           echo "Apply isort"
           poetry run isort --profile black botchan tests
-          echo "Aplly black"
+          echo "Apply black"
           poetry run black botchan tests
           echo "change owner to $CURRENT_UID"
           chown -R $CURRENT_UID botchan tests

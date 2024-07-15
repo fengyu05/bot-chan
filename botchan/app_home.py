@@ -1,9 +1,9 @@
-
 # In-memory storage for config settings (replace with your persistent storage)
 CONFIG_SETTINGS = {
     "setting_1": "Default value 1",
     "setting_2": "Default value 2222",
 }
+
 
 def open_modal(client, trigger_id):
     # Define a view (modal)
@@ -54,9 +54,7 @@ def publish_home(client, event):
                     "text": "*Current Configurations:*",
                 },
             },
-            {
-                "type": "divider"
-            },
+            {"type": "divider"},
             {
                 "type": "section",
                 "fields": [
@@ -68,9 +66,9 @@ def publish_home(client, event):
                         "type": "mrkdwn",
                         "text": f"*Setting 2:*\n{CONFIG_SETTINGS['setting_2']}",
                     },
-                ]
-            }
-        ]
+                ],
+            },
+        ],
     }
 
     # Publish the view to the Home tab

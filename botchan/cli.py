@@ -1,9 +1,10 @@
 # pylint: disable=C0415
 # pylint: disable=unused-import
 """CLI entrypoint."""
+import logging
+
 import click
 import structlog
-import logging
 
 
 def config_logger(log_level: str):
@@ -40,6 +41,7 @@ def start(log_level: str) -> None:
 
     config_logger(log_level=log_level)
     start_server()
+
 
 # Backdoor testing code block
 @main.command()

@@ -13,6 +13,7 @@ logger = structlog.getLogger(__name__)
 
 from botchan.settings import CHAT_MODE
 
+
 class ResultType(Enum):
     RETRIEVAL = 1
     FALLBACK = 2

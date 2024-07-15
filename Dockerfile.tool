@@ -1,6 +1,6 @@
 FROM hyperspacetech/code-py-base:3.9-poetry1.2.1
 # This Dockefile is for ci tool which doesn't need the app running
-WORKDIR /app/py/projects/botchan
+WORKDIR /app/home
 
 COPY pyproject.toml \
      poetry.lock \

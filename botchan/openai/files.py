@@ -1,9 +1,10 @@
-import requests
 import uuid
-from typing import Optional
 from pathlib import Path
-from openai.types import FileObject
+from typing import Optional
+
+import requests
 import structlog
+from openai.types import FileObject
 
 from botchan.openai import CLIENT as client
 

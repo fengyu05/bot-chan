@@ -41,7 +41,8 @@ services:
     env_file:
       - env.dev
     volumes:
-      - './:/app/py/projects/botchan'
+      - './botchan:/app/home/botchan'
+      - './tests:/app/home/tests'
     command: 
         - /bin/sh
         - -c

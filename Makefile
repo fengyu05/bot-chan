@@ -31,11 +31,14 @@ shell: # shell backend
 bash: shell  ## Connect to a bash within the docker image
 	docker-compose exec shell bash
 
-test: # shell backend
+test: # Run unit tests
 	docker-compose up --build test
 
 ## CI tool targets below
-ci-shell: # shell backend
+c-build:  ## Build CI image
+	docker-compose build
+
+ci-shell: # Create CI shell backend
 	docker-compose -f docker-compose-ci.yml up --build -d shell
 
 ci-bash: ci-shell  ## Connect to a bash within the tool image(faster), for running task like `poetry lock`

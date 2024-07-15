@@ -48,6 +48,12 @@ class MessageEvent(BaseModel):
     def has_files(self) -> bool:
         return self.files is not None and len(self.files) > 0
 
+    def find_by_files_type(self, file_type: str) -> list[FileObject]:
+        if self.files:
+            return [f for f in self.files if f.subtype == file_type]
+        else:
+            return []
+
 
 class MessageCreateEvent(MessageEvent):
     client_msg_id: str

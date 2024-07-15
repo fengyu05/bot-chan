@@ -4,12 +4,13 @@ from typing import Any
 import structlog
 
 import botchan.agents.prompt_bank as prompt_bank
+from botchan.agents.openai_whisper_agent import OpenAiWhisperAgent
 from botchan.openai import CLIENT as client
 from botchan.openai.chat_utils import get_message_from_response
 from botchan.openai.common import VISION_INPUT_SUPPORT_TYPE
 from botchan.settings import OPENAI_GPT_MODEL_ID
 from botchan.slack.data_model import FileObject, MessageEvent
-from botchan.utt.files import base64_encode_slack_image
+from botchan.utt.files import base64_encode_slack_image, download_slack_downloadable
 
 logger = structlog.getLogger(__name__)
 
@@ -24,6 +25,7 @@ class OpenAiChatAgent:
     def __init__(self, buffer_limit: int = 100) -> None:
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
+        self.whisper_agent = OpenAiWhisperAgent()
 
     def qa(self, message_event: MessageEvent) -> str:
         """
@@ -56,8 +58,8 @@ class OpenAiChatAgent:
 
         content = [{"type": "text", "text": message_event.text}]
         if message_event.has_files:
-            images_data = self._process_image(message_event)
-            content.extend(images_data)
+            content_from_files = self.process_files(message_event)
+            content.extend(content_from_files)
 
         self.message_buffer[thread_id].append(
             {
@@ -83,26 +85,38 @@ class OpenAiChatAgent:
         )
         return output_text
 
-    def _process_image(self, message_event: MessageEvent) -> list[dict]:
-        files = [
-            file_object
-            for file_object in message_event.files
-            if self._accept_image_filetype(file_object)
-        ]
+    def process_files(self, message_event: MessageEvent) -> list[dict]:
+        """
+        Process data by examining each file and determining its type.
+        """
         data = []
-        for f in files:
-            base64_image = base64_encode_slack_image(f.url_private_download)
-            data.append(
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}",
-                        "detail": "low",
-                    },
-                }
-            )
 
+        for file_object in message_event.files:
+            if self._accept_image_filetype(file_object):
+                base64_image = base64_encode_slack_image(
+                    file_object.url_private_download
+                )
+                data.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}",
+                            "detail": "low",
+                        },
+                    }
+                )
+            elif self._accept_slack_audio(file_object):
+                local_audio_file = download_slack_downloadable(file_object.aac)
+                data.append(
+                    {
+                        "type": "text",
+                        "text": self.whisper_agent.transcribe(local_audio_file),
+                    }
+                )
         return data
 
     def _accept_image_filetype(self, file_object: FileObject) -> bool:
         return file_object.filetype.lower() in VISION_INPUT_SUPPORT_TYPE
+
+    def _accept_slack_audio(self, file_object: FileObject) -> bool:
+        return file_object.subtype == "slack_audio"

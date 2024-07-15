@@ -1,11 +1,15 @@
 import base64
+import os
 import uuid
 from functools import lru_cache
+from urllib.parse import urlparse
 
-import httpx
 import requests
+import structlog
 
 from botchan.settings import SLACK_APP_OAUTH_TOKENS_FOR_WS, TMP_PATH
+
+logger = structlog.get_logger(__name__)
 
 
 @lru_cache(maxsize=128)
@@ -21,13 +25,27 @@ def download_slack_downloadable(
     url: str, token: str = SLACK_APP_OAUTH_TOKENS_FOR_WS
 ) -> str:
     filename = str(uuid.uuid4())
-    local_path = f"{TMP_PATH}/{filename}.pdf"
+    # Extract the file extension from the URL
+    parsed_url = urlparse(url)
+    _, ext = os.path.splitext(parsed_url.path)
+    # Default to .bin if no extension found
+    if not ext:
+        ext = ".bin"
+
+    local_path = f"{TMP_PATH}/{filename}.{ext}"
+
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(url, headers=headers, timeout=60)
     response.raise_for_status()
     with open(local_path, "wb") as f:
         f.write(response.content)
 
+    logger.debug(
+        "Downloaded slack file",
+        url=url,
+        local_path=local_path,
+        filename=f"{filename}{ext}",
+    )
     return local_path
 
 

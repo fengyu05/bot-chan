@@ -4,6 +4,7 @@ from typing import Tuple
 import structlog
 
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
+from botchan.agents.openai_whisper_agent import OpenAiWhisperAgent
 from botchan.rag.knowledge_base import KnowledgeBase
 from botchan.rag.knowledge_doc import Doc, DocKind
 from botchan.slack.data_model import FileObject, MessageEvent
@@ -15,21 +16,23 @@ from botchan.settings import CHAT_MODE
 
 
 class ResultType(Enum):
-    RETRIEVAL = 1
-    FALLBACK = 2
+    RETRIEVAL = 1  # Chat with knowledge retrieval
+    CHAT = 2  # Direct chat
+    SPEECH = 3  # With speech regconition
 
 
 class KnowledgeChatAgent:
     def __init__(self) -> None:
         self.base = KnowledgeBase()
-        self.fallback_agent = OpenAiChatAgent()
+        self.chat_agent = OpenAiChatAgent()
+        self.speech_agent = OpenAiWhisperAgent()
 
     def qa(self, message_event: MessageEvent) -> Tuple[ResultType, str]:
         text = message_event.text
         if CHAT_MODE == "RAG" and self.base.has_hit(text):
             return ResultType.RETRIEVAL, self.base.chain.invoke(text)
         else:
-            return ResultType.FALLBACK, self.fallback_agent.qa(message_event)
+            return ResultType.CHAT, self.chat_agent.qa(message_event)
 
     def learn_knowledge(self, message_event: MessageEvent) -> None:
         logger.debug("learn knowledge", message_event=message_event)

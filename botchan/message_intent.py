@@ -36,11 +36,8 @@ _INTENT_BY_EMOJI = {
 
 
 def get_message_intent(message: Union[Message, MessageEvent]):
-    text = message.text
-    if text == "":
-        return MessageIntent.UNKNOWN
     for emoji in _INTENT_BY_EMOJI:
-        if text.startswith(f":{emoji}:"):
+        if message.text.startswith(f":{emoji}:"):
             return _INTENT_BY_EMOJI[emoji]
     return MessageIntent.from_str(DEFAULT_INTENTION.strip().lower())
 

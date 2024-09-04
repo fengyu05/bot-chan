@@ -3,6 +3,17 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 
 
+class Preview(BaseModel):
+    content: str
+    has_more: bool
+
+
+class Transcription(BaseModel):
+    status: str
+    locale: Optional[str]
+    preview: Optional[Preview]
+
+
 class FileObject(BaseModel):
     id: str
     created: int
@@ -61,10 +72,20 @@ class FileObject(BaseModel):
     duration_ms: Optional[int]
     aac: Optional[str]
     audio_wave_samples: Optional[List[int]]
-    transcription: Optional[Dict[str, Any]]
+    transcription: Transcription
     # audio end
 
     permalink: str
     permalink_public: str
     has_rich_preview: bool
     file_access: str
+
+    def get_transcription_preview(self) -> Optional[str]:
+        if (
+            self.transcription
+            and self.transcription.status == "complete"
+            and self.transcription.preview
+        ):
+            return self.transcription.preview.content
+        else:
+            return None

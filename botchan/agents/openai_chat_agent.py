@@ -1,3 +1,4 @@
+import time
 from collections import OrderedDict
 from typing import Any
 
@@ -8,11 +9,15 @@ from botchan.agents.openai_whisper_agent import OpenAiWhisperAgent
 from botchan.openai import CLIENT as client
 from botchan.openai.chat_utils import get_message_from_response
 from botchan.openai.common import VISION_INPUT_SUPPORT_TYPE
-from botchan.settings import OPENAI_GPT_MODEL_ID
+from botchan.settings import OPENAI_GPT_MODEL_ID, SLACK_TRANSCRIBE_WAIT_SEC
 from botchan.slack.data_model import FileObject, MessageEvent
+from botchan.slack.shared import SLACK_MESSAGE_FETCHER
 from botchan.utt.files import base64_encode_slack_image, download_slack_downloadable
+from botchan.utt.retry import retry
 
 logger = structlog.getLogger(__name__)
+
+_USE_OPENAI_WHISPER = False
 
 
 class OpenAiChatAgent:
@@ -106,11 +111,31 @@ class OpenAiChatAgent:
                     }
                 )
             elif self._accept_slack_audio(file_object):
-                local_audio_file = download_slack_downloadable(file_object.aac)
+                text_transcribed = ""
+
+                if _USE_OPENAI_WHISPER:  # Use OpenAI whisper
+                    local_audio_file = download_slack_downloadable(file_object.aac)
+                    text_transcribed = self.whisper_agent.transcribe(local_audio_file)
+                else:  # Use Slack transcribe
+
+                    def transcribed_msg_func():
+                        time.sleep(SLACK_TRANSCRIBE_WAIT_SEC)
+                        transcribed_msg = SLACK_MESSAGE_FETCHER.fetch_message(
+                            message_event
+                        )
+                        logger.info(
+                            "slack transcribed message", transcribed_msg=transcribed_msg
+                        )
+                        audio_file = transcribed_msg.files[0]
+                        return audio_file.get_transcription_preview()
+
+                    text_transcribed = retry(
+                        transcribed_msg_func, retry_time_sec=SLACK_TRANSCRIBE_WAIT_SEC
+                    )
                 data.append(
                     {
                         "type": "text",
-                        "text": self.whisper_agent.transcribe(local_audio_file),
+                        "text": text_transcribed,
                     }
                 )
         return data

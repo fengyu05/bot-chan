@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from .block import RichTextBlock
 from .bot_profile import BotProfile
+from .file_object import FileObject
 
 
 class Message(BaseModel):
@@ -12,8 +13,8 @@ class Message(BaseModel):
     text: str
     user: str
     ts: str
-    blocks: List[RichTextBlock]
-    team: str
+    blocks: Optional[List[RichTextBlock]]
+    team: Optional[str]
     edited: Optional[dict]
     thread_ts: Optional[str]
     reply_count: int = 0
@@ -27,6 +28,7 @@ class Message(BaseModel):
     bot_id: Optional[str] = None
     app_id: Optional[str] = None
     bot_profile: Optional[BotProfile] = None
+    files: Optional[List[FileObject]] = None
 
     def is_user_mentioned(self, user_id: str) -> bool:
         return f"<@{user_id}>" in self.text

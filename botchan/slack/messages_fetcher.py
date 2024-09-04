@@ -8,7 +8,7 @@ import toolz as T
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from .data_model import Message
+from .data_model import Message, MessageEvent
 
 logger = structlog.getLogger(__name__)
 
@@ -121,3 +121,32 @@ class MessagesFetcher:
 
     def get_last_message(self, channel_id: str) -> Message:
         return self.fetch(channel_id=channel_id, limit=1)[0]
+
+    def fetch_message(self, message_event: MessageEvent) -> Optional[Message]:
+        """
+        Fetches a single message uniquely identified by its channel and timestamp.
+
+        Args:
+            message_event (dict): A dictionary containing 'channel' and 'ts' keys to identify the message.
+
+        Returns:
+            Optional[Message]: The fetched message object or None if not found.
+        """
+        try:
+            response = self.client.conversations_history(
+                channel=message_event.channel,
+                inclusive=True,
+                oldest=message_event.ts,
+                latest=message_event.ts,
+                limit=1,
+            )
+
+            if response["messages"]:
+                messages = response["messages"]
+                logger.info("fetch_message get messages", messages=messages)
+                return Message.parse_obj(messages[0])
+            return None
+
+        except SlackApiError as e:
+            logger.error("Error fetching message", error=str(e))
+            return None

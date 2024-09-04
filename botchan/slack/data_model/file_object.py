@@ -72,7 +72,7 @@ class FileObject(BaseModel):
     duration_ms: Optional[int]
     aac: Optional[str]
     audio_wave_samples: Optional[List[int]]
-    transcription: Transcription
+    transcription: Optional[Transcription]
     # audio end
 
     permalink: str

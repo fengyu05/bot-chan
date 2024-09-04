@@ -143,7 +143,7 @@ class MessagesFetcher:
 
             if response["messages"]:
                 messages = response["messages"]
-                logger.info("fetch_message get messages", messages=messages)
+                logger.debug("fetch_message get messages", messages=messages)
                 return Message.parse_obj(messages[0])
             return None
 

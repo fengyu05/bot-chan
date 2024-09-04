@@ -74,14 +74,16 @@ class OpenAiChatAgent:
         )
         logger.info(
             f"qa with messages for thread {thread_id}",
-            messages=self.message_buffer[thread_id],
+            messages=self._format_buffer(self.message_buffer[thread_id]),
         )
         response = client.chat.completions.create(
             model=OPENAI_GPT_MODEL_ID,
             messages=self.message_buffer[thread_id],
         )
-        logger.info(f"qa get response for thread {thread_id}", response=response)
         output_text = get_message_from_response(response)
+        logger.info(
+            f"qa get response text for thread {thread_id}", output_text=output_text
+        )
         self.message_buffer[thread_id].append(
             {
                 "role": "assistant",
@@ -123,7 +125,7 @@ class OpenAiChatAgent:
                         transcribed_msg = SLACK_MESSAGE_FETCHER.fetch_message(
                             message_event
                         )
-                        logger.info(
+                        logger.debug(
                             "slack transcribed message", transcribed_msg=transcribed_msg
                         )
                         audio_file = transcribed_msg.files[0]
@@ -132,6 +134,8 @@ class OpenAiChatAgent:
                     text_transcribed = retry(
                         transcribed_msg_func, retry_time_sec=SLACK_TRANSCRIBE_WAIT_SEC
                     )
+                    if not text_transcribed:
+                        text_transcribed = "audio not recognizable."
                 data.append(
                     {
                         "type": "text",
@@ -145,3 +149,16 @@ class OpenAiChatAgent:
 
     def _accept_slack_audio(self, file_object: FileObject) -> bool:
         return file_object.subtype == "slack_audio"
+
+    def _format_buffer(self, buffer: list[dict[str, Any]]) -> list[str]:
+        output = []
+        for item in buffer:
+            if isinstance(item["content"], str):
+                output.append(f'[{item["role"]}]: {item["content"]}')
+            elif isinstance(item["content"], list):
+                for content_item in item["content"]:
+                    if content_item["type"] == "text":
+                        output.append(f']{item["role"]}]: {content_item["text"]}')
+                    elif content_item["type"] == "image_url":
+                        output.append(f'[{item["role"]}]: attach an image')
+        return output

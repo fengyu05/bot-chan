@@ -158,7 +158,8 @@ def test_create_file_object():
     assert file_object.display_as_bot == False
     assert file_object.username == ""
     assert file_object.subtype == "slack_audio"
-    assert file_object.transcription == {"status": "processing"}
+    assert file_object.transcription.status == "processing"
+    assert file_object.transcription.preview == None
     assert (
         file_object.url_private
         == "https://files.slack.com/files-tmb/T050B663C4C-F07BYSPHHMM-4907f4fdaf/audio_message_audio.mp4"

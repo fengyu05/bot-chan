@@ -1,10 +1,8 @@
-from enum import Enum
-from typing import Tuple
-
 import structlog
 
+from botchan.agents.message_agent import MessageAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.agents.openai_whisper_agent import OpenAiWhisperAgent
+from botchan.message_intent import MessageIntent
 from botchan.rag.knowledge_base import KnowledgeBase
 from botchan.rag.knowledge_doc import Doc, DocKind
 from botchan.slack.data_model import FileObject, MessageEvent
@@ -12,27 +10,19 @@ from botchan.utt.regex import extract_all_urls
 
 logger = structlog.getLogger(__name__)
 
-from botchan.settings import CHAT_MODE
 
-
-class ResultType(Enum):
-    RETRIEVAL = 1  # Chat with knowledge retrieval
-    CHAT = 2  # Direct chat
-    SPEECH = 3  # With speech regconition
-
-
-class KnowledgeChatAgent:
+class KnowledgeChatAgent(MessageAgent):
     def __init__(self) -> None:
+        super().__init__()
         self.base = KnowledgeBase()
         self.chat_agent = OpenAiChatAgent()
-        self.speech_agent = OpenAiWhisperAgent()
 
-    def qa(self, message_event: MessageEvent) -> Tuple[ResultType, str]:
+    def process_message(self, message_event: MessageEvent) -> list[str]:
         text = message_event.text
-        if CHAT_MODE == "RAG" and self.base.has_hit(text):
-            return ResultType.RETRIEVAL, self.base.chain.invoke(text)
+        if self.base.has_hit(text):
+            return [self.base.chain.invoke(text)]
         else:
-            return ResultType.CHAT, self.chat_agent.qa(message_event)
+            return self.chat_agent(message_event=message_event)
 
     def learn_knowledge(self, message_event: MessageEvent) -> None:
         logger.debug("learn knowledge", message_event=message_event)
@@ -65,3 +55,15 @@ class KnowledgeChatAgent:
 
     def _accept_file_type(self, file_object: FileObject) -> bool:
         return file_object.filetype == "pdf"
+
+    @property
+    def description(self) -> str:
+        return "Use to this agent to chat with context in RAG way"
+
+    @property
+    def name(self) -> str:
+        return "KnowledgeChat"
+
+    @property
+    def intent(self) -> MessageIntent:
+        return MessageIntent.KNOW

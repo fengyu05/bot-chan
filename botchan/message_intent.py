@@ -12,12 +12,13 @@ class MessageIntent(Enum):
     REPORT = 2
     MRKL_AGENT = 3
     QA_INTERNET = 4
-    KNOW = 6
+    KNOW = 5
+    MIAO = 6
 
     @staticmethod
     def from_str(label):
         for intent in MessageIntent:
-            if label == intent.name.lower():
+            if label == intent.name.upper():
                 return intent
         raise NotImplementedError("The provided label does not match any MessageIntent")
 
@@ -28,6 +29,7 @@ _EMOJI_INTENT_MAP = {
     MessageIntent.REPORT: ["report"],
     MessageIntent.MRKL_AGENT: ["thought", "chains", "cot"],
     MessageIntent.QA_INTERNET: ["qa"],
+    MessageIntent.MIAO: ["cat"],
 }
 
 _INTENT_BY_EMOJI = {
@@ -39,7 +41,7 @@ def get_message_intent(message: Union[Message, MessageEvent]):
     for emoji in _INTENT_BY_EMOJI:
         if message.text.startswith(f":{emoji}:"):
             return _INTENT_BY_EMOJI[emoji]
-    return MessageIntent.from_str(DEFAULT_INTENTION.strip().lower())
+    return MessageIntent.from_str(DEFAULT_INTENTION.strip().upper())
 
 
 def remove_emoji_prefix(text: str) -> str:

@@ -1,8 +1,7 @@
 import structlog
 from slack_bolt import App
 
-from botchan.agent import Agent
-from botchan.app_home import CONFIG_SETTINGS, publish_home
+from botchan.multi_intent_agent import MessageMultiIntentAgent
 from botchan.settings import SLACK_APP_OAUTH_TOKENS_FOR_WS
 from botchan.slack.client import create_slack_client
 from botchan.slack.data_model import (
@@ -16,7 +15,7 @@ from botchan.slack.data_model import (
 logger = structlog.get_logger(__name__)
 slack_client = create_slack_client()
 
-agent = Agent(slack_client=slack_client)
+agent = MessageMultiIntentAgent(slack_client=slack_client)
 
 app = App(
     token=SLACK_APP_OAUTH_TOKENS_FOR_WS,

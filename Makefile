@@ -31,7 +31,7 @@ shell: # shell backend
 bash: shell  ## Connect to a bash within the docker image
 	docker-compose exec shell bash
 
-test: # Run unit tests
+test: ## Run unit tests
 	docker-compose up --build test
 
 ## CI tool targets below

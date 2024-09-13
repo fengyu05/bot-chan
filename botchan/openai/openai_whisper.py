@@ -1,3 +1,5 @@
+from typing import Any
+
 import structlog
 
 from botchan.openai import CLIENT as client
@@ -5,10 +7,7 @@ from botchan.openai import CLIENT as client
 logger = structlog.getLogger(__name__)
 
 
-class OpenAiWhisperAgent:
-    def __init__(self) -> None:
-        pass
-
+class OpenAiWhisper:
     def transcribe(self, audio_file_path: str) -> str:
         # FIXME(zf): seems to have issue on long audio messages.
         audio_file = open(audio_file_path, "rb")

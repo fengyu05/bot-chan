@@ -4,12 +4,16 @@ from typing import Any, Optional
 from botchan.constants import GPT_4O
 
 
-def config_default(key: str, value: Optional[Any] = None) -> Any:
-    return os.environ.get(key, value)
+def config_default(key: str, default_value: Optional[Any] = None) -> Any:
+    return os.environ.get(key, default_value)
 
 
-def config_default_float(key: str, value: Any = 0.0) -> float:
-    return float(os.environ.get(key, value))
+def config_default_float(key: str, default_value: Any = 0.0) -> float:
+    return float(os.environ.get(key, default_value))
+
+
+def config_default_bool(key: str, default_value: bool = False) -> float:
+    return bool(os.environ.get(key, default_value))
 
 
 # App config
@@ -33,35 +37,15 @@ OPENAI_GPT_MODEL_ID = config_default("OPENAI_GPT_MODEL_ID", GPT_4O)
 # Default intention to use without mapping
 DEFAULT_INTENTION = config_default("DEFAULT_INTENTION", "CHAT")
 
-# ChAT_MODE, SIMPLE|RAG
-CHAT_MODE = config_default("CHAT_MODE", "SIMPLE")
+# Whether to use LLM to match message intent
+LLM_INTENT_MATCHING = config_default_bool("LLM_INTENT_MATCHING", True)
 
-# SERPAPI API KEY, optional
-SERPAPI_API_KEY = config_default("SERPAPI_API_KEY")
-
-# NEWS API KEY, optional
-NEWS_API_KEY = config_default("NEWS_API_KEY")
-
-## Below is for knowledge indexing
-
-# Knowledge folder
-KNOWLEDGE_FOLDER = config_default("KNOWLEDGE_FOLDER", "/doc2index/test")
-
-# Accept knowledge file extention
-KNOWLEDGE_ACCEPT_PATTERN = [".txt", ".md"]
-
-# Default tools to load
-MARK_LOAD_TOOLS = config_default(
-    "DEFAULT_LOAD_TOOLS", "llm-math,wikipedia,arxiv"
-).split(",")
 
 # Default tmp path
 TMP_PATH = config_default("TMP", "/tmp/")
 
 # Embedding base retrival sim score threshold
-EMBEDDING_SIM_SCORE_THESHOLD = config_default_float("EMBEDDING_SIM_SCORE_THESHOLD", 0.4)
+EMBEDDING_SIM_SCORE_THESHOLD = config_default_float("EMBEDDING_SIM_SCORE_THESHOLD", 0.5)
 
 # Slack transcrition callback waiting time
 SLACK_TRANSCRIBE_WAIT_SEC = config_default_float("SLACK_TRANSCRIBE_WAIT_SEC", 10)
-
-## End of knowledge indexing setting

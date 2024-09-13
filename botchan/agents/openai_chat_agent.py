@@ -5,10 +5,12 @@ from typing import Any
 import structlog
 
 import botchan.agents.prompt_bank as prompt_bank
-from botchan.agents.openai_whisper_agent import OpenAiWhisperAgent
+from botchan.agents.message_agent import MessageAgent
+from botchan.message_intent import MessageIntent
 from botchan.openai import CLIENT as client
 from botchan.openai.chat_utils import get_message_from_response
 from botchan.openai.common import VISION_INPUT_SUPPORT_TYPE
+from botchan.openai.openai_whisper import OpenAiWhisper
 from botchan.settings import OPENAI_GPT_MODEL_ID, SLACK_TRANSCRIBE_WAIT_SEC
 from botchan.slack.data_model import FileObject, MessageEvent
 from botchan.slack.shared import SLACK_MESSAGE_FETCHER
@@ -19,8 +21,12 @@ logger = structlog.getLogger(__name__)
 
 _USE_OPENAI_WHISPER = False
 
+_AGENT_DESCRIPTION = """ Use this agent to make a natural converastion between the assistant bot and user.
 
-class OpenAiChatAgent:
+"""
+
+
+class OpenAiChatAgent(MessageAgent):
     """
     A Chat Agent using Open chat.completion API.
     Conversation is kept with message_buffer keyed by thread_id, with a max buffer limit of 100
@@ -28,11 +34,24 @@ class OpenAiChatAgent:
     """
 
     def __init__(self, buffer_limit: int = 100) -> None:
+        super().__init__()
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
-        self.whisper_agent = OpenAiWhisperAgent()
+        self.whisper_agent = OpenAiWhisper()
 
-    def qa(self, message_event: MessageEvent) -> str:
+    @property
+    def name(self) -> str:
+        return "OpenAIChatAgent"
+
+    @property
+    def description(self) -> str:
+        return _AGENT_DESCRIPTION
+
+    @property
+    def intent(self) -> MessageIntent:
+        return MessageIntent.CHAT
+
+    def process_message(self, message_event: MessageEvent) -> list[str]:
         """
         Processes a message event and generates a response using an AI model.
 
@@ -90,7 +109,7 @@ class OpenAiChatAgent:
                 "content": output_text,
             }
         )
-        return output_text
+        return [output_text]
 
     def process_files(self, message_event: MessageEvent) -> list[dict]:
         """

@@ -17,37 +17,37 @@ help:
 	@cat $(MAKEFILE_LIST) | python -c "$$PRINT_HELP_PYSCRIPT"
 
 build:  ## build image
-	docker-compose build
+	docker compose build
 
 server:  ## start prod server
-	docker-compose up --build app
+	docker compose up --build app
 
 server-dev:  ## start dev server
-	docker-compose up --build app-dev
+	docker compose up --build app-dev
 
 shell: # shell backend
-	docker-compose up -d --build shell
+	docker compose up -d --build shell
 
 bash: shell  ## Connect to a bash within the docker image
-	docker-compose exec shell bash
+	docker compose exec shell bash
 
 test: ## Run unit tests
-	docker-compose up --build test
+	docker compose up --build test
 
 ## CI tool targets below
 c-build:  ## Build CI image
-	docker-compose build
+	docker compose build
 
 ci-shell: # Create CI shell backend
-	docker-compose -f docker-compose-ci.yml up --build -d shell
+	docker compose -f docker-compose-ci.yml up --build -d shell
 
 ci-bash: ci-shell  ## Connect to a bash within the tool image(faster), for running task like `poetry lock`
-	docker-compose -f docker-compose-ci.yml exec shell bash
+	docker compose -f docker-compose-ci.yml exec shell bash
 
 lint:  ## Lint the code folder
-	docker-compose -f docker-compose-ci.yml up --build lint
+	docker compose -f docker-compose-ci.yml up --build lint
 
 fmt:  ## Apply python formater(will edit the code)
-	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-ci.yml up --build fmt
+	CURRENT_UID=$$(id -u):$$(id -g) docker compose -f docker-compose-ci.yml up --build fmt
 
 

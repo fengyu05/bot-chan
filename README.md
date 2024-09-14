@@ -108,21 +108,7 @@ lint                 Lint the code folder
 fmt                  Apply python formater(will edit the code)
 ```
 
-### Updating dependencies
-
-Method 1. With local poetry install:
-
-edit `pyproject.toml` and run `poetry lock`
-
-Method 2. Run `make ci-bash` to get a ci bash shell; then same with above.
  
-### Customization
-Want to customize your chatbot? Bot-chan offers the flexibility to tailor it to your specific needs. See [settings.py](./botchan/settings.py)
-You can use a env file if you are deploying it with docker or kube.
-
-### Intention
-Botchan uses an intention module to decide whether and how to reply to a certain message. The framework just applies the chat intention
-to all messages. If you want to extend it, add your code in [message_intent.py](./botchan/message_intent.py) and [agent.py](./botchan/agent.py) message handler registration.
 
 ### Slack event handling
 Botchat only subscribes to Slack message events. If you want to subscribe to other events and do sth cool. Make your change in the [app.py](https://github.com/fengyu05/bot-chan/blob/main/botchan/app.py#L39).

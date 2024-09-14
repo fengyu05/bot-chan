@@ -66,7 +66,7 @@ class MessageMultiIntentAgent:
     def match_message_intent(self, message_event: MessageEvent) -> MessageIntent:
         if LLM_INTENT_MATCHING:
             prompt = self.match_intent_prompt(message=message_event.text)
-            logger.info("LLM intent matching", prompt=prompt)
+            logger.debug("LLM intent matching", prompt=prompt)
             text = simple_assistant(model_id=GPT_4O_MINI, prompt=prompt)
             logger.info("Matched intent", intent=text)
             return MessageIntent.from_str(text.upper())

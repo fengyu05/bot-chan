@@ -1,10 +1,22 @@
 services:
+  ## For run unit test
+  test:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - env.ci
+    volumes:
+      - './botchan:/app/home/botchan'
+      - './tests:/app/home/tests'
+    command: poetry run pytest --verbose
+
   lint:
     build:
       context: ./
       dockerfile: Dockerfile.tool
     env_file:
-      - env.dev
+      - env.ci
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'
@@ -15,7 +27,7 @@ services:
       context: ./
       dockerfile: Dockerfile.tool
     env_file:
-      - env.dev
+      - env.ci
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'
@@ -36,7 +48,7 @@ services:
       context: ./
       dockerfile: Dockerfile.tool
     env_file:
-      - env.dev
+      - env.ci
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'

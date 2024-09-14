@@ -34,4 +34,4 @@ jobs:
       #     password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and run test containers
-        run: docker compose up --build test
+        run: make test

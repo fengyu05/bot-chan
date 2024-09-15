@@ -6,7 +6,7 @@ import requests
 import structlog
 from openai.types import FileObject
 
-from botchan.open import CLIENT as client
+from botchan.open import OPENAI_CLIENT
 
 logger = structlog.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def upload_file(file_path: str) -> FileObject:
         Optional[FileObject]: The file object if the upload is successful, otherwise None.
     """
     try:
-        return client.files.create(
+        return OPENAI_CLIENT.files.create(
             file=Path(file_path),
             purpose="fine-tune",
         )

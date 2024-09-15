@@ -1,4 +1,4 @@
-from . import CLIENT
+from . import OPENAI_CLIENT
 
 
 def get_message_from_response(response, idx: int = 0) -> str:
@@ -6,7 +6,7 @@ def get_message_from_response(response, idx: int = 0) -> str:
 
 
 def simple_assistant(model_id: str, prompt: str) -> str:
-    response = CLIENT.chat.completions.create(
+    response = OPENAI_CLIENT.chat.completions.create(
         model=model_id,
         messages=[
             {"role": "system", "content": "You are a helpful assistant"},

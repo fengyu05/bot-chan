@@ -7,7 +7,7 @@ from tests.test_data import MESSAGE_AUDIO_EVENT_1, MESSAGE_EVENT_SIMPLE_1
 
 
 class TestOpenAiChatAgent(unittest.TestCase):
-    @patch("botchan.openai.CLIENT.chat.completions.create")
+    @patch("botchan.agents.openai_chat_agent.OPENAI_CLIENT.chat.completions.create")
     def test_process_message_no_files(self, mock_create):
         event = MESSAGE_EVENT_SIMPLE_1
         # Mocking OpenAI response
@@ -26,12 +26,10 @@ class TestOpenAiChatAgent(unittest.TestCase):
         self.assertIn(f"{event['channel']}|{event['event_ts']}", agent.message_buffer)
         mock_create.assert_called_once()
 
-    @patch("botchan.slack.shared.SLACK_MESSAGE_FETCHER.fetch_message")
-    @patch("botchan.openai.CLIENT.chat.completions.create")
-    @patch("time.sleep", return_value=None)  # This line patches
-    def test_process_message_with_files(
-        self, mock_sleep, mock_create, mock_fetch_message
-    ):
+    @patch("botchan.agents.openai_chat_agent.SLACK_MESSAGE_FETCHER.fetch_message")
+    @patch("botchan.agents.openai_chat_agent.OPENAI_CLIENT.chat.completions.create")
+    @patch("botchan.agents.openai_chat_agent.SLACK_TRANSCRIBE_WAIT_SEC", 0)
+    def test_process_message_with_files(self, mock_create, mock_fetch_message):
         event = MESSAGE_AUDIO_EVENT_1
         # Mocking OpenAI response
         mock_response_text = "mocked response from OpenAI"
@@ -53,4 +51,3 @@ class TestOpenAiChatAgent(unittest.TestCase):
         self.assertIn(f"{event['channel']}|{event['event_ts']}", agent.message_buffer)
         mock_create.assert_called_once()
         mock_fetch_message.assert_called_once()
-        mock_sleep.assert_called()

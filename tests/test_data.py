@@ -22,6 +22,33 @@ MESSAGE_EVENT_SIMPLE_1 = {
     "channel_type": "im",
 }
 
+MESSAGE_EVENT_REPLY_TO_SIMPLE_1 = {
+    "user": "U0502429A8N",
+    "type": "message",
+    "ts": "1720999859.112233",
+    "client_msg_id": "6cb3204b-b615-4a07-b865-322e58140737",
+    "text": "You are a cat, what do you do~",
+    "team": "T050B663C4C",
+    "blocks": [
+        {
+            "type": "rich_text",
+            "block_id": "yqwSs",
+            "elements": [
+                {
+                    "type": "rich_text_section",
+                    "elements": [
+                        {"type": "text", "text": "You are a cat, what do you do~"}
+                    ],
+                }
+            ],
+        }
+    ],
+    "channel": "D06C2QNN5G8",
+    "event_ts": "1720999859.112233",
+    "thread_ts": "1720999857.716759",
+    "channel_type": "im",
+}
+
 
 MESSAGE_FILE_SHARE_EVENT_1 = {
     "type": "message",

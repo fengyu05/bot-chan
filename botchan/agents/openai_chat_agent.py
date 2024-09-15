@@ -7,7 +7,7 @@ import structlog
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_agent import MessageAgent
 from botchan.message_intent import MessageIntent
-from botchan.open import CLIENT as client
+from botchan.open import OPENAI_CLIENT
 from botchan.open.chat_utils import get_message_from_response
 from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
 from botchan.open.openai_whisper import OpenAiWhisper
@@ -95,7 +95,7 @@ class OpenAiChatAgent(MessageAgent):
             f"qa with messages for thread {thread_id}",
             messages=self._format_buffer(self.message_buffer[thread_id]),
         )
-        response = client.chat.completions.create(
+        response = OPENAI_CLIENT.chat.completions.create(
             model=OPENAI_GPT_MODEL_ID,
             messages=self.message_buffer[thread_id],
         )

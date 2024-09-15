@@ -11,7 +11,6 @@ from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.constants import GPT_4O_MINI
 from botchan.message_intent import MessageIntent, get_message_intent
-from botchan.open import CLIENT as openai_client
 from botchan.open.chat_utils import simple_assistant
 from botchan.settings import LLM_INTENT_MATCHING
 from botchan.slack import auth as slack_auth
@@ -32,11 +31,13 @@ class MessageMultiIntentAgent:
     fetcher: MessagesFetcher
     bot_user_id: str
     agents: list[Agent]
+    intent_by_thread: dict[str, MessageIntent]
 
     def __init__(self, slack_client: WebClient):
         self.slack_client = slack_client
         self.fetcher = MessagesFetcher(self.slack_client)
         self.bot_user_id = slack_auth.get_bot_user_id(self.slack_client)
+        self.intent_by_thread = {}
 
         self.agents = [
             OpenAiChatAgent(),  ## Handle simple chat
@@ -64,42 +65,45 @@ class MessageMultiIntentAgent:
                     slack_chat.reply_to_message(self.slack_client, message_event, msg)
 
     def match_message_intent(self, message_event: MessageEvent) -> MessageIntent:
+        if message_event.thread_message_id in self.intent_by_thread:
+            return self.intent_by_thread[message_event.thread_message_id]
+
         if LLM_INTENT_MATCHING:
             prompt = self.match_intent_prompt(message=message_event.text)
             logger.debug("LLM intent matching", prompt=prompt)
             text = simple_assistant(model_id=GPT_4O_MINI, prompt=prompt)
-            logger.info("Matched intent", intent=text)
-            return MessageIntent.from_str(text.upper())
+
+            message_intent = MessageIntent.from_str(text.upper())
         else:
-            return get_message_intent(message=message_event)
+            message_intent = get_message_intent(message=message_event)
+        logger.info("Matched intent will added to thread cache", intent=message_intent)
+        self.intent_by_thread[message_event.thread_message_id] = message_intent
+        return message_intent
 
     def match_intent_prompt(self, message: str) -> str:
         return f"""Help match the message intent to the following agents.
-        -------------------
-        {self.joined_agents_description}
-        -------------------
-        For example:
+-------------------
+{self.joined_agents_description}
+-------------------
+For example:
 
-        user_message: "Can you play a cat?"
-        output: MIAO
+user_message: "Can you play a cat?"
+output: MIAO
 
-        If you can now detech a good match, use default intent 'CHAT'.
-        Output text should only be one of the following enum in uppercase.
-        ---------------------
-        {self.joined_all_intents}
-        --------------------
-        user_message: {message}
-        output:
-        """
+If you can now detech a good match, use default intent 'CHAT'.
+Output text should only be one of the following enum in uppercase.
+---------------------
+{self.joined_all_intents}
+--------------------
+user_message: {message}
+output:"""
 
     @cached_property
     def joined_agents_description(self) -> str:
-        result = ""
-        for agent in self.agents:
-            result += f"{agent.intent.name}: {agent.description}\n"
-        return result
+        return "".join(
+            [f"{agent.intent.name}: {agent.description}" for agent in self.agents]
+        )
 
     @cached_property
     def joined_all_intents(self) -> str:
-        result = ", ".join([intent.name for intent in MessageIntent])
-        return result
+        return ",".join([agent.intent.name.upper() for agent in self.agents])

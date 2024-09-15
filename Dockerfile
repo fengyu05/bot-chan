@@ -1,4 +1,4 @@
-FROM hyperspacetech/code-py-base:3.9-poetry1.2.1
+FROM hyperspacetech/code-py-base:3.9-poetry1.8.3
 
 WORKDIR /app/home
 

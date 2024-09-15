@@ -6,7 +6,7 @@ import requests
 import structlog
 from openai.types import FileObject
 
-from botchan.openai import CLIENT as client
+from botchan.open import CLIENT as client
 
 logger = structlog.getLogger(__name__)
 

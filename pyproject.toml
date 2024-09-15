@@ -24,7 +24,7 @@ bs4 = "^0.0.2"
 numexpr = "^2.9.0"
 fake-useragent = "^1.4.0"
 pypdf = "^4.1.0"
-openai = "^1.35.10"
+openai = "^1.45.0"
 faiss-cpu = "^1.8.0.post1"
 
 

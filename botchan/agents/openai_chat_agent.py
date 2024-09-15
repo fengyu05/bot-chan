@@ -7,10 +7,10 @@ import structlog
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_agent import MessageAgent
 from botchan.message_intent import MessageIntent
-from botchan.openai import CLIENT as client
-from botchan.openai.chat_utils import get_message_from_response
-from botchan.openai.common import VISION_INPUT_SUPPORT_TYPE
-from botchan.openai.openai_whisper import OpenAiWhisper
+from botchan.open import CLIENT as client
+from botchan.open.chat_utils import get_message_from_response
+from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
+from botchan.open.openai_whisper import OpenAiWhisper
 from botchan.settings import OPENAI_GPT_MODEL_ID, SLACK_TRANSCRIBE_WAIT_SEC
 from botchan.slack.data_model import FileObject, MessageEvent
 from botchan.slack.shared import SLACK_MESSAGE_FETCHER

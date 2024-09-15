@@ -2,7 +2,7 @@ from typing import Any
 
 import structlog
 
-from botchan.openai import CLIENT as client
+from botchan.open import CLIENT as client
 
 logger = structlog.getLogger(__name__)
 

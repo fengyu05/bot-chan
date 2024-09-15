@@ -19,17 +19,7 @@ services:
     ports:
       - 3000:3000
 
-  ## For run unit test
-  test:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    env_file:
-      - env.dev
-    volumes:
-      - './botchan:/app/home/botchan'
-      - './tests:/app/home/tests'
-    command: poetry run pytest --verbose
+
 
   ## For quick testing, code are mounted
   backdoor:

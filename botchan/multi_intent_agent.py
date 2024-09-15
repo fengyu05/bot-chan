@@ -11,8 +11,8 @@ from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.constants import GPT_4O_MINI
 from botchan.message_intent import MessageIntent, get_message_intent
-from botchan.openai import CLIENT as openai_client
-from botchan.openai.chat_utils import simple_assistant
+from botchan.open import CLIENT as openai_client
+from botchan.open.chat_utils import simple_assistant
 from botchan.settings import LLM_INTENT_MATCHING
 from botchan.slack import auth as slack_auth
 from botchan.slack import chat as slack_chat

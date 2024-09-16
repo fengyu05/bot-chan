@@ -9,11 +9,10 @@ from botchan.slack.data_model import Message, MessageEvent
 class MessageIntent(Enum):
     UNKNOWN = 0
     CHAT = 1
-    REPORT = 2
-    MRKL_AGENT = 3
-    QA_INTERNET = 4
-    KNOW = 5
-    MIAO = 6
+    KNOW = 2
+    MIAO = 3
+    TASK = 4
+    EXPERT = 5
 
     @staticmethod
     def from_str(label):
@@ -26,9 +25,6 @@ class MessageIntent(Enum):
 _EMOJI_INTENT_MAP = {
     MessageIntent.CHAT: ["wave", "chat", "speech_balloon"],
     MessageIntent.KNOW: ["know", "learn", "rem"],
-    MessageIntent.REPORT: ["report"],
-    MessageIntent.MRKL_AGENT: ["thought", "chains", "cot"],
-    MessageIntent.QA_INTERNET: ["qa"],
     MessageIntent.MIAO: ["cat"],
 }
 

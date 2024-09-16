@@ -39,9 +39,12 @@ class MessageMultiIntentAgent:
         self.bot_user_id = slack_auth.get_bot_user_id(self.slack_client)
         self.intent_by_thread = {}
 
+        from botchan.agents.expert.poem_translate import create_poems_translation_task
+
         self.agents = [
             OpenAiChatAgent(),  ## Handle simple chat
             MiaoAgent(),
+            create_poems_translation_task(),
         ]
 
     def _should_reply(self, message_event: MessageCreateEvent) -> bool:

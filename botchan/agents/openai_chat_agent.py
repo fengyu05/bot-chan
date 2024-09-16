@@ -8,7 +8,7 @@ import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_agent import MessageAgent
 from botchan.message_intent import MessageIntent
 from botchan.open import OPENAI_CLIENT
-from botchan.open.chat_utils import get_message_from_response
+from botchan.open.chat_utils import get_message_from_completion
 from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
 from botchan.open.openai_whisper import OpenAiWhisper
 from botchan.settings import OPENAI_GPT_MODEL_ID, SLACK_TRANSCRIBE_WAIT_SEC
@@ -99,7 +99,7 @@ class OpenAiChatAgent(MessageAgent):
             model=OPENAI_GPT_MODEL_ID,
             messages=self.message_buffer[thread_id],
         )
-        output_text = get_message_from_response(response)
+        output_text = get_message_from_completion(response)
         logger.info(
             f"qa get response text for thread {thread_id}", output_text=output_text
         )

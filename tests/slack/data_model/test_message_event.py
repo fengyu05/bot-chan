@@ -1,5 +1,10 @@
 from botchan.slack.data_model import FileObject, MessageEvent
-from tests.data.messages import MESSAGE_AUDIO_EVENT_1, MESSAGE_EVENT_SIMPLE_1, MESSAGE_FILE_SHARE_EVENT_1
+from tests.data.messages import (
+    MESSAGE_AUDIO_EVENT_1,
+    MESSAGE_EVENT_SIMPLE_1,
+    MESSAGE_FILE_SHARE_EVENT_1,
+)
+
 
 def test_create_message_event():
     message_event = MessageEvent(**MESSAGE_EVENT_SIMPLE_1)

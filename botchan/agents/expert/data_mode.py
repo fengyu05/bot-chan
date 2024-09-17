@@ -23,12 +23,12 @@ class TaskConfig(BaseModel):
     def __repr__(self) -> str:
         field_strings = [f"{key}: {value}" for key, value in self.dict().items()]
         return "\n".join(field_strings)
-    
+
     @property
     def is_root(self) -> bool:
         """Root node is a node doesn't have upstream dependencies."""
         return len(self.upstream) == 0
-    
+
     @property
     def is_structure_output(self) -> bool:
-        return issubclass(self.output_schema, TaskEntity)   
+        return issubclass(self.output_schema, TaskEntity)

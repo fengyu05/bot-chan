@@ -36,7 +36,7 @@ class TaskNode(Task):
             prompt = self.config.instruction.format(**inputs)
 
         # output schema is a structure entity
-        if self.config.is_structure_output:  
+        if self.config.is_structure_output:
             response = simple_assistant_with_struct_ouput(
                 model_id=GTP_4O_WITH_STRUCT,
                 prompt=prompt,
@@ -45,5 +45,3 @@ class TaskNode(Task):
         else:
             response = simple_assistant(model_id=OPENAI_GPT_MODEL_ID, prompt=prompt)
         return response
-
-

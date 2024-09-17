@@ -37,7 +37,7 @@ def create_poems_translation_task_agent() -> TaskAgent:
                 instruction="Take a poem translation, grade the target translation 3 score of 1-5 integer of 3 crieteria. Rhetroic, Phonetics, Emotion. \n\n Peom: {poem_translation}",
                 input_schema={"peom": PoemTranslation},
                 output_schema=PoemGrading,
-                upstream = ['poem_translation'],
+                upstream=["poem_translation"],
             ),
         ],
     )

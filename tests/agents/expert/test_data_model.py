@@ -1,11 +1,15 @@
 import unittest
+
 from botchan.agents.expert.data_mode import TaskConfig, TaskEntity
+
 
 class Te1(TaskEntity):
     pass
 
+
 class Te2(TaskEntity):
     pass
+
 
 class TestTaskConfigProperties(unittest.TestCase):
     def test_is_root_property(self):
@@ -14,7 +18,7 @@ class TestTaskConfigProperties(unittest.TestCase):
             instruction="Test instruction with upstream",
             input_schema={"input_key": Te1},
             output_schema=str,
-            upstream=["upstream_task_1"]
+            upstream=["upstream_task_1"],
         )
         self.assertFalse(config_with_upstream.is_root)
 
@@ -23,7 +27,7 @@ class TestTaskConfigProperties(unittest.TestCase):
             instruction="Test instruction without upstream",
             input_schema={"input_key": Te2},
             output_schema=str,
-            upstream=[]
+            upstream=[],
         )
         self.assertTrue(config_without_upstream.is_root)
 
@@ -33,7 +37,7 @@ class TestTaskConfigProperties(unittest.TestCase):
             instruction="Test instruction with structured output",
             input_schema={"input_key": Te1},
             output_schema=Te2,
-            upstream=[]
+            upstream=[],
         )
         self.assertTrue(config_with_structured_output.is_structure_output)
 
@@ -42,7 +46,6 @@ class TestTaskConfigProperties(unittest.TestCase):
             instruction="Test instruction with unstructured output",
             input_schema={"input_key": Te1},
             output_schema=str,
-            upstream=[]
+            upstream=[],
         )
         self.assertFalse(config_with_unstructured_output.is_structure_output)
-

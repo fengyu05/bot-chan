@@ -28,18 +28,15 @@ class TaskAgent(MessageIntentAgent):
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
         return [TaskNode(task_config) for task_config in task_graph]
 
-
     def process_message(self, message_event: MessageEvent) -> list[str]:
-        context = {'message_event': MessageEvent}
+        context = {"message_event": MessageEvent}
         responses = []
         for task in self._tasks:
             responses.append(str(task.config))
             output = task(**context)
             responses.append(str(output))
             context[task.output_name] = output
-        logger.info(
-            "Task agent process message", name=self._name, all_output=context
-        )
+        logger.info("Task agent process message", name=self._name, all_output=context)
         return responses
 
     @property

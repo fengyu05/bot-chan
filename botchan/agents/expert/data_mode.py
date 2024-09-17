@@ -1,4 +1,4 @@
-from typing import Type, Union
+from typing import Any, Tuple, Type, Union
 
 from pydantic import BaseModel
 
@@ -11,15 +11,24 @@ class TaskEntity(BaseModel):
         return "\n".join(field_strings)
 
 
-class Task(BaseModel):
-    name: str
-    description: str
+class TaskConfig(BaseModel):
+    task_key: str
     instruction: str
-    intake: bool  # Whether this task take raw message as input
-    input_schema: Union[Type[MessageEvent], Type[TaskEntity]]
-    output_schema: Type[TaskEntity]
-    structure_output: bool  # Whether this task output structure entity
+    input_schema: dict[
+        str, Union[Type[MessageEvent], Type[TaskEntity]]
+    ]  # map from input name to input type
+    output_schema: Union[Type[str], Type[TaskEntity]]
+    upstream: list[str] = []
 
+    def __repr__(self) -> str:
+        field_strings = [f"{key}: {value}" for key, value in self.dict().items()]
+        return "\n".join(field_strings)
+    
     @property
-    def metadata(self) -> str:
-        return f"Expert Task: {self.name}, intake: {self.intake}, strcuture: {self.structure_output}, input_schema: {self.input_schema.__name__}, output_schema: {self.output_schema.__name__}"
+    def is_root(self) -> bool:
+        """Root node is a node doesn't have upstream dependencies."""
+        return len(self.upstream) == 0
+    
+    @property
+    def is_structure_output(self) -> bool:
+        return issubclass(self.output_schema, TaskEntity)   

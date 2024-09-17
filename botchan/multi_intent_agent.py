@@ -6,7 +6,7 @@ from typing import Union
 import structlog
 from slack_sdk import WebClient
 
-from botchan.agents import Agent
+from botchan.agents import MessageIntentAgent
 from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.constants import GPT_4O_MINI
@@ -30,7 +30,7 @@ class MessageMultiIntentAgent:
     slack_client: WebClient
     fetcher: MessagesFetcher
     bot_user_id: str
-    agents: list[Agent]
+    agents: list[MessageIntentAgent]
     intent_by_thread: dict[str, MessageIntent]
 
     def __init__(self, slack_client: WebClient):
@@ -39,12 +39,14 @@ class MessageMultiIntentAgent:
         self.bot_user_id = slack_auth.get_bot_user_id(self.slack_client)
         self.intent_by_thread = {}
 
-        from botchan.agents.expert.poem_translate import create_poems_translation_task
+        from botchan.agents.expert.poem_translate import (
+            create_poems_translation_task_agent,
+        )
 
         self.agents = [
             OpenAiChatAgent(),  ## Handle simple chat
             MiaoAgent(),
-            create_poems_translation_task(),
+            create_poems_translation_task_agent(),
         ]
 
     def _should_reply(self, message_event: MessageCreateEvent) -> bool:

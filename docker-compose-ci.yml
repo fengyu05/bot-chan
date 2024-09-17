@@ -5,10 +5,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     env_file:
-      - env.ci
-    volumes:
-      - './botchan:/app/home/botchan'
-      - './tests:/app/home/tests'
+      - env.ci  
     command: poetry run pytest --verbose
 
   lint:

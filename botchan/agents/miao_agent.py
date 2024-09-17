@@ -1,4 +1,4 @@
-from botchan.agents.message_agent import MessageAgent
+from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.message_intent import MessageIntent
 from botchan.slack.data_model.message_event import MessageEvent
 
@@ -12,7 +12,7 @@ For examples:
 """
 
 
-class MiaoAgent(MessageAgent):
+class MiaoAgent(MessageIntentAgent):
     def __init__(self) -> None:
         super().__init__()
 

@@ -1,6 +1,6 @@
 import structlog
 
-from botchan.agents.message_agent import MessageAgent
+from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.message_intent import MessageIntent
 from botchan.rag.knowledge_base import KnowledgeBase
@@ -11,7 +11,7 @@ from botchan.utt.regex import extract_all_urls
 logger = structlog.getLogger(__name__)
 
 
-class KnowledgeChatAgent(MessageAgent):
+class KnowledgeChatAgent(MessageIntentAgent):
     def __init__(self) -> None:
         super().__init__()
         self.base = KnowledgeBase()

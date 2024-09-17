@@ -1,43 +1,55 @@
-from botchan.agents.expert.data_mode import Task, TaskEntity
-from botchan.agents.message_agent import MessageAgent
-from botchan.constants import GTP_4O_WITH_STRUCT
+from typing import Any
+
+import structlog
+
+from botchan.agents.expert.data_mode import TaskConfig
+from botchan.agents.expert.task_node import TaskNode
+from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.message_intent import MessageIntent
-from botchan.open import OPENAI_CLIENT
-from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
-from botchan.settings import OPENAI_GPT_MODEL_ID
 from botchan.slack.data_model.message_event import MessageEvent
 
-_AGENT_DESC = """A {task_name} task agent handles the request of the following task:
-{task_description}
-"""
+logger = structlog.getLogger(__name__)
 
 
-class TaskAgent(MessageAgent):
-    def __init__(self, task: Task) -> None:
+class TaskAgent(MessageIntentAgent):
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        intent: MessageIntent,
+        task_graph: list[TaskConfig],
+    ) -> None:
         super().__init__()
-        self.task = task
+        self._name = name
+        self._description = description
+        self._intent = intent
+        self._tasks = self.build_task_graph(task_graph)
+
+    def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
+        return [TaskNode(task_config) for task_config in task_graph]
+
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
-        text = message_event.text
-        prompt = self.task.instruction.format(text=text)
+        context = {'message_event': MessageEvent}
+        responses = []
+        for task in self._tasks:
+            responses.append(str(task.config))
+            output = task(**context)
+            responses.append(str(output))
+            context[task.output_name] = output
+        logger.info(
+            "Task agent process message", name=self._name, all_output=context
+        )
+        return responses
 
-        if self.task.structure_output:
-            response = simple_assistant_with_struct_ouput(
-                model_id=GTP_4O_WITH_STRUCT,
-                prompt=prompt,
-                output_schema=self.task.output_schema,
-            )
-            return [self.task.metadata, str(response)]
-        else:
-            response = simple_assistant(model_id=OPENAI_GPT_MODEL_ID, prompt=prompt)
-            return [self.task.metadata, response]
+    @property
+    def name(self):
+        return self._name
 
     @property
     def description(self):
-        return _AGENT_DESC.format(
-            task_name=self.task.name, task_description=self.task.description
-        )
+        return self._description
 
     @property
     def intent(self):
-        return MessageIntent.TASK
+        return self._intent

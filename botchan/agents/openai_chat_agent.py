@@ -5,7 +5,7 @@ from typing import Any
 import structlog
 
 import botchan.agents.prompt_bank as prompt_bank
-from botchan.agents.message_agent import MessageAgent
+from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.message_intent import MessageIntent
 from botchan.open import OPENAI_CLIENT
 from botchan.open.chat_utils import get_message_from_completion
@@ -26,7 +26,7 @@ _AGENT_DESCRIPTION = """ Use this agent to make a natural converastion between t
 """
 
 
-class OpenAiChatAgent(MessageAgent):
+class OpenAiChatAgent(MessageIntentAgent):
     """
     A Chat Agent using Open chat.completion API.
     Conversation is kept with message_buffer keyed by thread_id, with a max buffer limit of 100

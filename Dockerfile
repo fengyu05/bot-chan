@@ -16,6 +16,7 @@ ENV PATH "/app/home/.venv/bin:$PATH"
 
 # Install the app
 ADD botchan ./botchan
+ADD tests ./tests
 RUN poetry install --no-interaction --with dev
 
 # Misc stuff

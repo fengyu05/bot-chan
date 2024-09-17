@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional
-
-from botchan.message_intent import MessageIntent
+from typing import Any, Callable, Optional, Type
 
 
-class Agent(ABC):
+class Task(ABC):
     def __init__(
         self,
         preprocess_hook: Optional[Callable] = None,
@@ -20,29 +18,12 @@ class Agent(ABC):
     def should_process(
         self, *args: Any, **kwds: Any
     ) -> bool:  # pylint: disable=unused-argument
-        message_intent: MessageIntent = self._require_input(
-            kwargs=kwds, key="message_intent"
-        )
-        return message_intent == self.intent
+        return True
 
     def fallback_process(
         self, *args: Any, **kwds: Any
     ) -> Any:  # pylint: disable=unused-argument
         return None
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
-
-    @property
-    @abstractmethod
-    def description(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def intent(self) -> MessageIntent:
-        pass
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         if self.preprocess_hook:
@@ -57,9 +38,15 @@ class Agent(ABC):
             return self.fallback_process(*args, **kwds)
 
     def _require_input(
-        self, kwargs: dict[str, Any], key: str, message: Optional[str] = None
+        self,
+        kwargs: dict[str, Any],
+        key: str,
+        message: Optional[str] = None,
+        value_type: Optional[Type[Any]] = None,
     ) -> Any:
         if not message:
-            message = f"Agent must has field {key}"
+            message = f"task[{self.__class__.__name__}] input must has field {key}"
         assert key in kwargs, message
+        if value_type is not None:
+            assert isinstance(kwargs[key], value_type)
         return kwargs[key]

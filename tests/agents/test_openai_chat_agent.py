@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.slack.data_model import MessageEvent
-from tests.test_data import MESSAGE_AUDIO_EVENT_1, MESSAGE_EVENT_SIMPLE_1
+from tests.data.messages import MESSAGE_AUDIO_EVENT_1, MESSAGE_EVENT_SIMPLE_1
 
 
 class TestOpenAiChatAgent(unittest.TestCase):

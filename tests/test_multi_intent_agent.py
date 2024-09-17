@@ -5,7 +5,7 @@ from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.message_intent import MessageIntent
 from botchan.multi_intent_agent import MessageMultiIntentAgent
 from botchan.slack.data_model import MessageCreateEvent
-from tests.test_data import MESSAGE_EVENT_REPLY_TO_SIMPLE_1, MESSAGE_EVENT_SIMPLE_1
+from tests.data.messages import MESSAGE_EVENT_REPLY_TO_SIMPLE_1, MESSAGE_EVENT_SIMPLE_1
 
 
 class TestMessageMultiIntentAgent(unittest.TestCase):

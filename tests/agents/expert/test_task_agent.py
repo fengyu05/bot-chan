@@ -1,15 +1,16 @@
 import unittest
 from unittest.mock import MagicMock, patch
+
 from botchan.agents.expert.data_mode import TaskConfig
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.agents.expert.task_node import TaskNode
+from botchan.message_intent import MessageIntent
 from botchan.slack.data_model import MessageEvent
 from botchan.task import Task
-from botchan.message_intent import MessageIntent
 from tests.data.messages import MESSAGE_EVENT_SIMPLE_1
 
-class TestTaskAgent(unittest.TestCase):
 
+class TestTaskAgent(unittest.TestCase):
     def setUp(self):
         self.name = "test_agent"
         self.description = "A test agent"
@@ -31,7 +32,6 @@ class TestTaskAgent(unittest.TestCase):
         ]
         self.message_event = MessageEvent(**MESSAGE_EVENT_SIMPLE_1)
 
-
     def test_build_task_graph(self):
         agent = TaskAgent(self.name, self.description, self.intent, self.task_graph)
         self.assertEqual(len(agent.tasks), 2)
@@ -40,7 +40,6 @@ class TestTaskAgent(unittest.TestCase):
         self.assertEqual(agent.tasks[1].config.task_key, "peom_grader")
 
     def test_process_message(self):
-        
         task1 = TaskNode(self.task_graph[0])
         task2 = TaskNode(self.task_graph[1])
 
@@ -48,14 +47,14 @@ class TestTaskAgent(unittest.TestCase):
         task1.process = MagicMock(return_value="output_task1")
         task2.process = MagicMock(return_value="output_task2")
 
-
         tasks = [task1, task2]
-        with patch.object(TaskAgent, 'build_task_graph', return_value=tasks):
+        with patch.object(TaskAgent, "build_task_graph", return_value=tasks):
             agent = TaskAgent(self.name, self.description, self.intent, self.task_graph)
-            
-        responses = agent.process_message(message_event=self.message_event) 
+
+        responses = agent.process_message(message_event=self.message_event)
         self.assertEqual(responses[1], "output_task1")
         self.assertEqual(responses[3], "output_task2")
         task1.process.assert_called_once_with(message_event=self.message_event)
-        task2.process.assert_called_once_with(message_event=self.message_event, poem_translation='output_task1')
-
+        task2.process.assert_called_once_with(
+            message_event=self.message_event, poem_translation="output_task1"
+        )

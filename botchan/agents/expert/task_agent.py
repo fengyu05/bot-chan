@@ -27,15 +27,19 @@ class TaskAgent(MessageIntentAgent):
 
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
         return [TaskNode(task_config) for task_config in task_graph]
+    
+    #def topo_sort(self, task_graph: list[TaskConfig]) -> list[TaskConfig]:
+        
+
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
-        context = {"message_event": MessageEvent}
+        context = {"message_event": message_event}
         responses = []
         for task in self._tasks:
             responses.append(str(task.config))
             output = task(**context)
             responses.append(str(output))
-            context[task.output_name] = output
+            context[task.config.task_key] = output
         logger.info("Task agent process message", name=self._name, all_output=context)
         return responses
 
@@ -50,3 +54,7 @@ class TaskAgent(MessageIntentAgent):
     @property
     def intent(self):
         return self._intent
+
+    @property
+    def tasks(self) -> list[TaskNode]:
+        return self._tasks

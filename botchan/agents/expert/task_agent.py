@@ -28,8 +28,6 @@ class TaskAgent(MessageIntentAgent):
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
         return [TaskNode(task_config) for task_config in task_graph]
 
-    # def topo_sort(self, task_graph: list[TaskConfig]) -> list[TaskConfig]:
-
     def process_message(self, message_event: MessageEvent) -> list[str]:
         context = {"message_event": message_event}
         responses = []

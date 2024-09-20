@@ -76,7 +76,7 @@ class TestTaskNode(unittest.TestCase):
 
         config = TaskConfig(
             task_key="task3",
-            instruction="Process data: {input1}, {input2}",
+            instruction="Process data: {input1.value}, {input2.value}",
             input_schema={"input1": Te1, "input2": Te2},
             output_schema=str,
             upstream=["i1,", "i2"],
@@ -90,6 +90,6 @@ class TestTaskNode(unittest.TestCase):
 
         mock_simple_assistant.assert_called_once_with(
             model_id=OPENAI_GPT_MODEL_ID,
-            prompt=f"Process data: {input1}, {input2}",
+            prompt=f"Process data: {input1.value}, {input2.value}",
         )
         self.assertEqual(result, "Processed data")

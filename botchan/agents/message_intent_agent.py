@@ -3,11 +3,11 @@ from typing import Any
 
 import structlog
 
-from botchan.message_intent import MessageIntent
+from botchan.intent.message_intent import MessageIntent
 from botchan.slack.data_model import MessageEvent
 from botchan.task import Task
 
-logger = structlog.getLogger(__name__)
+logger = structlog.getLogger(__name__)  
 
 
 class MessageIntentAgent(Task):
@@ -29,9 +29,11 @@ class MessageIntentAgent(Task):
         intent (MessageIntent): Abstract property representing the intent of the agent.
         description (str): Abstract property describing the agent's function.
     """
+    intent: MessageIntent
 
-    def __init__(self) -> None:
+    def __init__(self, intent: MessageIntent) -> None:
         super().__init__()
+        self._intent = intent
 
     def process(self, *args: Any, **kwds: Any) -> Any:
         message_event: MessageEvent = self._require_input(
@@ -51,16 +53,15 @@ class MessageIntentAgent(Task):
         message_intent: MessageIntent = self._require_input(
             kwargs=kwds, key="message_intent"
         )
-        return message_intent == self.intent
+        return message_intent.type == self.intent.type
 
     @property
     def name(self) -> str:
         return self.__class__.__name__
 
     @property
-    @abstractmethod
     def intent(self) -> MessageIntent:
-        pass
+        return self._intent
 
     @property
     @abstractmethod

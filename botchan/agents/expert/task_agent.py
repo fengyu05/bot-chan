@@ -5,7 +5,7 @@ import structlog
 from botchan.agents.expert.data_mode import TaskConfig
 from botchan.agents.expert.task_node import TaskNode
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.message_intent import MessageIntent
+from botchan.intent.message_intent import MessageIntent, MessageIntentType
 from botchan.slack.data_model.message_event import MessageEvent
 
 logger = structlog.getLogger(__name__)
@@ -19,7 +19,9 @@ class TaskAgent(MessageIntentAgent):
         intent: MessageIntent,
         task_graph: list[TaskConfig],
     ) -> None:
-        super().__init__()
+        super().__init__(
+            intent=intent
+        )
         self._name = name
         self._description = description
         self._intent = intent
@@ -39,6 +41,15 @@ class TaskAgent(MessageIntentAgent):
         logger.info("Task agent process message", name=self._name, all_output=context)
         return responses
 
+    def should_process(
+        self, *args: Any, **kwds: Any
+    ) -> bool:  # pylint: disable=unused-argument
+        message_intent: MessageIntent = self._require_input(
+            kwargs=kwds, key="message_intent"
+        )
+        return message_intent.type == self.intent.type and message_intent.key == self.intent.key
+
+
     @property
     def name(self):
         return self._name
@@ -46,10 +57,6 @@ class TaskAgent(MessageIntentAgent):
     @property
     def description(self):
         return self._description
-
-    @property
-    def intent(self):
-        return self._intent
 
     @property
     def tasks(self) -> list[TaskNode]:

@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from .message_intent import MessageIntent
+from .intent.message_intent import MessageIntent
 
 _DESCRIPTION = "description"
 _TEMPLATE = "template"

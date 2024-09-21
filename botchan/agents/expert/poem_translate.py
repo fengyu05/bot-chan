@@ -1,6 +1,6 @@
 from botchan.agents.expert.data_mode import TaskConfig, TaskEntity
 from botchan.agents.expert.task_agent import TaskAgent
-from botchan.message_intent import MessageIntent
+from botchan.intent.message_intent import create_intent
 from botchan.slack.data_model.message_event import MessageEvent
 
 
@@ -24,7 +24,7 @@ def create_poems_translation_task_agent() -> TaskAgent:
     return TaskAgent(
         name="Poem translation",
         description="This task translate poem from any source language to tharget lanuage and display them side by side.",
-        intent=MessageIntent.TASK,
+        intent=create_intent(type_name="EXPERT", key="poem_translation"),
         task_graph=[
             TaskConfig(
                 task_key="poem_translation",

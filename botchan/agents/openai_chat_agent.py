@@ -6,7 +6,7 @@ import structlog
 
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.message_intent import MessageIntent
+from botchan.intent.message_intent import create_intent
 from botchan.open import OPENAI_CLIENT
 from botchan.open.chat_utils import get_message_from_completion
 from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
@@ -34,7 +34,9 @@ class OpenAiChatAgent(MessageIntentAgent):
     """
 
     def __init__(self, buffer_limit: int = 100) -> None:
-        super().__init__()
+        super().__init__(
+            intent=create_intent('CHAT')
+        )
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
         self.whisper_agent = OpenAiWhisper()
@@ -46,10 +48,6 @@ class OpenAiChatAgent(MessageIntentAgent):
     @property
     def description(self) -> str:
         return _AGENT_DESCRIPTION
-
-    @property
-    def intent(self) -> MessageIntent:
-        return MessageIntent.CHAT
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
         """

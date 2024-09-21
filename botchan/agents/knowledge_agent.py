@@ -2,7 +2,7 @@ import structlog
 
 from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.message_intent import MessageIntent
+from botchan.intent.message_intent import create_intent
 from botchan.rag.knowledge_base import KnowledgeBase
 from botchan.rag.knowledge_doc import Doc, DocKind
 from botchan.slack.data_model import FileObject, MessageEvent
@@ -13,7 +13,9 @@ logger = structlog.getLogger(__name__)
 
 class KnowledgeChatAgent(MessageIntentAgent):
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__(
+            intent=create_intent('KNOW')
+        )
         self.base = KnowledgeBase()
         self.chat_agent = OpenAiChatAgent()
 
@@ -63,7 +65,3 @@ class KnowledgeChatAgent(MessageIntentAgent):
     @property
     def name(self) -> str:
         return "KnowledgeChat"
-
-    @property
-    def intent(self) -> MessageIntent:
-        return MessageIntent.KNOW

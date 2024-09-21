@@ -13,7 +13,7 @@ class TestTaskAgent(unittest.TestCase):
     def setUp(self):
         self.name = "test_agent"
         self.description = "A test agent"
-        self.intent = MessageIntent(type=MessageIntentType.EXPERT, key="test_task") 
+        self.intent = MessageIntent(type=MessageIntentType.EXPERT, key="test_task")
         self.task_graph = [
             TaskConfig(
                 task_key="poem_translation",
@@ -37,6 +37,50 @@ class TestTaskAgent(unittest.TestCase):
         self.assertIsInstance(agent.tasks[0], TaskNode)
         self.assertEqual(agent.tasks[0].config.task_key, "poem_translation")
         self.assertEqual(agent.tasks[1].config.task_key, "peom_grader")
+
+    def test_build_task_graph_2(self):
+        task_graph = [
+            TaskConfig(
+                task_key="A",
+                instruction="Take user input, if input is a peom name, output the information of the poem translate into the user request language. User input: {text}",
+                input_schema={"message_event": MessageEvent},
+                output_schema=str,
+            ),
+            TaskConfig(
+                task_key="B",
+                instruction="Take a poem translation, grade the target translation 3 score of 1-5 integer of 3 crieteria. Rhetroic, Phonetics, Emotion. \n\n Peom: {poem_translation}",
+                input_schema={"message_event": MessageEvent},
+                output_schema=str,
+                upstream=["A"],
+            ),
+            TaskConfig(
+                task_key="C",
+                instruction="Take a poem translation, grade the target translation 3 score of 1-5 integer of 3 crieteria. Rhetroic, Phonetics, Emotion. \n\n Peom: {poem_translation}",
+                input_schema={"message_event": MessageEvent},
+                output_schema=str,
+                upstream=["A"],
+            ),
+            TaskConfig(
+                task_key="D",
+                instruction="Take a poem translation, grade the target translation 3 score of 1-5 integer of 3 crieteria. Rhetroic, Phonetics, Emotion. \n\n Peom: {poem_translation}",
+                input_schema={"message_event": MessageEvent},
+                output_schema=str,
+                upstream=["B", "C"],
+            ),
+        ]
+        agent = TaskAgent(self.name, self.description, self.intent, task_graph)
+        self.debug(agent.tasks)
+        self.assertEqual(len(agent.tasks), 4)
+        self.assertIsInstance(agent.tasks[0], TaskNode)
+        self.assertEqual(agent.tasks[0].config.task_key, "A")
+        self.assertIn(agent.tasks[1].config.task_key, ["B", "C"])
+        if agent.tasks[1].config.task_key == "B":
+            self.assertEqual(agent.tasks[1].config.task_key, "B")
+            self.assertEqual(agent.tasks[2].config.task_key, "C")
+        else:
+            self.assertEqual(agent.tasks[1].config.task_key, "C")
+            self.assertEqual(agent.tasks[2].config.task_key, "B")
+        self.assertEqual(agent.tasks[3].config.task_key, "D")
 
     def test_process_message(self):
         task1 = TaskNode(self.task_graph[0])

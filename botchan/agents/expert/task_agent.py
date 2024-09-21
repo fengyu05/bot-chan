@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, Set, Tuple
 
 import structlog
 
@@ -19,16 +19,68 @@ class TaskAgent(MessageIntentAgent):
         intent: MessageIntent,
         task_graph: list[TaskConfig],
     ) -> None:
-        super().__init__(
-            intent=intent
-        )
+        super().__init__(intent=intent)
         self._name = name
         self._description = description
         self._intent = intent
         self._tasks = self.build_task_graph(task_graph)
 
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
-        return [TaskNode(task_config) for task_config in task_graph]
+        def build_graph(
+            configs: list[TaskConfig],
+        ) -> Tuple[TaskNode, Dict[str, TaskNode]]:
+            graph_dict: Dict[str, TaskNode] = {}
+            root_node: TaskNode | None = None
+            for config in configs:
+                graph_dict[config.task_key] = TaskNode(config)
+            for _, node in graph_dict.items():
+                if node.config.is_root:
+                    root_node = node
+                for upstream_key in node.config.upstream:
+                    if upstream_key in graph_dict:
+                        upstream_node = graph_dict[upstream_key]
+                        node.upstream.append(upstream_node)
+
+            if root_node is None:
+                raise ValueError("No root found.")
+
+            return (root_node, graph_dict)
+
+        def topo_sort(
+            root: TaskNode, node_graph: Dict[str, TaskNode]
+        ) -> list[TaskNode]:
+            visited: Set[str] = set()
+            temp_marked: Set[str] = set()
+            stack: list[TaskNode] = [root]
+            visited.add(root.config.task_key)
+
+            def dfs(node: TaskNode):
+                if node.config.task_key in temp_marked:
+                    raise ValueError("Graph is not a DAG (contains a cycle)")
+
+                if node.config.task_key in visited:
+                    return
+                temp_marked.add(node.config.task_key)
+                for neighbor in node.upstream:
+                    dfs(neighbor)
+                temp_marked.remove(node.config.task_key)
+                visited.add(node.config.task_key)
+                stack.append(node)
+
+            for _, node in node_graph.items():
+                dfs(node)
+
+            return stack
+
+        root, node_graph = build_graph(task_graph)
+        sorted_nodes = topo_sort(root, node_graph)
+        logger.info(
+            "Task agent build task graph",
+            name=self._name,
+            all_output=[node.config.task_key for node in sorted_nodes],
+        )
+
+        return sorted_nodes
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
         context = {"message_event": message_event}
@@ -47,8 +99,10 @@ class TaskAgent(MessageIntentAgent):
         message_intent: MessageIntent = self._require_input(
             kwargs=kwds, key="message_intent"
         )
-        return message_intent.type == self.intent.type and message_intent.key == self.intent.key
-
+        return (
+            message_intent.type == self.intent.type
+            and message_intent.key == self.intent.key
+        )
 
     @property
     def name(self):

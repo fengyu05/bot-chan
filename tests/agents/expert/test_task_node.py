@@ -1,12 +1,10 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-from botchan.agents.expert.data_mode import TaskConfig, TaskEntity
+from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntity
 from botchan.agents.expert.task_node import TaskNode
 from botchan.constants import GTP_4O_WITH_STRUCT
 from botchan.settings import OPENAI_GPT_MODEL_ID
-from botchan.slack.data_model.message_event import MessageEvent
-from tests.data.messages import MESSAGE_EVENT_SIMPLE_1
 
 
 class Te1(TaskEntity):
@@ -20,17 +18,15 @@ class Te2(TaskEntity):
 class TestTaskNode(unittest.TestCase):
     def setUp(self) -> None:
         self.secret_word = "Hello World"
-        message_data = MESSAGE_EVENT_SIMPLE_1.copy()
-        message_data["text"] = self.secret_word
-        self.message_event = MessageEvent(**message_data)
+        self.intake_message = IntakeMessage(text=self.secret_word)
         return super().setUp()
 
     @patch("botchan.agents.expert.task_node.simple_assistant_with_struct_ouput")
     def test_process_with_root_struct_output(self, mock_assistant):
         config = TaskConfig(
             task_key="task1",
-            instruction="Test instruction: {text}",
-            input_schema={"message_event": MessageEvent},
+            instruction="Test instruction: {message.text}",
+            input_schema={"message": IntakeMessage},
             output_schema=Te1,
         )
         task_node = TaskNode(config=config)
@@ -40,7 +36,7 @@ class TestTaskNode(unittest.TestCase):
         # Test with root config and message_event in kwargs
         expect_result = Te1(value=self.secret_word)
         mock_assistant.return_value = expect_result
-        result = task_node(message_event=self.message_event)
+        result = task_node(message=self.intake_message)
 
         mock_assistant.assert_called_once_with(
             model_id=GTP_4O_WITH_STRUCT,
@@ -55,15 +51,15 @@ class TestTaskNode(unittest.TestCase):
 
         config = TaskConfig(
             task_key="task1",
-            instruction="Test instruction: {text}",
-            input_schema={"message_event": MessageEvent},
+            instruction="Test instruction: {message.text}",
+            input_schema={"message": IntakeMessage},
             output_schema=str,
         )
         self.assertTrue(config.is_root)
         self.assertFalse(config.is_structure_output)
         task_node = TaskNode(config=config)
 
-        result = task_node(message_event=self.message_event)
+        result = task_node(message=self.intake_message)
         mock_simple_assistant.assert_called_once_with(
             model_id=OPENAI_GPT_MODEL_ID,
             prompt=f"Test instruction: {self.secret_word}",
@@ -79,7 +75,6 @@ class TestTaskNode(unittest.TestCase):
             instruction="Process data: {input1.value}, {input2.value}",
             input_schema={"input1": Te1, "input2": Te2},
             output_schema=str,
-            upstream=["i1,", "i2"],
         )
         self.assertFalse(config.is_root)
         self.assertFalse(config.is_structure_output)

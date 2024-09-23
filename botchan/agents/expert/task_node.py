@@ -24,20 +24,10 @@ class TaskNode(Task):
         return self._config
 
     def process(self, *args: Any, **kwds: Any) -> Any:
-        if self.config.is_root:
-            message_event: MessageEvent = self._require_input(
-                kwargs=kwds, key="message_event"
-            )
-            prompt = fstring_format(
-                fstring=self.config.instruction, text=message_event.text
-            )
-        else:
-            inputs = {}
-            for key, _type in self.config.input_schema.items():
-                inputs[key] = self._require_input(
-                    kwargs=kwds, key=key, value_type=_type
-                )
-            prompt = fstring_format(fstring=self.config.instruction, **inputs)
+        inputs = {}
+        for key, _type in self.config.input_schema.items():
+            inputs[key] = self._require_input(kwargs=kwds, key=key, value_type=_type)
+        prompt = fstring_format(fstring=self.config.instruction, **inputs)
 
         # output schema is a structure entity
         if self.config.is_structure_output:

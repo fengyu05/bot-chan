@@ -1,4 +1,3 @@
-
 from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.intent.message_intent import create_intent
 from botchan.slack.data_model.message_event import MessageEvent
@@ -15,7 +14,7 @@ For examples:
 
 class MiaoAgent(MessageIntentAgent):
     def __init__(self) -> None:
-        super().__init__(intent=create_intent(type_name='MIAO'))
+        super().__init__(intent=create_intent(type_name="MIAO"))
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
         return [":cat: miao~~"]
@@ -23,4 +22,3 @@ class MiaoAgent(MessageIntentAgent):
     @property
     def description(self) -> str:
         return _AGENT_DESC
-

@@ -27,8 +27,16 @@ def fstring_format(fstring: str, **kwargs) -> str:
         keys = key.split(".")
         for k in keys:
             if isinstance(obj, dict):
+                if k not in obj:
+                    raise KeyError(
+                        f"Input invalid: Key '{k}' not found in dictionary when resoloving {key}."
+                    )
                 obj = obj[k]
             else:
+                if not hasattr(obj, k):
+                    raise KeyError(
+                        f"Input invalid: Attribute '{k}' not found in object when resoloving {key}."
+                    )
                 obj = getattr(obj, k)
         return obj
 

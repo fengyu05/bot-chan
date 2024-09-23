@@ -1,7 +1,6 @@
-from botchan.agents.expert.data_mode import TaskConfig, TaskEntity
+from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntity
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.intent.message_intent import create_intent
-from botchan.slack.data_model.message_event import MessageEvent
 
 
 class PoemTranslation(TaskEntity):
@@ -28,8 +27,8 @@ def create_poems_translation_task_agent() -> TaskAgent:
         task_graph=[
             TaskConfig(
                 task_key="poem_translation",
-                instruction="Take user input, if input is a peom name, output the information of the poem translate into the user request language. User input: {text}",
-                input_schema={"message_event": MessageEvent},
+                instruction="Take user input, if input is a peom name, output the information of the poem translate into the user request language. User input: {message.text}",
+                input_schema={"message": IntakeMessage},
                 output_schema=PoemTranslation,
             ),
             TaskConfig(
@@ -37,7 +36,6 @@ def create_poems_translation_task_agent() -> TaskAgent:
                 instruction="Take a poem translation, grade the target translation 3 score of 1-5 integer of 3 crieteria. Rhetroic, Phonetics, Emotion. \n\n Peom: {poem_translation.target_text}",
                 input_schema={"poem_translation": PoemTranslation},
                 output_schema=PoemGrading,
-                upstream=["poem_translation"],
             ),
         ],
     )

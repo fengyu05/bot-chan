@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch
 
-from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.agents.miao_agent import MiaoAgent
-from botchan.intent.message_intent import create_intent
+from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.intent.intent_matcher import IntentMatcher
+from botchan.intent.message_intent import create_intent
 from botchan.slack.data_model import MessageEvent
 from tests.data.messages import MESSAGE_EVENT_REPLY_TO_SIMPLE_1, MESSAGE_EVENT_SIMPLE_1
 
@@ -20,9 +20,9 @@ class TestIntentMatcher(unittest.TestCase):
             use_strcuture_output=False,
         )
 
-    @patch('botchan.intent.intent_matcher.simple_assistant_with_struct_ouput')
+    @patch("botchan.intent.intent_matcher.simple_assistant_with_struct_ouput")
     def test_message_intent_match_llm_with_struct(self, mock_simple_assistant):
-        test_intent = create_intent('CHAT')
+        test_intent = create_intent("CHAT")
         mock_simple_assistant.return_value = test_intent
 
         matcher = IntentMatcher(
@@ -53,11 +53,10 @@ class TestIntentMatcher(unittest.TestCase):
 
         mock_simple_assistant.asert_called_once()  # Call only once, second time is in cache
 
-
-    @patch('botchan.intent.intent_matcher.simple_assistant')
+    @patch("botchan.intent.intent_matcher.simple_assistant")
     def test_message_intent_match_llm_with_plain_text(self, mock_simple_assistant):
-        test_intent = create_intent('CHAT')
-        mock_simple_assistant.return_value = '0'
+        test_intent = create_intent("CHAT")
+        mock_simple_assistant.return_value = "0"
         matcher = self.default_matcher
         message_event_1 = MessageEvent(**MESSAGE_EVENT_SIMPLE_1)
         # Assert the intent cache starts empty

@@ -2,7 +2,7 @@ from typing import Any
 
 import structlog
 
-from botchan.agents.expert.data_mode import TaskConfig
+from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig
 from botchan.agents.expert.task_node import TaskNode
 from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.intent.message_intent import MessageIntent, MessageIntentType
@@ -19,19 +19,25 @@ class TaskAgent(MessageIntentAgent):
         intent: MessageIntent,
         task_graph: list[TaskConfig],
     ) -> None:
-        super().__init__(
-            intent=intent
-        )
+        super().__init__(intent=intent)
         self._name = name
         self._description = description
         self._intent = intent
         self._tasks = self.build_task_graph(task_graph)
 
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
+        """
+        1. build graph from input_schema, set up Task upstreams, downstream pointers.
+        2. check whether it's valid(raise execption)
+            1. Root tasks must take consume message only.
+            2. instruction only has fields in the input object.
+            3 .no pending inputs
+        3. topo sort accordingly
+        """
         return [TaskNode(task_config) for task_config in task_graph]
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
-        context = {"message_event": message_event}
+        context = {"message": IntakeMessage(text=message_event.text)}
         responses = []
         for task in self._tasks:
             responses.append(str(task.config))
@@ -47,8 +53,10 @@ class TaskAgent(MessageIntentAgent):
         message_intent: MessageIntent = self._require_input(
             kwargs=kwds, key="message_intent"
         )
-        return message_intent.type == self.intent.type and message_intent.key == self.intent.key
-
+        return (
+            message_intent.type == self.intent.type
+            and message_intent.key == self.intent.key
+        )
 
     @property
     def name(self):

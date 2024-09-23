@@ -34,9 +34,7 @@ class OpenAiChatAgent(MessageIntentAgent):
     """
 
     def __init__(self, buffer_limit: int = 100) -> None:
-        super().__init__(
-            intent=create_intent('CHAT')
-        )
+        super().__init__(intent=create_intent("CHAT"))
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
         self.whisper_agent = OpenAiWhisper()

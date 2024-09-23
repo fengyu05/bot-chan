@@ -13,9 +13,7 @@ logger = structlog.getLogger(__name__)
 
 class KnowledgeChatAgent(MessageIntentAgent):
     def __init__(self) -> None:
-        super().__init__(
-            intent=create_intent('KNOW')
-        )
+        super().__init__(intent=create_intent("KNOW"))
         self.base = KnowledgeBase()
         self.chat_agent = OpenAiChatAgent()
 

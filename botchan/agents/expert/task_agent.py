@@ -63,18 +63,26 @@ class TaskAgent(MessageIntentAgent):
             v: str,
             adj: dict[str, TaskNode],
             visited: dict[str, bool],
+            rec_stack: dict[str, bool],
             stack: list[TaskNode],
         ):
-            # Mark the current node as visited
-            visited[v] = True
+            if rec_stack[v]:
+                raise ValueError("Graph contains a cycle.")
+
+            if visited[v]:
+                return True
+            rec_stack[v] = True
 
             # Recur for all adjacent vertices
             for upstream_key, _ in adj[v].config.input_schema.items():
                 if upstream_key not in visited:
                     continue
-                if not visited[upstream_key]:
-                    topological_sort_util(upstream_key, adj, visited, stack)
+                topological_sort_util(upstream_key, adj, visited, rec_stack, stack)
 
+            # Remove the vertex from recursion stack
+            rec_stack[v] = False
+            # Mark the current node as visited
+            visited[v] = True
             # Push current vertex to stack stores the result
             stack.append(adj[v])
 
@@ -82,11 +90,14 @@ class TaskAgent(MessageIntentAgent):
             # Stack to store the result
             stack: list[TaskNode] = []
 
+            # Mark all the vertices as not visited
             visited: dict[str, bool] = {key: False for key, _ in adj.items()}
+            rec_stack = visited.copy()
 
+            # Call the recursive helper function to store
+            # Topological Sort starting from all vertices one by one
             for v, _ in adj.items():
-                if not visited[v]:
-                    topological_sort_util(v, adj, visited, stack)
+                topological_sort_util(v, adj, visited, rec_stack, stack)
 
             return stack
 

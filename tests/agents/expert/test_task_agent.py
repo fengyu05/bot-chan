@@ -246,13 +246,9 @@ class TestTaskAgent(unittest.TestCase):
                 output_schema=Te1,
             ),
         ]
-        agent = TaskAgent(self.name, self.description, self.intent, task_graph)
-        self.assertEqual(len(agent.tasks), 5)
-        self.assertIsInstance(agent.tasks[0], TaskNode)
-        self.assertEqual(agent.tasks[0].config.task_key, "step_1")
-        self.assertEqual(agent.tasks[1].config.task_key, "step_2")
-        self.assertEqual(agent.tasks[2].config.task_key, "step_3")
-        self.assertEqual(agent.tasks[3].config.task_key, "step_4")
+        with self.assertRaises(ValueError) as context:
+            _ = TaskAgent(self.name, self.description, self.intent, task_graph)
+        self.assertEqual(str(context.exception), "Graph contains a cycle.")
 
     def test_process_message(self):
         task1 = TaskNode(self.task_graph[0])

@@ -34,7 +34,82 @@ class TaskAgent(MessageIntentAgent):
             3 .no pending inputs
         3. topo sort accordingly
         """
-        return [TaskNode(task_config) for task_config in task_graph]
+
+        def check_instruction(config: TaskConfig):
+            # TODO:
+            for key, _ in config.input_schema.items():
+                if config.instruction.find("{" + key) < 0:
+                    raise ValueError("Instruction fields not match input object.")
+
+        def check_config(config_list: list[TaskConfig]):
+            has_root = False
+            for config in config_list:
+                # check has root
+                if not has_root and config.is_root:
+                    has_root = True
+                # check instruction
+                check_instruction(config)
+
+            if not has_root:
+                raise ValueError(f"No root found. {config_list}")
+
+        def build_graph(config_list: list[TaskConfig]) -> dict[str, TaskNode]:
+            graph_dict: dict[str, TaskNode] = {}
+            for config in config_list:
+                graph_dict[config.task_key] = TaskNode(config)
+            return graph_dict
+
+        def topological_sort_util(
+            v: str,
+            adj: dict[str, TaskNode],
+            visited: dict[str, bool],
+            rec_stack: dict[str, bool],
+            stack: list[TaskNode],
+        ):
+            if rec_stack[v]:
+                raise ValueError("Graph contains a cycle.")
+
+            if visited[v]:
+                return True
+            rec_stack[v] = True
+
+            # Recur for all adjacent vertices
+            for upstream_key, _ in adj[v].config.input_schema.items():
+                if upstream_key not in visited:
+                    continue
+                topological_sort_util(upstream_key, adj, visited, rec_stack, stack)
+
+            # Remove the vertex from recursion stack
+            rec_stack[v] = False
+            # Mark the current node as visited
+            visited[v] = True
+            # Push current vertex to stack stores the result
+            stack.append(adj[v])
+
+        def topological_sort(adj: dict[str, TaskNode]) -> list[TaskNode]:
+            # Stack to store the result
+            stack: list[TaskNode] = []
+
+            # Mark all the vertices as not visited
+            visited: dict[str, bool] = {key: False for key, _ in adj.items()}
+            rec_stack = visited.copy()
+
+            # Call the recursive helper function to store
+            # Topological Sort starting from all vertices one by one
+            for v, _ in adj.items():
+                topological_sort_util(v, adj, visited, rec_stack, stack)
+
+            return stack
+
+        check_config(task_graph)
+        node_graph = build_graph(task_graph)
+        sorted_node = topological_sort(node_graph)
+        logger.info(
+            "Build task graph finish",
+            name=self._name,
+            all_output=[n.config.task_key for n in sorted_node],
+        )
+        return sorted_node
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
         context = {"message": IntakeMessage(text=message_event.text)}

@@ -1,8 +1,6 @@
-from typing import Any, Tuple, Type, Union
+from typing import Callable, Type, Union, Optional
 
 from pydantic import BaseModel
-
-from botchan.slack.data_model.message_event import MessageEvent
 
 
 class TaskEntity(BaseModel):
@@ -20,6 +18,8 @@ class TaskConfig(BaseModel):
     instruction: str
     input_schema: dict[str, Type[TaskEntity]]  # map from input name to input type
     output_schema: Union[Type[str], Type[TaskEntity]]
+    success_criteria: Optional[Callable]
+    loop_message: Optional[str]
 
     def __repr__(self) -> str:
         field_strings = [f"{key}: {value}" for key, value in self.dict().items()]

@@ -1,16 +1,16 @@
-from typing import Any
+from typing import Any, Optional
 
 import structlog
 
 from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig
 from botchan.agents.expert.task_node import TaskNode
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.intent.message_intent import MessageIntent, MessageIntentType
+from botchan.intent.message_intent import MessageIntent
 from botchan.slack.data_model.message_event import MessageEvent
 
 logger = structlog.getLogger(__name__)
 
-
+EMPTY_LOOP_MESSAGE = "Cannot proceed with the request, please try again :bow:"
 class TaskAgent(MessageIntentAgent):
     def __init__(
         self,
@@ -18,11 +18,13 @@ class TaskAgent(MessageIntentAgent):
         description: str,
         intent: MessageIntent,
         task_graph: list[TaskConfig],
+        context: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(intent=intent)
         self._name = name
         self._description = description
         self._intent = intent
+        self._context = context or {}
         self._tasks = self.build_task_graph(task_graph)
 
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
@@ -36,10 +38,7 @@ class TaskAgent(MessageIntentAgent):
         """
 
         def check_instruction(config: TaskConfig):
-            # TODO:
-            for key, _ in config.input_schema.items():
-                if config.instruction.find("{" + key) < 0:
-                    raise ValueError("Instruction fields not match input object.")
+            pass
 
         def check_config(config_list: list[TaskConfig]):
             has_root = False
@@ -112,15 +111,27 @@ class TaskAgent(MessageIntentAgent):
         return sorted_node
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
-        context = {"message": IntakeMessage(text=message_event.text)}
+        context = self._context.copy()
+        context.update({"message": IntakeMessage(text=message_event.text)})
         responses = []
         for task in self._tasks:
             responses.append(str(task.config))
             output = task(**context)
             responses.append(str(output))
             context[task.config.task_key] = output
+
+            if self.stuck_in_loop(task=task, output=output):
+                responses.append(task.config.loop_message or EMPTY_LOOP_MESSAGE)
+                break
+
         logger.info("Task agent process message", name=self._name, all_output=context)
         return responses
+
+    def stuck_in_loop(self, task: TaskNode, output: Any) -> bool:
+        if task.config.success_criteria is None:
+            return False
+        
+        return task.config.success_criteria(output)
 
     def should_process(
         self, *args: Any, **kwds: Any

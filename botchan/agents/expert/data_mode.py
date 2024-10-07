@@ -1,4 +1,4 @@
-from typing import Callable, Type, Union, Optional
+from typing import Any, Callable, Optional, Type, Union
 
 from pydantic import BaseModel
 
@@ -7,6 +7,26 @@ class TaskEntity(BaseModel):
     def __repr__(self):
         field_strings = [f"{key}: {value}" for key, value in self.dict().items()]
         return "\n".join(field_strings)
+
+    @classmethod
+    def check_nested_field_in_class(cls, field_path: str) -> bool:
+        """
+        Check whether a nested field path like "a.b" or "a.b.c" exists in this Pydantic class.
+
+        Args:
+            field_path (str): The dot-separated path of the field.
+
+        Returns:
+            bool: True if the field path exists, False otherwise.
+        """
+        fields = field_path.split(".")
+        current_model: Any = cls
+        try:
+            for field in fields:
+                current_model = current_model.__annotations__[field]
+            return True
+        except KeyError:
+            return False
 
 
 class IntakeMessage(TaskEntity):

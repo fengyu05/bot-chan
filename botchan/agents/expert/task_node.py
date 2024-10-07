@@ -1,12 +1,12 @@
 from typing import Any
 
 import structlog
+from jinja2 import Template
 
-from botchan.agents.expert.data_mode import TaskConfig, TaskEntity
+from botchan.agents.expert.data_mode import TaskConfig
 from botchan.constants import GTP_4O_WITH_STRUCT
 from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
 from botchan.settings import OPENAI_GPT_MODEL_ID
-from botchan.slack.data_model.message_event import MessageEvent
 from botchan.task import Task
 from botchan.utt.template import fstring_format
 
@@ -27,7 +27,9 @@ class TaskNode(Task):
         inputs = {}
         for key, _type in self.config.input_schema.items():
             inputs[key] = self._require_input(kwargs=kwds, key=key, value_type=_type)
-        prompt = fstring_format(fstring=self.config.instruction, **inputs)
+
+        template = Template(self.config.instruction)
+        prompt = template.render(**inputs)
 
         # output schema is a structure entity
         if self.config.is_structure_output:

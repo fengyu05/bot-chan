@@ -100,25 +100,25 @@ class TestTaskAgent(unittest.TestCase):
         task_graph = [
             TaskConfig(
                 task_key="step_1",
-                instruction="User: {message}",
+                instruction="User: {{message}}",
                 input_schema={"message": IntakeMessage},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_2",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_3",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_4",
-                instruction="User: {step_2} {step_3}",
+                instruction="User: {{step_2}} {{step_3}}",
                 input_schema={"step_2": Te1, "step_3": Te1},
                 output_schema=Te1,
             ),
@@ -143,31 +143,31 @@ class TestTaskAgent(unittest.TestCase):
         task_graph = [
             TaskConfig(
                 task_key="step_1",
-                instruction="User: {message}",
+                instruction="User: {{message}}",
                 input_schema={"message": IntakeMessage},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_5",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_2",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_3",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_4",
-                instruction="User: {step_2} {step_3}",
+                instruction="User: {{step_2}} {{step_3}}",
                 input_schema={"step_2": Te1, "step_3": Te1},
                 output_schema=Te1,
             ),
@@ -193,31 +193,31 @@ class TestTaskAgent(unittest.TestCase):
         task_graph = [
             TaskConfig(
                 task_key="step_1",
-                instruction="User: {message}",
+                instruction="User: {{message}}",
                 input_schema={"message": IntakeMessage},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_4",
-                instruction="User: {step_1} {step_3}",
+                instruction="User: {{step_1}} {{step_3}}",
                 input_schema={"step_1": Te1, "step_3": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_5",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_2",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_3",
-                instruction="User: {step_2}",
+                instruction="User: {{step_2}}",
                 input_schema={"step_2": Te1},
                 output_schema=Te1,
             ),
@@ -240,13 +240,13 @@ class TestTaskAgent(unittest.TestCase):
         task_graph = [
             TaskConfig(
                 task_key="step_1",
-                instruction="User: {message} {input}",
+                instruction="User: {{message}} {{input}}",
                 input_schema={"message": IntakeMessage, "input": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_2",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
@@ -264,13 +264,13 @@ class TestTaskAgent(unittest.TestCase):
         task_graph = [
             TaskConfig(
                 task_key="step_1",
-                instruction="User: {message}",
+                instruction="User: {{message}}",
                 input_schema={"message": IntakeMessage},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_2",
-                instruction="User: {text}",
+                instruction="User: {{text}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
@@ -282,7 +282,7 @@ class TestTaskAgent(unittest.TestCase):
                 intent=self.intent,
                 task_graph=task_graph,
             )
-        self.assertEqual(str(context.exception)[0:18], "Instruction fields")
+        self.assertEqual(str(context.exception)[0:18], "Invalid template o")
 
     def test_build_task_graph_cycular(self):
         # cycle
@@ -292,31 +292,31 @@ class TestTaskAgent(unittest.TestCase):
         task_graph = [
             TaskConfig(
                 task_key="step_1",
-                instruction="User: {message}",
+                instruction="User: {{message}}",
                 input_schema={"message": IntakeMessage},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_2",
-                instruction="User: {step_1}",
+                instruction="User: {{step_1}}",
                 input_schema={"step_1": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_3",
-                instruction="User: {step_1} {step_2} {step_5}",
+                instruction="User: {{step_1}} {{step_2}} {{step_5}}",
                 input_schema={"step_1": Te1, "step_2": Te1, "step_5": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_4",
-                instruction="User: {step_3}",
+                instruction="User: {{step_3}}",
                 input_schema={"step_3": Te1},
                 output_schema=Te1,
             ),
             TaskConfig(
                 task_key="step_5",
-                instruction="User: {step_4}",
+                instruction="User: {{step_4}}",
                 input_schema={"step_4": Te1},
                 output_schema=Te1,
             ),

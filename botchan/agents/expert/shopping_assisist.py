@@ -10,7 +10,8 @@ class ProductSpec(TaskEntity):
     @property
     def desc_short(self) -> str:
         return f'{self.name}:[{" ".join(self.choices)}]'
-    
+
+
 class Product(TaskEntity):
     id: str
     name: str
@@ -24,11 +25,13 @@ class Product(TaskEntity):
 
     @property
     def all_spec(self) -> str:
-        return ' '.join([spec.desc_short for spec in self.specs])
+        return " ".join([spec.desc_short for spec in self.specs])
+
 
 class ProductMatch(TaskEntity):
     match: bool
     product: Product
+
 
 class Order(TaskEntity):
     product_id: str

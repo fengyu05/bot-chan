@@ -25,7 +25,7 @@ class TestTaskNode(unittest.TestCase):
     def test_process_with_root_struct_output(self, mock_assistant):
         config = TaskConfig(
             task_key="task1",
-            instruction="Test instruction: {message.text}",
+            instruction="Test instruction: {{ message.text }}",
             input_schema={"message": IntakeMessage},
             output_schema=Te1,
         )
@@ -51,7 +51,7 @@ class TestTaskNode(unittest.TestCase):
 
         config = TaskConfig(
             task_key="task1",
-            instruction="Test instruction: {message.text}",
+            instruction="Test instruction: {{ message.text }}",
             input_schema={"message": IntakeMessage},
             output_schema=str,
         )
@@ -72,7 +72,7 @@ class TestTaskNode(unittest.TestCase):
 
         config = TaskConfig(
             task_key="task3",
-            instruction="Process data: {input1.value}, {input2.value}",
+            instruction="Process data: {{input1.value}}, {{input2.value}}",
             input_schema={"input1": Te1, "input2": Te2},
             output_schema=str,
         )

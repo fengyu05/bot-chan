@@ -1,15 +1,21 @@
 import unittest
 
 from botchan.agents.expert.data_mode import TaskEntity
-from botchan.utt.template import fstring_format
+from botchan.utt.template import collect_placeholders, fstring_format
 
 
 class TestFStringFormat(unittest.TestCase):
     def test_simple_format(self):
         self.assertEqual(fstring_format("{a},{b}", a=1, b=2), "1,2")
 
+    def test_place_holder1(self):
+        self.assertEqual(collect_placeholders("{a},{b}"), ["a", "b"])
+
     def test_nested_dict(self):
         self.assertEqual(fstring_format("{a} {b.c}", a=1, b={"c": "hello"}), "1 hello")
+
+    def test_place_holder2(self):
+        self.assertEqual(collect_placeholders("{a} {b.c}"), ["a", "b.c"])
 
     def test_missing_placeholder(self):
         with self.assertRaises(KeyError):

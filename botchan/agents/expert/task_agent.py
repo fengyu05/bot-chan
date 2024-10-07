@@ -1,14 +1,17 @@
-from typing import Any
+from typing import Any, Optional
 
 import structlog
+from jinja2 import Environment, meta
 
 from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig
 from botchan.agents.expert.task_node import TaskNode
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.intent.message_intent import MessageIntent, MessageIntentType
+from botchan.intent.message_intent import MessageIntent
 from botchan.slack.data_model.message_event import MessageEvent
 
 logger = structlog.getLogger(__name__)
+
+EMPTY_LOOP_MESSAGE = "Cannot proceed with the request, please try again :bow:"
 
 
 class TaskAgent(MessageIntentAgent):
@@ -18,46 +21,21 @@ class TaskAgent(MessageIntentAgent):
         description: str,
         intent: MessageIntent,
         task_graph: list[TaskConfig],
+        context: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(intent=intent)
         self._name = name
         self._description = description
         self._intent = intent
+        self._context = context or {}
         self._tasks = self.build_task_graph(task_graph)
 
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
         """
-        1. build graph from input_schema, set up Task upstreams, downstream pointers.
-        2. check whether it's valid(raise execption)
-            1. Root tasks must take consume message only.
-            2. instruction only has fields in the input object.
-            3 .no pending inputs
-        3. topo sort accordingly
+        1. check graph
+        2. build nodes
+        3. toposort
         """
-
-        def check_instruction(config: TaskConfig):
-            # TODO:
-            for key, _ in config.input_schema.items():
-                if config.instruction.find("{" + key) < 0:
-                    raise ValueError("Instruction fields not match input object.")
-
-        def check_config(config_list: list[TaskConfig]):
-            has_root = False
-            for config in config_list:
-                # check has root
-                if not has_root and config.is_root:
-                    has_root = True
-                # check instruction
-                check_instruction(config)
-
-            if not has_root:
-                raise ValueError(f"No root found. {config_list}")
-
-        def build_graph(config_list: list[TaskConfig]) -> dict[str, TaskNode]:
-            graph_dict: dict[str, TaskNode] = {}
-            for config in config_list:
-                graph_dict[config.task_key] = TaskNode(config)
-            return graph_dict
 
         def topological_sort_util(
             v: str,
@@ -101,8 +79,10 @@ class TaskAgent(MessageIntentAgent):
 
             return stack
 
-        check_config(task_graph)
-        node_graph = build_graph(task_graph)
+        self.check_config(task_graph)
+        node_graph: dict[str, TaskNode] = {}
+        for config in task_graph:
+            node_graph[config.task_key] = TaskNode(config)
         sorted_node = topological_sort(node_graph)
         logger.info(
             "Build task graph finish",
@@ -111,16 +91,62 @@ class TaskAgent(MessageIntentAgent):
         )
         return sorted_node
 
+    def check_instruction(self, config: TaskConfig) -> None:
+        """
+        Check whether config.instruction is a valid Jinja2 template that can be filled
+        with config.input_schema map.
+
+        Raises:
+            ValueError: if the template is invalid or any required variable is missing.
+        """
+        try:
+            env = Environment()
+            parsed_content = env.parse(config.instruction)
+            # Find undeclared variables in the template
+            undeclared_variables = meta.find_undeclared_variables(parsed_content)
+            # Check if all required variables are in the input_schema
+            missing_vars = undeclared_variables - config.input_schema.keys()
+            if missing_vars:
+                raise ValueError(
+                    f"Missing required variables in input schema: {missing_vars}"
+                )
+        except Exception as e:
+            raise ValueError(
+                f"Invalid template or error in template processing: {e}"
+            ) from e
+
+    def check_config(self, config_list: list[TaskConfig]):
+        has_root = False
+        for config in config_list:
+            if not has_root and config.is_root:
+                has_root = True
+            self.check_instruction(config)
+
+        if not has_root:
+            raise ValueError(f"No root found. {config_list}")
+
     def process_message(self, message_event: MessageEvent) -> list[str]:
-        context = {"message": IntakeMessage(text=message_event.text)}
+        context = self._context.copy()
+        context.update({"message": IntakeMessage(text=message_event.text)})
         responses = []
         for task in self._tasks:
             responses.append(str(task.config))
             output = task(**context)
             responses.append(str(output))
             context[task.config.task_key] = output
+
+            if self.stuck_in_loop(task=task, output=output):
+                responses.append(task.config.loop_message or EMPTY_LOOP_MESSAGE)
+                break
+
         logger.info("Task agent process message", name=self._name, all_output=context)
         return responses
+
+    def stuck_in_loop(self, task: TaskNode, output: Any) -> bool:
+        if task.config.success_criteria is None:
+            return False
+
+        return task.config.success_criteria(output)
 
     def should_process(
         self, *args: Any, **kwds: Any

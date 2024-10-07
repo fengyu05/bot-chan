@@ -1,6 +1,27 @@
 import re
 
 
+def collect_placeholders(fstring: str):
+    """
+    Extracts all placeholders from the format string without braces.
+
+    Args:
+        fstring (str): The format string containing placeholders.
+
+    Returns:
+        list: A list of placeholders without braces.
+    """
+    # Escape "{{" and "}}" to gracefully handle them as "{" and "}" respectively
+    fstring = fstring.replace("{{", "\u007b").replace("}}", "\u007d")
+
+    # Regular expression to match valid placeholder patterns
+    pattern = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)*)\}")
+
+    placeholders = pattern.findall(fstring)
+    # Return only the first element of each match, which is the full placeholder key
+    return [match[0] for match in placeholders]
+
+
 def fstring_format(fstring: str, **kwargs) -> str:
     """
     Formats a string by replacing placeholders with corresponding values from kwargs.

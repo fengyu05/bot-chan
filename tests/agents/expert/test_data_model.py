@@ -4,11 +4,23 @@ from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntit
 
 
 class Te1(TaskEntity):
-    pass
+    a: str
 
 
 class Te2(TaskEntity):
-    pass
+    x: int
+    tt: Te1
+
+
+class TestTaskEntityClass(unittest.TestCase):
+    def test_check_fields(self):
+        self.assertTrue(Te1.check_nested_field_in_class("a"))
+        self.assertTrue(Te2.check_nested_field_in_class("x"))
+        self.assertTrue(Te2.check_nested_field_in_class("tt.a"))
+
+        self.assertFalse(Te1.check_nested_field_in_class("b"))
+        self.assertFalse(Te2.check_nested_field_in_class("y"))
+        self.assertFalse(Te2.check_nested_field_in_class("tt.b"))
 
 
 class TestTaskConfigProperties(unittest.TestCase):
@@ -45,3 +57,7 @@ class TestTaskConfigProperties(unittest.TestCase):
             output_schema=str,
         )
         self.assertFalse(config_with_unstructured_output.is_structure_output)
+
+
+if __name__ == "__main__":
+    unittest.main()

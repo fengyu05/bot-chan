@@ -50,6 +50,9 @@ class IntentMatcher:
                 )
                 logger.debug("LLM intent matching", prompt=prompt)
                 selected_text = simple_assistant(model_id=GPT_4O_MINI, prompt=prompt)
+                logger.debug(
+                    "LLM intent matching selected_text", selected_text=selected_text
+                )
                 message_intent = self.get_message_intent_from_index_text(selected_text)
         else:
             message_intent = get_message_intent_by_emoji(message_event.text)
@@ -59,8 +62,11 @@ class IntentMatcher:
 
     def get_message_intent_from_index_text(self, text: str) -> MessageIntent:
         try:
-            # Attempt to convert the text to an integer
-            idx = int(text)
+            # Remove non-numeric characters from the text
+            numeric_text = re.sub(r"\D", "", text)
+
+            # Attempt to convert the sanitized text to an integer
+            idx = int(numeric_text)
             return self.agents[idx].intent
         except ValueError:
             return create_intent("UNKNOWN")
@@ -108,9 +114,6 @@ output:"""
     @cached_property
     def joined_agents_description_list(self) -> str:
         result = "".join(
-            [
-                f"{i})\n {agent.description} \n---\n"
-                for i, agent in enumerate(self.agents)
-            ]
+            [f"{i}: {agent.description} \n---\n" for i, agent in enumerate(self.agents)]
         )
         return result

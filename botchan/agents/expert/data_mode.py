@@ -1,14 +1,32 @@
-from typing import Any, Tuple, Type, Union
+from typing import Any, Callable, Optional, Type, Union
 
 from pydantic import BaseModel
-
-from botchan.slack.data_model.message_event import MessageEvent
 
 
 class TaskEntity(BaseModel):
     def __repr__(self):
         field_strings = [f"{key}: {value}" for key, value in self.dict().items()]
         return "\n".join(field_strings)
+
+    @classmethod
+    def check_nested_field_in_class(cls, field_path: str) -> bool:
+        """
+        Check whether a nested field path like "a.b" or "a.b.c" exists in this Pydantic class.
+
+        Args:
+            field_path (str): The dot-separated path of the field.
+
+        Returns:
+            bool: True if the field path exists, False otherwise.
+        """
+        fields = field_path.split(".")
+        current_model: Any = cls
+        try:
+            for field in fields:
+                current_model = current_model.__annotations__[field]
+            return True
+        except KeyError:
+            return False
 
 
 class IntakeMessage(TaskEntity):
@@ -20,6 +38,8 @@ class TaskConfig(BaseModel):
     instruction: str
     input_schema: dict[str, Type[TaskEntity]]  # map from input name to input type
     output_schema: Union[Type[str], Type[TaskEntity]]
+    success_criteria: Optional[Callable]
+    loop_message: Optional[str]
 
     def __repr__(self) -> str:
         field_strings = [f"{key}: {value}" for key, value in self.dict().items()]

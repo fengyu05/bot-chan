@@ -31,11 +31,15 @@ class MessageMultiIntentAgent:
         from botchan.agents.expert.poem_translate import (
             create_poems_translation_task_agent,
         )
+        from botchan.agents.expert.shopping_assisist import (
+            create_shopping_assisist_task_agent,
+        )
 
         self.agents = [
             OpenAiChatAgent(),  ## Handle simple chat
             MiaoAgent(),
             create_poems_translation_task_agent(),
+            create_shopping_assisist_task_agent(),
         ]
         self.intent_matcher = IntentMatcher(self.agents)
 

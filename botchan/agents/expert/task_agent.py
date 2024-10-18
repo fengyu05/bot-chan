@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any, Optional
 
 import structlog
@@ -12,6 +13,12 @@ from botchan.slack.data_model.message_event import MessageEvent
 logger = structlog.getLogger(__name__)
 
 EMPTY_LOOP_MESSAGE = "Cannot proceed with the request, please try again :bow:"
+
+
+@dataclass
+class TaskInvocationContext:
+    context: dict[str, Any]
+    current_task_index: int = 0
 
 
 class TaskAgent(MessageIntentAgent):
@@ -29,6 +36,7 @@ class TaskAgent(MessageIntentAgent):
         self._intent = intent
         self._context = context or {}
         self._tasks = self.build_task_graph(task_graph)
+        self._invocation_contexts = {}
 
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
         """
@@ -125,28 +133,49 @@ class TaskAgent(MessageIntentAgent):
         if not has_root:
             raise ValueError(f"No root found. {config_list}")
 
-    def process_message(self, message_event: MessageEvent) -> list[str]:
-        context = self._context.copy()
-        context.update({"message": IntakeMessage(text=message_event.text)})
-        responses = []
-        for task in self._tasks:
-            responses.append(str(task.config))
-            output = task(**context)
-            responses.append(str(output))
-            context[task.config.task_key] = output
+    def retrieve_context(self, message_event: MessageIntent) -> TaskInvocationContext:
+        if message_event.message_id not in self._invocation_contexts:
+            self._invocation_contexts[message_event.message_id] = TaskInvocationContext(
+                context=self._context.copy()
+            )
+        return self._invocation_contexts[message_event.message_id]
 
+    def process_message(self, message_event: MessageEvent) -> list[str]:
+        ic = self.retrieve_context(message_event)
+        return self.run_task_with_ic(message_event.text, ic=ic)
+
+    def run_task_with_ic(
+        self, message_text: str, ic: TaskInvocationContext
+    ) -> list[str]:
+        ic.context.update({"message": IntakeMessage(text=message_text)})
+        responses = []
+
+        for index, task in enumerate(self._tasks):
+            if index != ic.current_task_index:
+                continue
+
+            output = task(**ic.context)
+            ic.context[task.config.task_key] = output
+
+            responses.append(str(task.config))
+            responses.append(str(output))
             if self.stuck_in_loop(task=task, output=output):
                 responses.append(task.config.loop_message or EMPTY_LOOP_MESSAGE)
                 break
 
-        logger.info("Task agent process message", name=self._name, all_output=context)
+            # Task success update ic status
+            ic.current_task_index += 1
+
+        logger.info(
+            "Task agent process message", name=self._name, all_output=ic.context
+        )
         return responses
 
     def stuck_in_loop(self, task: TaskNode, output: Any) -> bool:
         if task.config.success_criteria is None:
             return False
 
-        return task.config.success_criteria(output)
+        return not task.config.success_criteria(output)
 
     def should_process(
         self, *args: Any, **kwds: Any

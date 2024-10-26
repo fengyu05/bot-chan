@@ -1,17 +1,8 @@
 services:
-  ## For run unit test
-  test:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    env_file:
-      - env.ci  
-    command: poetry run pytest --verbose
-
   lint:
     build:
       context: ./
-      dockerfile: Dockerfile.tool
+      dockerfile: Dockerfile.ci
     env_file:
       - env.ci
     volumes:
@@ -22,7 +13,7 @@ services:
   fmt:
     build:
       context: ./
-      dockerfile: Dockerfile.tool
+      dockerfile: Dockerfile.ci
     env_file:
       - env.ci
     volumes:
@@ -43,7 +34,7 @@ services:
   shell:
     build:
       context: ./
-      dockerfile: Dockerfile.tool
+      dockerfile: Dockerfile.ci
     env_file:
       - env.ci
     volumes:

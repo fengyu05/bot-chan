@@ -1,5 +1,6 @@
 """ Messages Fetcher.
 """
+
 import datetime
 from typing import Callable, Optional, Union
 

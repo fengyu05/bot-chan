@@ -30,7 +30,7 @@ class MessageIntent(BaseModel):
         return False
 
     def __repr__(self):
-        field_strings = [f"{key}: {value}" for key, value in self.dict().items()]
+        field_strings = [f"{key}: {value}" for key, value in self.model_dump().items()]
         return "\n".join(field_strings)
 
 

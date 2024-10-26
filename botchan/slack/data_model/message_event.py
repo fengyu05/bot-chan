@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 
 from .block import RichTextBlock
 from .file_object import FileObject
@@ -22,12 +22,6 @@ class MessageEvent(BaseModel):
     upload: Optional[bool] = None
     display_as_bot: Optional[bool] = None
     client_msg_id: Optional[str] = None
-
-    @validator("files", each_item=True)
-    def validate_file(cls, v):  # pylint: disable=no-self-argument
-        if not isinstance(v, FileObject):
-            raise ValueError("Each item in 'files' must be an instance of FileObject")
-        return v
 
     @property
     def is_thread_root(self):
@@ -87,9 +81,3 @@ class MessageFileShareEvent(MessageEvent):
     client_msg_id: str
     files: List[FileObject]
     upload: bool
-
-    @validator("files", each_item=True)
-    def validate_file(cls, v):  # pylint: disable=no-self-argument
-        if not isinstance(v, FileObject):
-            raise ValueError("Each item in 'files' must be an instance of FileObject")
-        return v

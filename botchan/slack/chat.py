@@ -2,6 +2,7 @@
 
 All methods return a MessageResponse.
 """
+
 from typing import Optional
 
 import structlog

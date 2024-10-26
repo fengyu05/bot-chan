@@ -1,24 +1,19 @@
-FROM hyperspacetech/code-py-base:3.9-poetry1.8.3
+FROM python:3.11-slim
 
 WORKDIR /app/home
 
-# To improve layers cache hit rate, install dependencies first, because this part is relative stable.
-COPY pyproject.toml \
-     poetry.lock \
-     ./
+# Copy and install Python dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# `--with dev` means "install the dev dependencies"
-# `--no-root` means "install all dependencies but not the project(the app)
-RUN poetry install --no-interaction --no-root --with dev && rm -rf /root/.cache/pypoetry
-
-# Activate the virtualenv.
-ENV PATH "/app/home/.venv/bin:$PATH"
-
-# Install the app
+# Add the bot-chan application
 ADD botchan ./botchan
-ADD tests ./tests
-RUN poetry install --no-interaction --with dev
 
-# Misc stuff
+# Miscellaneous additions
+ADD tests ./tests
 ADD .pylintrc ./.pylintrc
 ADD ./bin /app/bin/
+ADD setup.py ./setup.py
+
+# Install the app
+RUN pip install -e .

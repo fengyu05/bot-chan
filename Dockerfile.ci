@@ -1,14 +1,16 @@
-FROM hyperspacetech/code-py-base:3.9-poetry1.8.3
-# This Dockefile is for ci tool which doesn't need the app running
+FROM python:3.11-slim
+
 WORKDIR /app/home
 
-COPY pyproject.toml \
-     poetry.lock \
-     .pylintrc \
-     ./
+# Copy and install Python dependencies
+COPY requirements-dev.txt ./
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
-# `--only dev` means only to install dev deps
-RUN poetry install --no-interaction --only dev
+# Add the bot-chan application
+ADD botchan ./botchan
 
-# Activate the virtualenv.
-ENV PATH "/app/home/.venv/bin:$PATH"
+# Miscellaneous additions
+ADD tests ./tests
+ADD .pylintrc ./.pylintrc
+ADD ./bin /app/bin/
+ADD setup.py ./setup.py

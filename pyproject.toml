@@ -5,34 +5,31 @@ description = ""
 authors = ["ZF"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11.10"
 structlog = "^23.1.0"
 slack-bolt = "^1.18.0"
 click = "^8.1.3"
-
-pydantic = "^1.10.7"
+pydantic = "^2.9.2"
 toolz = "^0.12.0"
-google-search-results = "^2.4.2"
-wikipedia = "^1.4.0"
-arxiv = "^1.4.8"
-langchain = "^0.1.10"
-langchain-community = "^0.0.25"
-langchainhub = "^0.1.14"
-langchain-openai = "^0.0.8"
-chromadb = "^0.3.29"
+langchain = "^0.3.4"
+langgraph = "^0.2.39"
+langchain-community = "^0.3.3"
+langchainhub = "^0.1.21"
+langchain-openai = "^0.2.3"
+langchain-fireworks = "^0.2.1"
+chromadb = "^0.5.15"
 bs4 = "^0.0.2"
 numexpr = "^2.9.0"
 fake-useragent = "^1.4.0"
 pypdf = "^4.1.0"
 openai = "^1.45.0"
-faiss-cpu = "^1.8.0.post1"
 jinja2 = "^3.1.4"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
-pylint = "^2.17.3"
-pytest = "^8.2.2"
+black = "^24.10.0"
+pylint = "^3.3.1"
+pytest = "^8.3.3"
 
 
 [build-system]

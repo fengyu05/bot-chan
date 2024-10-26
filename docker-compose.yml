@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-    command: poetry run cli start  --log-level info
+    command: botchan start  --log-level info
     ports:
       - 3000:3000
 
@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env  
-    command: poetry run cli start  --log-level debug
+    command: botchan start  --log-level debug
     ports:
       - 3000:3000
 
@@ -35,16 +35,9 @@ services:
         - /bin/sh
         - -c
         - |
-          poetry run cli backdoor
+          python botchan/cli.py backdoor
 
-  ## For run unit test
-  test:
-    build:
-      context: ./
-      dockerfile: Dockerfile 
-    env_file:
-      - env.ci
-    command: poetry run pytest --verbose
+
 
   ## For shell access and involve tooling, code are mounted
   shell:

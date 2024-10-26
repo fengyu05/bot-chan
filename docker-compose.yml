@@ -4,17 +4,17 @@ services:
       context: ./
       dockerfile: Dockerfile
     env_file:
-      - env.prod
+      - .env
     command: poetry run cli start  --log-level info
     ports:
       - 3000:3000
 
-  app-dev:
+  app-debug:
     build:
       context: ./
       dockerfile: Dockerfile
     env_file:
-      - env.dev
+      - .env.
     command: poetry run cli start  --log-level debug
     ports:
       - 3000:3000
@@ -27,7 +27,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     env_file:
-      - env.dev
+      - .env
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'
@@ -37,13 +37,22 @@ services:
         - |
           poetry run cli backdoor
 
+  ## For run unit test
+  test:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env.ci  
+    command: poetry run pytest --verbose
+
   ## For shell access and involve tooling, code are mounted
   shell:
     build:
       context: ./
       dockerfile: Dockerfile
     env_file:
-      - env.dev
+      - .env
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'

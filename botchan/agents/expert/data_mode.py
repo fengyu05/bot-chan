@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class TaskEntity(BaseModel):
     def __repr__(self):
-        field_strings = [f"{key}: {value}" for key, value in self.dict().items()]
+        field_strings = [f"{key}: {value}" for key, value in self.model_dump().items()]
         return "\n".join(field_strings)
 
     @classmethod
@@ -38,11 +38,11 @@ class TaskConfig(BaseModel):
     instruction: str
     input_schema: dict[str, Type[TaskEntity]]  # map from input name to input type
     output_schema: Union[Type[str], Type[TaskEntity]]
-    success_criteria: Optional[Callable]
-    loop_message: Optional[str]
+    success_criteria: Optional[Callable] = None
+    loop_message: Optional[str] = None
 
     def __repr__(self) -> str:
-        field_strings = [f"{key}: {value}" for key, value in self.dict().items()]
+        field_strings = [f"{key}: {value}" for key, value in self.model_dump().items()]
         return "\n".join(field_strings)
 
     @property

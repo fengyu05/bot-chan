@@ -51,7 +51,7 @@ class TestIntentMatcher(unittest.TestCase):
         # Assert the two intents should be equal since they are from the same thread
         self.assertEqual(intent_1, intent_2)
 
-        mock_simple_assistant.asert_called_once()  # Call only once, second time is in cache
+        mock_simple_assistant.assert_called_once()  # Call only once, second time is in cache
 
     @patch("botchan.intent.intent_matcher.simple_assistant")
     def test_message_intent_match_llm_with_plain_text(self, mock_simple_assistant):
@@ -65,4 +65,4 @@ class TestIntentMatcher(unittest.TestCase):
         matcher.match_message_intent(message_event_1)
         intent_1 = matcher.intent_by_thread[message_event_1.thread_message_id]
         self.assertEqual(intent_1, test_intent)
-        mock_simple_assistant.asert_called_once()  # Call only once, second time is in cache
+        mock_simple_assistant.assert_called_once()  # Call only once, second time is in cache

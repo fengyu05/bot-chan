@@ -2,6 +2,7 @@ include makefiles/help.mk
 include makefiles/docker.mk
 include makefiles/docker-lint.mk
 include makefiles/docker-ci.mk
+include makefiles/poetry.mk
 
 .PHONY: app app-debug
 

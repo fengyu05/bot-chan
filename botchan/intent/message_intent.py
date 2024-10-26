@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -21,7 +20,7 @@ class MessageIntentType(Enum):
 
 class MessageIntent(BaseModel):
     type: MessageIntentType
-    key: Optional[str] = None
+    key: str | None = None
 
     def __eq__(self, other: object) -> bool:
         """Override the equality operator to compare `type` and `key` fields only."""
@@ -34,7 +33,7 @@ class MessageIntent(BaseModel):
         return "\n".join(field_strings)
 
 
-def create_intent(type_name: str, key: Optional[str] = None) -> MessageIntent:
+def create_intent(type_name: str, key: str | None = None) -> MessageIntent:
     return MessageIntent(type=MessageIntentType.from_str(type_name), key=key)
 
 
@@ -52,5 +51,5 @@ _INTENT_BY_EMOJI = {
 def get_message_intent_by_emoji(text: str) -> MessageIntent:
     for emoji in _INTENT_BY_EMOJI:
         if text.startswith(f":{emoji}:"):
-            return _INTENT_BY_EMOJI[emoji]
+            return MessageIntent(type=_INTENT_BY_EMOJI[emoji])
     return MessageIntent(type=MessageIntentType.UNKNOWN)

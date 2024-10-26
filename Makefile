@@ -11,4 +11,6 @@ app:  ## start app server
 app-debug:  ## start app server with debug mode
 	docker compose up --build app-debug
 
-
+test: docker-compose-test  ## Test
+lint: docker-compose-lint  ## Lint
+fmt: docker-compose-fmt  ## Fmt

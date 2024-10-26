@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-    command: python botchan/cli.py start  --log-level info
+    command: botchan start  --log-level info
     ports:
       - 3000:3000
 
@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env  
-    command: python botchan/cli.py start  --log-level debug
+    command: botchan start  --log-level debug
     ports:
       - 3000:3000
 

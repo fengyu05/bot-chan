@@ -23,7 +23,6 @@ class MessageEvent(BaseModel):
     display_as_bot: Optional[bool] = None
     client_msg_id: Optional[str] = None
 
-
     @property
     def is_thread_root(self):
         return self.thread_ts is None
@@ -82,4 +81,3 @@ class MessageFileShareEvent(MessageEvent):
     client_msg_id: str
     files: List[FileObject]
     upload: bool
-

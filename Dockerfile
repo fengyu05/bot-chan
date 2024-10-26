@@ -13,3 +13,7 @@ ADD botchan ./botchan
 ADD tests ./tests
 ADD .pylintrc ./.pylintrc
 ADD ./bin /app/bin/
+ADD setup.py ./setup.py
+
+# Install the app
+RUN pip install -e .

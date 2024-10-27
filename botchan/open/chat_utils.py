@@ -26,7 +26,7 @@ def simple_assistant(model_id: str, prompt: str) -> str:
 
 def simple_assistant_with_struct_ouput(
     model_id: str, prompt: str, output_schema: Type[Any]
-) -> str:
+) -> Any:
     completion = OPENAI_CLIENT.beta.chat.completions.parse(
         model=model_id,
         messages=[

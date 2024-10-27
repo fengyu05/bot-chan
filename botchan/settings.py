@@ -12,7 +12,7 @@ def config_default_float(key: str, default_value: Any = 0.0) -> float:
     return float(os.environ.get(key, default_value))
 
 
-def config_default_bool(key: str, default_value: bool = False) -> float:
+def config_default_bool(key: str, default_value: bool = False) -> bool:
     return bool(os.environ.get(key, default_value))
 
 

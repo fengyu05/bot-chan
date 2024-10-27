@@ -1,47 +1,48 @@
-from enum import Enum
-from typing import Any, Optional
+from pydantic import BaseModel, field_validator
 
-from pydantic import BaseModel
-
-
-class MessageIntentType(Enum):
-    UNKNOWN = 0
-    CHAT = 1
-    KNOW = 2
-    MIAO = 3
-    EXPERT = 4
-
-    @staticmethod
-    def from_str(label):
-        for intent in MessageIntentType:
-            if label == intent.name.upper():
-                return intent
-        raise NotImplementedError("The provided label does not match any MessageIntent")
+_UNKNOWN = "unknown"
+_METHOD = "method"
+_EMOJI = "emoji"
 
 
 class MessageIntent(BaseModel):
-    type: MessageIntentType
-    key: Optional[str] = None
+    key: str
+    metadata: dict[str, str | bool | float | int | None] = {}
 
-    def __eq__(self, other: object) -> bool:
-        """Override the equality operator to compare `type` and `key` fields only."""
-        if isinstance(other, MessageIntent):
-            return self.type == other.type and self.key == other.key
-        return False
+    @field_validator("key")
+    @classmethod
+    def uppercase_key(cls, v):
+        if not isinstance(v, str):
+            raise ValueError("The key must be a string.")
+        return v.upper()
 
-    def __repr__(self):
-        field_strings = [f"{key}: {value}" for key, value in self.model_dump().items()]
-        return "\n".join(field_strings)
+    @property
+    def unknown(self) -> bool:
+        return _UNKNOWN in self.metadata
+
+    def method(self) -> str:
+        return str(self.metadata.get(_METHOD, ""))
+
+    def equal_wo_metadata(self, other: "MessageIntent") -> bool:
+        return self.key == other.key
 
 
-def create_intent(type_name: str, key: Optional[str] = None) -> MessageIntent:
-    return MessageIntent(type=MessageIntentType.from_str(type_name), key=key)
+def create_intent(key: str | None = None, unknown: bool = False) -> MessageIntent:
+    if unknown:
+        return MessageIntent(key="", metadata={_UNKNOWN: True})
+    assert key, "key must present"
+    return MessageIntent(key=key)
+
+
+class IntentCandidate(BaseModel):
+    CustomerUnderstanding: str  # System's interpretation of the message
+    IntentName1: str  # Primary intent matching the user's need
+    IntentName2: str  # Secondary intent somewhat matching the need
+    IntentClarification: str  # Explanation of chosen intents' relevance
 
 
 _EMOJI_INTENT_MAP = {
-    MessageIntentType.KNOW: ["know", "learn"],
-    MessageIntentType.MIAO: ["cat"],
-    MessageIntentType.EXPERT: ["expert"],
+    "miao": ["cat"],
 }
 
 _INTENT_BY_EMOJI = {
@@ -52,5 +53,7 @@ _INTENT_BY_EMOJI = {
 def get_message_intent_by_emoji(text: str) -> MessageIntent:
     for emoji in _INTENT_BY_EMOJI:
         if text.startswith(f":{emoji}:"):
-            return _INTENT_BY_EMOJI[emoji]
-    return MessageIntent(type=MessageIntentType.UNKNOWN)
+            return MessageIntent(
+                key=_INTENT_BY_EMOJI[emoji], metadata={_METHOD: _EMOJI, _EMOJI: emoji}
+            )
+    return MessageIntent(key="", metadata={_UNKNOWN: True, _METHOD: _EMOJI})

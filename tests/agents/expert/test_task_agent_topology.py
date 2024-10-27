@@ -4,7 +4,7 @@ from unittest.mock import patch
 from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntity
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.agents.expert.task_node import TaskNode
-from botchan.intent.message_intent import MessageIntent, MessageIntentType
+from botchan.intent.message_intent import MessageIntent
 
 
 class Te1(TaskEntity):
@@ -15,7 +15,7 @@ class TestTaskAgentTopology(unittest.TestCase):
     def setUp(self):
         self.name = "test_agent"
         self.description = "A test agent"
-        self.intent = MessageIntent(type=MessageIntentType.EXPERT, key="test_task")
+        self.intent = MessageIntent(key="test_task")
         self.task_graph = [
             TaskConfig(
                 task_key="poem_translation",

@@ -1,63 +1,46 @@
 import re
-import string
 from functools import cached_property
 
 import structlog
 
 from botchan.agents import MessageIntentAgent
 from botchan.constants import GPT_4O_MINI
-from botchan.intent.message_intent import (
-    MessageIntent,
-    create_intent,
-    get_message_intent_by_emoji,
-)
+from botchan.intent.intent_macher_base import IntentMatcherBase
+from botchan.intent.message_intent import MessageIntent, create_intent
 from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
 from botchan.settings import LLM_INTENT_MATCHING
-from botchan.slack.data_model import MessageEvent
 
 logger = structlog.getLogger(__name__)
 
 
-class IntentMatcher:
-    intent_by_thread: dict[str, MessageIntent]
-    agents: list[MessageIntentAgent]
-
+class OpenAIIntentMatcher(IntentMatcherBase):
     def __init__(
         self,
         agents: list[MessageIntentAgent],
         use_llm: bool = LLM_INTENT_MATCHING,
         use_strcuture_output: bool = False,
     ) -> None:
-        self.use_llm = use_llm
+        super().__init__(
+            use_llm=use_llm,
+            agents=agents,
+        )
         self.use_structure_output = use_strcuture_output
-        self.intent_by_thread = {}
-        self.agents = agents
 
-    def match_message_intent(self, message_event: MessageEvent) -> MessageIntent:
-        if message_event.thread_message_id in self.intent_by_thread:
-            return self.intent_by_thread[message_event.thread_message_id]
-
-        if self.use_llm:
-            if self.use_structure_output:
-                prompt = self.match_intent_prompt_structure(message=message_event.text)
-                logger.debug("LLM intent matching", prompt=prompt)
-                message_intent = simple_assistant_with_struct_ouput(
-                    model_id=GPT_4O_MINI, prompt=prompt, output_schema=MessageIntent
-                )
-            else:
-                prompt = self.match_intent_prompt_non_structure(
-                    message=message_event.text
-                )
-                logger.debug("LLM intent matching", prompt=prompt)
-                selected_text = simple_assistant(model_id=GPT_4O_MINI, prompt=prompt)
-                logger.debug(
-                    "LLM intent matching selected_text", selected_text=selected_text
-                )
-                message_intent = self.get_message_intent_from_index_text(selected_text)
+    def parse_intent(self, text: str) -> MessageIntent:
+        if self.use_structure_output:
+            prompt = self.match_intent_prompt_structure(message=text)
+            logger.debug("LLM intent matching", prompt=prompt)
+            message_intent = simple_assistant_with_struct_ouput(
+                model_id=GPT_4O_MINI, prompt=prompt, output_schema=MessageIntent
+            )
         else:
-            message_intent = get_message_intent_by_emoji(message_event.text)
-        logger.info("Matched intent", intent=message_intent)
-        self.intent_by_thread[message_event.thread_message_id] = message_intent
+            prompt = self.match_intent_prompt_non_structure(message=text)
+            logger.debug("LLM intent matching", prompt=prompt)
+            selected_text = simple_assistant(model_id=GPT_4O_MINI, prompt=prompt)
+            logger.debug(
+                "LLM intent matching selected_text", selected_text=selected_text
+            )
+            message_intent = self.get_message_intent_from_index_text(selected_text)
         return message_intent
 
     def get_message_intent_from_index_text(self, text: str) -> MessageIntent:
@@ -86,7 +69,7 @@ output:"""
     def joined_agents_description_for_structure(self) -> str:
         result = "".join(
             [
-                f"Type={agent.intent.type.name}, key={agent.intent.key}: {agent.description} \n---\n"
+                f"key={agent.intent.key}: {agent.description} \n---\n"
                 for agent in self.agents
             ]
         )
@@ -94,12 +77,7 @@ output:"""
 
     @cached_property
     def joined_agents_selection(self) -> str:
-        return "".join(
-            [
-                f"Type={agent.intent.type.name}, key={agent.intent.key} \n---\n"
-                for agent in self.agents
-            ]
-        )
+        return "".join([f"key={agent.intent.key} \n---\n" for agent in self.agents])
 
     def match_intent_prompt_non_structure(self, message: str) -> str:
         return f"""Select one of the below task based on the user message. 

@@ -30,8 +30,6 @@ class MessageIntentAgent(Task):
         description (str): Abstract property describing the agent's function.
     """
 
-    intent: MessageIntent
-
     def __init__(self, intent: MessageIntent) -> None:
         super().__init__()
         self._intent = intent
@@ -54,7 +52,7 @@ class MessageIntentAgent(Task):
         message_intent: MessageIntent = self._require_input(
             kwargs=kwds, key="message_intent"
         )
-        return message_intent.type == self.intent.type
+        return message_intent.equal_wo_metadata(self.intent)
 
     @property
     def name(self) -> str:

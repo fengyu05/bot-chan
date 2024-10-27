@@ -6,7 +6,7 @@ from slack_sdk import WebClient
 from botchan.agents import MessageIntentAgent
 from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.intent.intent_matcher import IntentMatcher
+from botchan.intent.openai_intent_matcher import OpenAIIntentMatcher
 from botchan.slack import auth as slack_auth
 from botchan.slack import chat as slack_chat
 from botchan.slack import reaction as slack_reaction
@@ -19,7 +19,7 @@ logger = structlog.getLogger(__name__)
 class MessageMultiIntentAgent:
     slack_client: WebClient
     fetcher: MessagesFetcher
-    intent_matcher: IntentMatcher
+    intent_matcher: OpenAIIntentMatcher
     bot_user_id: str
     agents: list[MessageIntentAgent]
 
@@ -41,7 +41,7 @@ class MessageMultiIntentAgent:
             create_poems_translation_task_agent(),
             create_shopping_assisist_task_agent(),
         ]
-        self.intent_matcher = IntentMatcher(self.agents)
+        self.intent_matcher = OpenAIIntentMatcher(self.agents)
 
     def _should_reply(self, message_event: MessageEvent) -> bool:
         return message_event.channel_type == "im" or message_event.is_user_mentioned(

@@ -2,6 +2,8 @@ from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntit
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.intent.message_intent import create_intent
 
+INTENT_KEY = "shopping_assist"
+
 
 class ProductSpec(TaskEntity):
     name: str
@@ -69,7 +71,7 @@ def create_shopping_assisist_task_agent() -> TaskAgent:
     return TaskAgent(
         name="Shopping assisist",
         description="This task assisist shopper to discover what product are avialiable, place order and follow the status of the order.",
-        intent=create_intent(type_name="EXPERT", key="shopping_assisist"),
+        intent=create_intent(INTENT_KEY),
         context={"inventory": create_inventory()},
         task_graph=[
             TaskConfig(
@@ -78,7 +80,7 @@ def create_shopping_assisist_task_agent() -> TaskAgent:
                 input_schema={"message": IntakeMessage},
                 output_schema=ProductMatch,
                 loop_message="Please select from the following inventory: {inventory.all_product_desc}",
-                success_critera=lambda x: x.match == True,
+                success_criteria=lambda x: x.match == True,
             ),
             TaskConfig(
                 task_key="product_specs",

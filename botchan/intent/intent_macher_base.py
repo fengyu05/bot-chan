@@ -13,6 +13,8 @@ from botchan.slack.data_model import MessageEvent
 
 logger = structlog.getLogger(__name__)
 
+_UNKNOWN_INTENT = create_intent("UNKNOWN")
+
 
 class IntentMatcherBase(ABC):
     intent_by_thread: dict[str, MessageIntent]
@@ -28,19 +30,22 @@ class IntentMatcherBase(ABC):
         self.use_llm = use_llm
 
     @abstractmethod
-    def parse_intent(self, message_event: MessageEvent) -> MessageIntent:
+    def parse_intent(self, text: str) -> MessageIntent:
         pass
 
     def match_message_intent(self, message_event: MessageEvent) -> MessageIntent:
+
         if message_event.thread_message_id in self.intent_by_thread:
             return self.intent_by_thread[message_event.thread_message_id]
+        if not message_event.text:
+            return _UNKNOWN_INTENT
         if self.use_llm:
-            message_intent = self.parse_intent()
+            message_intent = self.parse_intent(message_event.text)
         else:
             if message_event.text:
                 message_intent = get_message_intent_by_emoji(message_event.text)
             else:
-                message_intent = create_intent("unkown")
+                message_intent = _UNKNOWN_INTENT
         logger.info("Matched intent", intent=message_intent)
         self.intent_by_thread[message_event.thread_message_id] = message_intent
         return message_intent

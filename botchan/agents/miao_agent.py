@@ -11,10 +11,12 @@ For examples:
 "Response like you are a kitty"
 """
 
+INTENT_KEY = "MIAO"
+
 
 class MiaoAgent(MessageIntentAgent):
     def __init__(self) -> None:
-        super().__init__(intent=create_intent(type_name="MIAO"))
+        super().__init__(intent=create_intent(INTENT_KEY))
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
         return [":cat: miao~~"]

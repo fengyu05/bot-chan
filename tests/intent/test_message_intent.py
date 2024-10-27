@@ -1,38 +1,65 @@
 import unittest
 
 from botchan.intent.message_intent import (
+    _EMOJI,
+    _METHOD,
+    _UNKNOWN,
     MessageIntent,
-    MessageIntentType,
+    create_intent,
     get_message_intent_by_emoji,
 )
 
 
 class TestMessageIntent(unittest.TestCase):
-    def test_message_intent_type_from_str(self):
-        self.assertEqual(MessageIntentType.from_str("CHAT"), MessageIntentType.CHAT)
-        self.assertEqual(MessageIntentType.from_str("KNOW"), MessageIntentType.KNOW)
-        self.assertEqual(MessageIntentType.from_str("MIAO"), MessageIntentType.MIAO)
-        self.assertEqual(MessageIntentType.from_str("EXPERT"), MessageIntentType.EXPERT)
-        self.assertEqual(
-            MessageIntentType.from_str("UNKNOWN"), MessageIntentType.UNKNOWN
-        )
-        with self.assertRaises(NotImplementedError):
-            MessageIntentType.from_str("NON_EXISTENT")
 
-    def test_get_message_intent_by_emoji(self):
-        self.assertEqual(get_message_intent_by_emoji(":know:"), MessageIntentType.KNOW)
-        self.assertEqual(get_message_intent_by_emoji(":cat:"), MessageIntentType.MIAO)
-        self.assertEqual(
-            get_message_intent_by_emoji(":nonexistent:"),
-            MessageIntent(type=MessageIntentType.UNKNOWN),
-        )
+    def test_uppercase_key(self):
+        intent = MessageIntent(key="testKey")
+        self.assertEqual(intent.key, "TESTKEY")
 
-    def test_message_intent_equality(self):
-        intent1 = MessageIntent(type=MessageIntentType.CHAT, key="chat_key")
-        intent2 = MessageIntent(type=MessageIntentType.CHAT, key="chat_key")
-        intent3 = MessageIntent(type=MessageIntentType.KNOW, key="know_key")
-        self.assertTrue(intent1 == intent2)
-        self.assertFalse(intent1 == intent3)
+    def test_key_is_required(self):
+        with self.assertRaises(AssertionError):
+            create_intent()
+
+    def test_unknown_property(self):
+        intent = MessageIntent(key="somekey", metadata={_UNKNOWN: True})
+        self.assertTrue(intent.unknown)
+
+        intent_no_unknown = MessageIntent(key="somekey")
+        self.assertFalse(intent_no_unknown.unknown)
+
+    def test_method_function(self):
+        intent = MessageIntent(key="somekey", metadata={_METHOD: "test_method"})
+        self.assertEqual(intent.method(), "test_method")
+
+        intent_without_method = MessageIntent(key="somekey")
+        self.assertEqual(intent_without_method.method(), "")
+
+    def test_equal_wo_metadata(self):
+        intent1 = MessageIntent(key="somekey")
+        intent2 = MessageIntent(key="SomeKey")
+        self.assertTrue(intent1.equal_wo_metadata(intent2))
+
+        intent3 = MessageIntent(key="otherkey")
+        self.assertFalse(intent1.equal_wo_metadata(intent3))
+
+    def test_create_intent_with_default(self):
+        intent = create_intent("test")
+        self.assertEqual(intent.key, "TEST")
+
+    def test_create_intent_unknown(self):
+        intent = create_intent(unknown=True)
+        self.assertEqual(intent.key, "")
+        self.assertTrue(intent.unknown)
+
+    def test_get_message_intent_by_emoji_found(self):
+        intent = get_message_intent_by_emoji(":cat:")
+        self.assertEqual(intent.key, "MIAO")
+        self.assertEqual(intent.metadata[_EMOJI], "cat")
+
+    def test_get_message_intent_by_emoji_not_found(self):
+        intent = get_message_intent_by_emoji(":dog:")
+        self.assertEqual(intent.key, "")
+        self.assertTrue(intent.unknown)
 
 
 if __name__ == "__main__":

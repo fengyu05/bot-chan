@@ -4,7 +4,17 @@ services:
       context: ./
       dockerfile: Dockerfile.ci
     env_file:
-      - env.ci
+      - .env
+    command: pytest --verbose
+
+  test-int:
+    build:
+      context: ./
+      dockerfile: Dockerfile.ci
+    env_file:
+     - .env
+    environment:
+      - RUN_INTEGRATION_TESTS=1
     command: pytest --verbose
 
   lint:
@@ -12,7 +22,7 @@ services:
       context: ./
       dockerfile: Dockerfile.ci
     env_file:
-      - env.ci
+     - .env
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'
@@ -23,7 +33,7 @@ services:
       context: ./
       dockerfile: Dockerfile.ci
     env_file:
-      - env.ci
+     - .env
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'
@@ -44,7 +54,7 @@ services:
       context: ./
       dockerfile: Dockerfile.ci
     env_file:
-      - env.ci
+     - .env
     volumes:
       - './botchan:/app/home/botchan'
       - './tests:/app/home/tests'

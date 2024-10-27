@@ -6,5 +6,6 @@ GTP_4O_WITH_STRUCT = "gpt-4o-2024-08-06"  # For parse structure
 # FIREWORDS MODEL
 
 FIREWORKS_MIXTRAL_22B = "accounts/fireworks/models/mixtral-8x22b-instruct"
+FIREWORKS_MIXTRAL_7B = "accounts/fireworks/models/mixtral-8x7b-instruct"
 FIREWORKS_LLAMA3_8B = "accounts/fireworks/models/llama-v3p1-8b-instruct"
 FIREWORKS_LLAMA3_70B = "accounts/fireworks/models/llama-v3p1-70b-instruct"

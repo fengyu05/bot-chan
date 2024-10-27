@@ -25,6 +25,8 @@ _AGENT_DESCRIPTION = """ Use this agent to make a natural converastion between t
 
 """
 
+INTENT_KEY = "CHAT"
+
 
 class OpenAiChatAgent(MessageIntentAgent):
     """
@@ -34,7 +36,7 @@ class OpenAiChatAgent(MessageIntentAgent):
     """
 
     def __init__(self, buffer_limit: int = 100) -> None:
-        super().__init__(intent=create_intent("CHAT"))
+        super().__init__(intent=create_intent(INTENT_KEY))
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
         self.whisper_agent = OpenAiWhisper()

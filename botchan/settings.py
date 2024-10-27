@@ -12,14 +12,18 @@ def config_default_float(key: str, default_value: Any = 0.0) -> float:
     return float(os.environ.get(key, default_value))
 
 
+_TRUTHY_VALUES = {"true", "1", "yes", "t", "y"}
+
+
 def config_default_bool(key: str, default_value: bool = False) -> bool:
-    return bool(os.environ.get(key, default_value))
+    return str(os.environ.get(key, default_value)).lower() in _TRUTHY_VALUES
 
 
 # App config
 ENV = config_default("ENV", "dev")
 APP_NAME = config_default("APP_NAME", "botchan")
 LOG_LEVEL = config_default("LOG_LEVEL", "INFO")
+DEBUG_MODE = config_default_bool("DEBUG_MODE", False)
 
 # Bot config
 BOT_NAME = config_default("BOT_NAME", APP_NAME)

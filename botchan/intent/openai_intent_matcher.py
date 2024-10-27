@@ -5,14 +5,14 @@ import structlog
 
 from botchan.agents import MessageIntentAgent
 from botchan.constants import GPT_4O_MINI
-from botchan.intent.intent_macher_base import IntentMatcherBase
+from botchan.intent.intent_macher_base import IntentMatcher
 from botchan.intent.message_intent import MessageIntent, create_intent
 from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
 
 logger = structlog.getLogger(__name__)
 
 
-class OpenAIIntentMatcher(IntentMatcherBase):
+class OpenAIIntentMatcher(IntentMatcher):
     def __init__(
         self,
         agents: list[MessageIntentAgent],

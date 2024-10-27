@@ -9,7 +9,7 @@ from botchan.slack.data_model import MessageEvent
 logger = structlog.getLogger(__name__)
 
 
-class IntentMatcherBase(ABC):
+class IntentMatcher(ABC):
     intent_by_thread: dict[str, MessageIntent]
     agents: list[MessageIntentAgent]
 

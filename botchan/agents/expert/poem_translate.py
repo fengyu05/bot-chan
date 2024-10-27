@@ -2,7 +2,7 @@ from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntit
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.intent.message_intent import create_intent
 
-INTENT_KEY = "poem_translation"
+INTENT_KEY = "POEM_TRANSLATE"
 
 
 class PoemTranslation(TaskEntity):

@@ -4,9 +4,10 @@ import structlog
 from slack_sdk import WebClient
 
 from botchan.agents import MessageIntentAgent
-from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.intent.openai_intent_matcher import OpenAIIntentMatcher
+from botchan.intent.intent_macher_base import IntentMatcher
+from botchan.intent.rag_intent_matcher import RagIntentMatcher
+from botchan.settings import DEBUG_MODE
 from botchan.slack import auth as slack_auth
 from botchan.slack import chat as slack_chat
 from botchan.slack import reaction as slack_reaction
@@ -19,7 +20,7 @@ logger = structlog.getLogger(__name__)
 class MessageMultiIntentAgent:
     slack_client: WebClient
     fetcher: MessagesFetcher
-    intent_matcher: OpenAIIntentMatcher
+    intent_matcher: IntentMatcher
     bot_user_id: str
     agents: list[MessageIntentAgent]
 
@@ -27,21 +28,20 @@ class MessageMultiIntentAgent:
         self.slack_client = slack_client
         self.fetcher = MessagesFetcher(self.slack_client)
         self.bot_user_id = slack_auth.get_bot_user_id(self.slack_client)
-
+        self.chat_agent = OpenAiChatAgent()
         from botchan.agents.expert.poem_translate import (
             create_poems_translation_task_agent,
         )
-        from botchan.agents.expert.shopping_assisist import (
+        from botchan.agents.expert.shopping_assist import (
             create_shopping_assisist_task_agent,
         )
 
         self.agents = [
-            OpenAiChatAgent(),  ## Handle simple chat
-            MiaoAgent(),
             create_poems_translation_task_agent(),
             create_shopping_assisist_task_agent(),
+            self.chat_agent,
         ]
-        self.intent_matcher = OpenAIIntentMatcher(self.agents)
+        self.intent_matcher = RagIntentMatcher(self.agents)
 
     def _should_reply(self, message_event: MessageEvent) -> bool:
         return message_event.channel_type == "im" or message_event.is_user_mentioned(
@@ -56,9 +56,22 @@ class MessageMultiIntentAgent:
             message_intent = self.intent_matcher.match_message_intent(
                 message_event=message_event
             )
-            for agent in self.agents:
-                msgs = agent(message_event=message_event, message_intent=message_intent)
-                if msgs is None:  ## agent didn't process this intent
-                    continue
-                for msg in msgs:
-                    slack_chat.reply_to_message(self.slack_client, message_event, msg)
+            if DEBUG_MODE:
+                slack_chat.reply_to_message(
+                    self.slack_client, message_event, f"Matched itent {message_intent}"
+                )
+            if message_intent.unknown:
+                self.chat_agent(
+                    message_event=message_event, message_intent=message_intent
+                )
+            else:
+                for agent in self.agents:
+                    msgs = agent(
+                        message_event=message_event, message_intent=message_intent
+                    )
+                    if msgs is None:  ## agent didn't process this intent
+                        continue
+                    for msg in msgs:
+                        slack_chat.reply_to_message(
+                            self.slack_client, message_event, msg
+                        )

@@ -4,10 +4,12 @@ _UNKNOWN = "unknown"
 _METHOD = "method"
 _EMOJI = "emoji"
 
+MessageIntentMetadataType = str | bool | float | int | None
+
 
 class MessageIntent(BaseModel):
     key: str
-    metadata: dict[str, str | bool | float | int | None] = {}
+    metadata: dict[str, MessageIntentMetadataType] = {}
 
     @field_validator("key")
     @classmethod
@@ -20,11 +22,20 @@ class MessageIntent(BaseModel):
     def unknown(self) -> bool:
         return _UNKNOWN in self.metadata
 
-    def method(self) -> str:
-        return str(self.metadata.get(_METHOD, ""))
-
     def equal_wo_metadata(self, other: "MessageIntent") -> bool:
         return self.key == other.key
+
+    def set_metadata(self, **kwargs: MessageIntentMetadataType):
+        """Set multiple metadata key-value pairs at once.
+
+        Args:
+            kwargs: Key-value pairs where the key is a string, and the value is of type MessageIntentMetaData.
+        """
+        for key, value in kwargs.items():
+            self.metadata[key] = value
+
+    def get_metadata(self, key: str) -> MessageIntentMetadataType:
+        return self.metadata.get(key, None)
 
 
 def create_intent(key: str | None = None, unknown: bool = False) -> MessageIntent:
@@ -32,13 +43,6 @@ def create_intent(key: str | None = None, unknown: bool = False) -> MessageInten
         return MessageIntent(key="", metadata={_UNKNOWN: True})
     assert key, "key must present"
     return MessageIntent(key=key)
-
-
-class IntentCandidate(BaseModel):
-    CustomerUnderstanding: str  # System's interpretation of the message
-    IntentName1: str  # Primary intent matching the user's need
-    IntentName2: str  # Secondary intent somewhat matching the need
-    IntentClarification: str  # Explanation of chosen intents' relevance
 
 
 _EMOJI_INTENT_MAP = {

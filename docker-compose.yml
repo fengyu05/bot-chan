@@ -14,7 +14,9 @@ services:
       context: ./
       dockerfile: Dockerfile
     env_file:
-      - .env  
+      - .env
+    environment:
+      - DEBUG_MODE=true  
     command: botchan start  --log-level debug
     ports:
       - 3000:3000

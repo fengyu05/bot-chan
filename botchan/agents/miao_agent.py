@@ -2,15 +2,9 @@ from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.intent.message_intent import create_intent
 from botchan.slack.data_model.message_event import MessageEvent
 
-_AGENT_DESC = """A miao agent handle the message request such as mimicking a cat voice.
-
-For examples:
-"Can you play a cat?",
-"Pretent you are a cat, what do you say?",
-"You are a cat now!",
-"Response like you are a kitty"
-"""
-
+_AGENT_DESC = (
+    """A miao agent handle the message request such as mimicking a cat voice. """
+)
 INTENT_KEY = "MIAO"
 
 

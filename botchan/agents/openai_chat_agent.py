@@ -114,7 +114,7 @@ class OpenAiChatAgent(MessageIntentAgent):
         Process data by examining each file and determining its type.
         """
         data = []
-
+        assert message_event.files, "message_event.files can not be None"
         for file_object in message_event.files:
             if self._accept_image_filetype(file_object):
                 base64_image = base64_encode_slack_image(
@@ -133,6 +133,7 @@ class OpenAiChatAgent(MessageIntentAgent):
                 text_transcribed = ""
 
                 if _USE_OPENAI_WHISPER:  # Use OpenAI whisper
+                    assert file_object.aac
                     local_audio_file = download_slack_downloadable(file_object.aac)
                     text_transcribed = self.whisper_agent.transcribe(local_audio_file)
                 else:  # Use Slack transcribe
@@ -145,6 +146,8 @@ class OpenAiChatAgent(MessageIntentAgent):
                         logger.debug(
                             "slack transcribed message", transcribed_msg=transcribed_msg
                         )
+                        assert transcribed_msg
+                        assert isinstance(transcribed_msg.files, list)
                         audio_file = transcribed_msg.files[0]
                         return audio_file.get_transcription_preview()
 

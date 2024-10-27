@@ -2,7 +2,6 @@ import unittest
 
 from botchan.intent.message_intent import (
     _EMOJI,
-    _METHOD,
     _UNKNOWN,
     MessageIntent,
     create_intent,
@@ -26,13 +25,6 @@ class TestMessageIntent(unittest.TestCase):
 
         intent_no_unknown = MessageIntent(key="somekey")
         self.assertFalse(intent_no_unknown.unknown)
-
-    def test_method_function(self):
-        intent = MessageIntent(key="somekey", metadata={_METHOD: "test_method"})
-        self.assertEqual(intent.method(), "test_method")
-
-        intent_without_method = MessageIntent(key="somekey")
-        self.assertEqual(intent_without_method.method(), "")
 
     def test_equal_wo_metadata(self):
         intent1 = MessageIntent(key="somekey")

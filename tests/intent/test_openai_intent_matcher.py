@@ -16,7 +16,6 @@ class TestIntentMatcher(unittest.TestCase):
                 OpenAiChatAgent(),
                 MiaoAgent(),
             ],
-            use_llm=True,
             use_strcuture_output=False,
         )
 
@@ -30,7 +29,6 @@ class TestIntentMatcher(unittest.TestCase):
                 OpenAiChatAgent(),
                 MiaoAgent(),
             ],
-            use_llm=True,
             use_strcuture_output=True,
         )
         message_event_1 = MessageEvent(**MESSAGE_EVENT_SIMPLE_1)

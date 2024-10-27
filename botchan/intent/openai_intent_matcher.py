@@ -5,23 +5,20 @@ import structlog
 
 from botchan.agents import MessageIntentAgent
 from botchan.constants import GPT_4O_MINI
-from botchan.intent.intent_macher_base import IntentMatcherBase
+from botchan.intent.intent_macher_base import IntentMatcher
 from botchan.intent.message_intent import MessageIntent, create_intent
 from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
-from botchan.settings import LLM_INTENT_MATCHING
 
 logger = structlog.getLogger(__name__)
 
 
-class OpenAIIntentMatcher(IntentMatcherBase):
+class OpenAIIntentMatcher(IntentMatcher):
     def __init__(
         self,
         agents: list[MessageIntentAgent],
-        use_llm: bool = LLM_INTENT_MATCHING,
         use_strcuture_output: bool = False,
     ) -> None:
         super().__init__(
-            use_llm=use_llm,
             agents=agents,
         )
         self.use_structure_output = use_strcuture_output

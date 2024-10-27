@@ -2,7 +2,7 @@ from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntit
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.intent.message_intent import create_intent
 
-INTENT_KEY = "shopping_assist"
+INTENT_KEY = "SHOPPING_ASSIST"
 
 
 class ProductSpec(TaskEntity):

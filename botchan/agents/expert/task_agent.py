@@ -92,11 +92,6 @@ class TaskAgent(MessageIntentAgent):
         for config in task_graph:
             node_graph[config.task_key] = TaskNode(config)
         sorted_node = topological_sort(node_graph)
-        logger.info(
-            "Build task graph finish",
-            name=self._name,
-            all_output=[n.config.task_key for n in sorted_node],
-        )
         return sorted_node
 
     def check_instruction(self, config: TaskConfig) -> None:
@@ -133,7 +128,7 @@ class TaskAgent(MessageIntentAgent):
         if not has_root:
             raise ValueError(f"No root found. {config_list}")
 
-    def retrieve_context(self, message_event: MessageIntent) -> TaskInvocationContext:
+    def retrieve_context(self, message_event: MessageEvent) -> TaskInvocationContext:
         if message_event.message_id not in self._invocation_contexts:
             self._invocation_contexts[message_event.message_id] = TaskInvocationContext(
                 context=self._context.copy()
@@ -142,6 +137,7 @@ class TaskAgent(MessageIntentAgent):
 
     def process_message(self, message_event: MessageEvent) -> list[str]:
         ic = self.retrieve_context(message_event)
+        assert message_event.text, "message text is missing"
         return self.run_task_with_ic(message_event.text, ic=ic)
 
     def run_task_with_ic(
@@ -176,17 +172,6 @@ class TaskAgent(MessageIntentAgent):
             return False
 
         return not task.config.success_criteria(output)
-
-    def should_process(
-        self, *args: Any, **kwds: Any
-    ) -> bool:  # pylint: disable=unused-argument
-        message_intent: MessageIntent = self._require_input(
-            kwargs=kwds, key="message_intent"
-        )
-        return (
-            message_intent.type == self.intent.type
-            and message_intent.key == self.intent.key
-        )
 
     @property
     def name(self):

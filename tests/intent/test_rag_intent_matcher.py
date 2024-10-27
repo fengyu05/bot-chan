@@ -40,14 +40,13 @@ class TestRagIntentMatcher(unittest.TestCase):
         result = rag_intent_matcher.parse_intent("Let's have a free chat")
         self.assertTrue(result.equal_wo_metadata(create_intent("chat")))
 
-    # Fix the _ escape issue with reflection
-    # @skip_integration_tests
-    # def test_parse_intent_poem_translate(self):
-    #     rag_intent_matcher = RagIntentMatcher(self.agents)
-    #     result = rag_intent_matcher.parse_intent("静夜思 English")
-    #     self.assertTrue(
-    #         result.equal_wo_metadata(create_intent(poem_translate_intent_key))
-    #     )
+    #@skip_integration_tests
+    def test_parse_intent_poem_translate(self):
+        rag_intent_matcher = RagIntentMatcher(self.agents)
+        result = rag_intent_matcher.parse_intent("静夜思 English")
+        self.assertTrue(
+            result.equal_wo_metadata(create_intent(poem_translate_intent_key))
+        )
 
     @skip_integration_tests
     def test_parse_intent_shopping(self):

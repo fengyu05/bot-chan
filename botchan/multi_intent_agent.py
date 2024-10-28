@@ -5,7 +5,7 @@ from slack_sdk import WebClient
 
 from botchan.agents import MessageIntentAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.intent.intent_macher_base import IntentMatcher
+from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.rag_intent_matcher import RagIntentMatcher
 from botchan.settings import DEBUG_MODE
 from botchan.slack import auth as slack_auth

@@ -4,7 +4,7 @@ from typing import Any, Optional
 import structlog
 from jinja2 import Environment, meta
 
-from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig
+from botchan.agents.expert.data_model import IntakeMessage, TaskConfig
 from botchan.agents.expert.task_node import TaskNode
 from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.intent.message_intent import MessageIntent

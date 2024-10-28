@@ -1,10 +1,12 @@
 from pydantic import BaseModel, field_validator
+from typing_extensions import TypeAlias
 
 _UNKNOWN = "unknown"
 _METHOD = "method"
 _EMOJI = "emoji"
+_DEFAULT = "default"
 
-MessageIntentMetadataType = str | bool | float | int | None
+MessageIntentMetadataType: TypeAlias = str | bool | float | int | None
 
 
 class MessageIntent(BaseModel):
@@ -45,6 +47,9 @@ def create_intent(key: str | None = None, unknown: bool = False) -> MessageInten
     return MessageIntent(key=key)
 
 
+UNKNOWN_INTENT = create_intent(unknown=True)
+DEFAULT_CHAT_INTENT = MessageIntent(key="CHAT", metadata={_METHOD: _DEFAULT})
+
 _EMOJI_INTENT_MAP = {
     "miao": ["cat"],
 }
@@ -60,4 +65,4 @@ def get_message_intent_by_emoji(text: str) -> MessageIntent:
             return MessageIntent(
                 key=_INTENT_BY_EMOJI[emoji], metadata={_METHOD: _EMOJI, _EMOJI: emoji}
             )
-    return MessageIntent(key="", metadata={_UNKNOWN: True, _METHOD: _EMOJI})
+    return UNKNOWN_INTENT

@@ -3,6 +3,9 @@ from collections import OrderedDict
 from typing import Any
 
 import structlog
+from langsmith import traceable
+from openai.types.chat import ChatCompletion
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_intent_agent import MessageIntentAgent
@@ -89,18 +92,10 @@ class OpenAiChatAgent(MessageIntentAgent):
                 "content": content,
             }
         )
-        logger.info(
-            f"qa with messages for thread {thread_id}",
-            messages=self._format_buffer(self.message_buffer[thread_id]),
-        )
-        response = OPENAI_CLIENT.chat.completions.create(
-            model=OPENAI_GPT_MODEL_ID,
+        response = self.chat_complete(
             messages=self.message_buffer[thread_id],
         )
         output_text = get_message_from_completion(response)
-        logger.info(
-            f"qa get response text for thread {thread_id}", output_text=output_text
-        )
         self.message_buffer[thread_id].append(
             {
                 "role": "assistant",
@@ -108,6 +103,15 @@ class OpenAiChatAgent(MessageIntentAgent):
             }
         )
         return [output_text]
+
+    @traceable(run_type="llm", name="chat_agent")
+    def chat_complete(
+        self, messages: list[ChatCompletionMessageParam]
+    ) -> ChatCompletion:
+        return OPENAI_CLIENT.chat.completions.create(
+            model=OPENAI_GPT_MODEL_ID,
+            messages=messages,
+        )
 
     def process_files(self, message_event: MessageEvent) -> list[dict]:
         """

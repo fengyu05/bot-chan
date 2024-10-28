@@ -38,18 +38,12 @@ OPENAI_API_KEY = config_default("OPENAI_API_KEY")
 # OPENAI GPT MODEL ID
 OPENAI_GPT_MODEL_ID = config_default("OPENAI_GPT_MODEL_ID", GPT_4O)
 
-# Default intention to use without mapping
-DEFAULT_INTENTION = config_default("DEFAULT_INTENTION", "CHAT")
-
 # Whether to use LLM to match message intent
-LLM_INTENT_MATCHING = config_default_bool("LLM_INTENT_MATCHING", True)
+LLM_INTENT_MATCHING = config_default_bool("LLM_INTENT_MATCHING", False)
 
 
 # Default tmp path
 TMP_PATH = config_default("TMP", "/tmp/")
-
-# Embedding base retrival sim score threshold
-EMBEDDING_SIM_SCORE_THESHOLD = config_default_float("EMBEDDING_SIM_SCORE_THESHOLD", 0.5)
 
 # Slack transcrition callback waiting time
 SLACK_TRANSCRIBE_WAIT_SEC = config_default_float("SLACK_TRANSCRIBE_WAIT_SEC", 10)

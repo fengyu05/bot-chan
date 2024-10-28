@@ -3,7 +3,7 @@ from typing import Any
 import structlog
 from jinja2 import Template
 
-from botchan.agents.expert.data_mode import TaskConfig
+from botchan.agents.expert.data_model import TaskConfig
 from botchan.constants import GTP_4O_WITH_STRUCT
 from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
 from botchan.settings import OPENAI_GPT_MODEL_ID

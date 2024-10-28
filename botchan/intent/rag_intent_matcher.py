@@ -1,4 +1,3 @@
-import json
 from functools import cached_property
 
 import structlog
@@ -6,18 +5,17 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_fireworks import ChatFireworks
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
-from pydantic import ValidationError
 from typing_extensions import TypedDict
 
-from botchan.agents import MessageIntentAgent
 from botchan.chain.prompt_utils import construct_system_prompt
 from botchan.constants import FIREWORKS_MIXTRAL_22B
+from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.intent_candidate import (
     EXAMPLE_INTENT_CANDIDATE,
     IntentCandidate,
     parse_intent_candidate_json,
 )
-from botchan.intent.intent_macher_base import IntentMatcher
+from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.message_intent import MessageIntent, create_intent
 
 logger = structlog.getLogger(__name__)
@@ -75,7 +73,7 @@ class RagIntentMatcher(IntentMatcher):
 
     def __init__(
         self,
-        agents: list[MessageIntentAgent],
+        agents: list[IntentAgent],
         model_id: str = FIREWORKS_MIXTRAL_22B,
         max_tokens: int = 32768,
     ) -> None:

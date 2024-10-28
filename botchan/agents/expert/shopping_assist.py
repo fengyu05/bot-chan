@@ -1,4 +1,4 @@
-from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntity
+from botchan.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.intent.message_intent import create_intent
 

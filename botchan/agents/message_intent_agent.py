@@ -3,6 +3,7 @@ from typing import Any
 
 import structlog
 
+from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import MessageIntent
 from botchan.slack.data_model import MessageEvent
 from botchan.task import Task
@@ -10,7 +11,7 @@ from botchan.task import Task
 logger = structlog.getLogger(__name__)
 
 
-class MessageIntentAgent(Task):
+class MessageIntentAgent(Task, IntentAgent):
     """
     This class provides a framework for processing messages by defining
     abstract methods that must be implemented in subclasses. It offers
@@ -61,8 +62,3 @@ class MessageIntentAgent(Task):
     @property
     def intent(self) -> MessageIntent:
         return self._intent
-
-    @property
-    @abstractmethod
-    def description(self) -> str:
-        pass

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from botchan.agents.expert.data_mode import IntakeMessage, TaskConfig, TaskEntity
+from botchan.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
 from botchan.agents.expert.task_node import TaskNode
 from botchan.constants import GTP_4O_WITH_STRUCT
 from botchan.settings import OPENAI_GPT_MODEL_ID

@@ -11,7 +11,6 @@ ADD botchan ./botchan
 
 # Miscellaneous additions
 ADD tests ./tests
-ADD .pylintrc ./.pylintrc
 ADD ./bin /app/bin/
 ADD setup.py ./setup.py
 

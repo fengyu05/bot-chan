@@ -47,3 +47,12 @@ TMP_PATH = config_default("TMP", "/tmp/")
 
 # Slack transcrition callback waiting time
 SLACK_TRANSCRIBE_WAIT_SEC = config_default_float("SLACK_TRANSCRIBE_WAIT_SEC", 10)
+
+TTS_ENGINE = config_default("TTS_ENGINE", "ELEVEN_LABS_API_KEY")
+# TTS API
+# XTTS
+# XTTS_API_KEY = config_default("XTTS_API_KEY", "")
+# XTTS_API_URL = config_default("XTTS_API_URL")
+
+# LEVEN_LABS TTS
+ELEVEN_LABS_API_KEY = config_default("ELEVEN_LABS_API_KEY")

@@ -1,30 +1,12 @@
 # pylint: disable=C0415
 # pylint: disable=unused-import
 """CLI entrypoint."""
-import logging
 
-import click
-import structlog
+import asyncclick as click
 
+from botchan.logger import get_logger
 
-def config_logger(log_level: str):
-    # Convert log level string to upper case
-    numeric_log_level = getattr(logging, log_level.upper(), logging.INFO)
-
-    # Configure global logging level
-    logging.basicConfig(level=numeric_log_level)
-
-    # Configure structlog to respect the global logging level
-    structlog.configure(
-        processors=[
-            structlog.stdlib.filter_by_level,
-            structlog.processors.JSONRenderer(),  # You can change to other formats if needed
-        ],
-        context_class=dict,
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        wrapper_class=structlog.stdlib.BoundLogger,
-        cache_logger_on_first_use=True,
-    )
+logger = get_logger(__name__)
 
 
 @click.group()
@@ -33,17 +15,37 @@ def main() -> None:
 
 
 @main.command()
-@click.option(
-    "--log-level", default="info", help="Set the logging level (default: info)"
-)
-def start(log_level: str) -> None:
+async def start() -> None:
     from botchan.server import start_server
 
-    config_logger(log_level=log_level)
+    logger.debug("Debug log is on[if you see this]")
     start_server()
 
 
 # Backdoor testing code block
 @main.command()
-def backdoor() -> None:
-    pass
+async def backdoor() -> None:
+    from botchan.audio.text_to_speech import get_text_to_speech
+
+    tts = get_text_to_speech()
+    wave_data = await tts.generate_audio(
+        text="""
+hello, how are you?"""
+    )
+    logger.info("wave data length", length=len(wave_data))
+    save_wave_data_pydub("/tmp/output.wav", wave_data)
+
+
+# Function to save wave_data using pydub
+def save_wave_data_pydub(file_name, data):
+    from pydub import AudioSegment
+
+    # Create an AudioSegment instance from raw audio data
+    audio_segment = AudioSegment(
+        data=data,
+        sample_width=2,  # Assuming 2 bytes for 16-bit audio
+        frame_rate=16000,  # Specified frame rate
+        channels=1,  # Mono audio
+    )
+    # Export the audio segment to a WAV file
+    audio_segment.export(file_name, format="wav")

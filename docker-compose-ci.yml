@@ -17,37 +17,6 @@ services:
       - RUN_INTEGRATION_TESTS=1
     command: pytest --verbose
 
-  lint:
-    build:
-      context: ./
-      dockerfile: Dockerfile.ci
-    env_file:
-     - .env
-    volumes:
-      - './botchan:/app/home/botchan'
-      - './tests:/app/home/tests'
-    command: pylint botchan tests
-
-  fmt:
-    build:
-      context: ./
-      dockerfile: Dockerfile.ci
-    env_file:
-     - .env
-    volumes:
-      - './botchan:/app/home/botchan'
-      - './tests:/app/home/tests'
-    command:
-        - /bin/sh
-        - -c
-        - |
-          echo "Apply isort"
-          isort --profile black botchan tests
-          echo "Apply black"
-          black botchan tests
-          echo "change owner to $CURRENT_UID"
-          chown -R $CURRENT_UID botchan tests
-
   ## For shell access and involve tooling, code are mounted
   shell:
     build:

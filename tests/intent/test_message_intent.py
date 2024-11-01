@@ -10,7 +10,6 @@ from botchan.intent.message_intent import (
 
 
 class TestMessageIntent(unittest.TestCase):
-
     def test_uppercase_key(self):
         intent = MessageIntent(key="testKey")
         self.assertEqual(intent.key, "TESTKEY")

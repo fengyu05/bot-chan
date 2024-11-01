@@ -5,7 +5,9 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-    command: botchan start  --log-level info
+    environment:
+      - LOG_LEVEL=info
+    command: botchan start
     ports:
       - 3000:3000
 
@@ -16,8 +18,9 @@ services:
     env_file:
       - .env
     environment:
-      - DEBUG_MODE=true  
-    command: botchan start  --log-level debug
+      - DEBUG_MODE=true
+      - LOG_LEVEL=debug  
+    command: botchan start
     ports:
       - 3000:3000
 
@@ -31,13 +34,9 @@ services:
     env_file:
       - .env
     volumes:
-      - './botchan:/app/home/botchan'
-      - './tests:/app/home/tests'
-    command: 
-        - /bin/sh
-        - -c
-        - |
-          python botchan/cli.py backdoor
+      - './tmp:/tmp'
+    command: botchan backdoor
+          
 
 
 

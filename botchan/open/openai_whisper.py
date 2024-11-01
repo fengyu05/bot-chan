@@ -1,5 +1,3 @@
-from typing import Any
-
 import structlog
 
 from botchan.open import OPENAI_CLIENT

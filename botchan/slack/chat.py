@@ -1,4 +1,4 @@
-""" Method for post message.
+"""Method for post message.
 
 All methods return a MessageResponse.
 """

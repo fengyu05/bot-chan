@@ -1,5 +1,4 @@
-""" Messages Fetcher.
-"""
+"""Messages Fetcher."""
 
 import datetime
 from typing import Callable, Optional, Union
@@ -84,7 +83,7 @@ class MessagesFetcher:
                 lambda x: map(Message.parse_obj, x),
                 # batch conver filters_function to a list of lambda that T.pipe expect
                 *map(self._apply_filter, filters_function),
-                list
+                list,
             )
             return messages
 

@@ -47,9 +47,7 @@ class MessageIntentAgent(Task, IntentAgent):
     def process_message(self, message_event: MessageEvent) -> list[str]:
         pass
 
-    def should_process(
-        self, *args: Any, **kwds: Any
-    ) -> bool:  # pylint: disable=unused-argument
+    def should_process(self, *args: Any, **kwds: Any) -> bool:  # pylint: disable=unused-argument
         message_intent: MessageIntent = self._require_input(
             kwargs=kwds, key="message_intent"
         )

@@ -11,8 +11,7 @@ from botchan.agents.expert.shopping_assist import (
 from botchan.agents.expert.shopping_assist import create_shopping_assisist_task_agent
 from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.intent.intent_candidate import EXAMPLE_INTENT_CANDIDATE, IntentCandidate
-from botchan.intent.message_intent import create_intent
+from botchan.intent.intent_candidate import IntentCandidate
 from botchan.intent.rag_intent_matcher import GraphState, RagIntentMatcher
 from tests.intergation_test_utils import skip_integration_tests
 

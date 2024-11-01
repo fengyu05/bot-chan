@@ -70,7 +70,6 @@ class GraphState(TypedDict):
 
 
 class RagIntentMatcher(IntentMatcher):
-
     def __init__(
         self,
         agents: list[IntentAgent],

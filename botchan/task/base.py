@@ -15,14 +15,10 @@ class Task(ABC):
     def process(self, *args: Any, **kwds: Any) -> Any:
         pass
 
-    def should_process(
-        self, *args: Any, **kwds: Any
-    ) -> bool:  # pylint: disable=unused-argument
+    def should_process(self, *args: Any, **kwds: Any) -> bool:  # pylint: disable=unused-argument
         return True
 
-    def fallback_process(
-        self, *args: Any, **kwds: Any
-    ) -> Any:  # pylint: disable=unused-argument
+    def fallback_process(self, *args: Any, **kwds: Any) -> Any:  # pylint: disable=unused-argument
         return None
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:

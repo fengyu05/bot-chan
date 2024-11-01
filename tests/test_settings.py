@@ -5,7 +5,6 @@ from botchan.settings import _TRUTHY_VALUES, config_default_bool
 
 
 class TestConfigDefaultBool(unittest.TestCase):
-
     @patch("os.environ.get")
     def test_truthy_values(self, mock_get):
         # Mock various truthy values

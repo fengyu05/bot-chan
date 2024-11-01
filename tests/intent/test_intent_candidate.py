@@ -4,7 +4,6 @@ from botchan.intent.intent_candidate import IntentCandidate, parse_intent_candid
 
 
 class TestIntentCandidate(unittest.TestCase):
-
     def test_intent_candidate_creation(self):
         candidate = IntentCandidate(
             understanding="The user wants to order a pizza.",

@@ -1,4 +1,4 @@
-""" Method for reaction.
+"""Method for reaction.
 
 All methods return a ReactionResponse.
 """

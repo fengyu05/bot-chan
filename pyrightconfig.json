@@ -1,5 +1,0 @@
-{
-  "include": ["botchan", "tests"],
-  "strict": true,
-  "venvPath": "./.venv"
-}

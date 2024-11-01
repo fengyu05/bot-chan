@@ -52,7 +52,7 @@ def download_file(url: str, local_filename: Optional[str] = None) -> Optional[st
             file.write(response.content)
         return local_filename
     except requests.RequestException as e:
-        logger.error(f"An error occurred while downloading the file", exc_info=e)
+        logger.error("An error occurred while downloading the file", exc_info=e)
         return None
 
 

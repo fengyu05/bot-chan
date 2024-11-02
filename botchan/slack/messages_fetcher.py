@@ -3,17 +3,18 @@
 import datetime
 from typing import Callable, Optional, Union
 
-import structlog
 import toolz as T
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 from .data_model import Message, MessageEvent
+from botchan.utt.singleton import Singleton
+from botchan.logger import get_logger
 
-logger = structlog.getLogger(__name__)
+logger = get_logger(__name__)
 
 
-class MessagesFetcher:
+class MessagesFetcher(Singleton):
     def __init__(self, client: WebClient) -> None:
         self.client = client
 

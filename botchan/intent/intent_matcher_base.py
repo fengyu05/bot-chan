@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-import structlog
 
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import (
@@ -12,7 +11,9 @@ from botchan.intent.message_intent import (
 from botchan.settings import LLM_INTENT_MATCHING
 from botchan.slack.data_model import MessageEvent
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class IntentMatcher(ABC):

@@ -3,14 +3,15 @@
 All methods return a ReactionResponse.
 """
 
-import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 from .data_model import MessageEvent, ReactionResponse
 from .exception import SlackResponseError
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def add_reaction(

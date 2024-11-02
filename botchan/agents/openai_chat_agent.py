@@ -2,7 +2,7 @@ import time
 from collections import OrderedDict
 from typing import Any
 
-import structlog
+
 from langsmith import traceable
 from openai.types.chat import ChatCompletion
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
@@ -13,16 +13,16 @@ from botchan.intent.message_intent import create_intent
 from botchan.open import OPENAI_CLIENT
 from botchan.open.chat_utils import get_message_from_completion
 from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
-from botchan.open.openai_whisper import OpenAiWhisper
 from botchan.settings import OPENAI_GPT_MODEL_ID, SLACK_TRANSCRIBE_WAIT_SEC
 from botchan.slack.data_model import FileObject, MessageEvent
 from botchan.slack.shared import SLACK_MESSAGE_FETCHER
-from botchan.utt.files import base64_encode_slack_image, download_slack_downloadable
+from botchan.utt.files import base64_encode_slack_image
 from botchan.utt.retry import retry
+from botchan.logger import get_logger
+from botchan.utt.singleton import Singleton
 
-logger = structlog.getLogger(__name__)
+logger = get_logger(__name__)
 
-_USE_OPENAI_WHISPER = False
 
 _AGENT_DESCRIPTION = """ Use this agent to make a natural converastion between the assistant bot and user.
 
@@ -31,7 +31,7 @@ _AGENT_DESCRIPTION = """ Use this agent to make a natural converastion between t
 INTENT_KEY = "CHAT"
 
 
-class OpenAiChatAgent(MessageIntentAgent):
+class OpenAiChatAgent(MessageIntentAgent, Singleton):
     """
     A Chat Agent using Open chat.completion API.
     Conversation is kept with message_buffer keyed by thread_id, with a max buffer limit of 100
@@ -42,7 +42,6 @@ class OpenAiChatAgent(MessageIntentAgent):
         super().__init__(intent=create_intent(INTENT_KEY))
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
-        self.whisper_agent = OpenAiWhisper()
 
     @property
     def name(self) -> str:
@@ -136,30 +135,23 @@ class OpenAiChatAgent(MessageIntentAgent):
             elif self._accept_slack_audio(file_object):
                 text_transcribed = ""
 
-                if _USE_OPENAI_WHISPER:  # Use OpenAI whisper
-                    assert file_object.aac
-                    local_audio_file = download_slack_downloadable(file_object.aac)
-                    text_transcribed = self.whisper_agent.transcribe(local_audio_file)
-                else:  # Use Slack transcribe
-
-                    def transcribed_msg_func():
-                        time.sleep(SLACK_TRANSCRIBE_WAIT_SEC)
-                        transcribed_msg = SLACK_MESSAGE_FETCHER.fetch_message(
-                            message_event
-                        )
-                        logger.debug(
-                            "slack transcribed message", transcribed_msg=transcribed_msg
-                        )
-                        assert transcribed_msg
-                        assert isinstance(transcribed_msg.files, list)
-                        audio_file = transcribed_msg.files[0]
-                        return audio_file.get_transcription_preview()
-
-                    text_transcribed = retry(
-                        transcribed_msg_func, retry_time_sec=SLACK_TRANSCRIBE_WAIT_SEC
+                # Use Slack transcribe
+                def transcribed_msg_func():
+                    time.sleep(SLACK_TRANSCRIBE_WAIT_SEC)
+                    transcribed_msg = SLACK_MESSAGE_FETCHER.fetch_message(message_event)
+                    logger.debug(
+                        "slack transcribed message", transcribed_msg=transcribed_msg
                     )
-                    if not text_transcribed:
-                        text_transcribed = "audio not recognizable."
+                    assert transcribed_msg
+                    assert isinstance(transcribed_msg.files, list)
+                    audio_file = transcribed_msg.files[0]
+                    return audio_file.get_transcription_preview()
+
+                text_transcribed = retry(
+                    transcribed_msg_func, retry_time_sec=SLACK_TRANSCRIBE_WAIT_SEC
+                )
+                if not text_transcribed:
+                    text_transcribed = "audio not recognizable."
                 data.append(
                     {
                         "type": "text",

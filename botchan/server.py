@@ -2,13 +2,14 @@ import logging
 import signal
 import sys
 
-import structlog
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from botchan.app import app
 from botchan.settings import LOG_LEVEL, SLACK_APP_LEVEL_TOKEN
 
-logger = structlog.get_logger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def start_server(port: int = 3000) -> None:

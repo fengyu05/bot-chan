@@ -1,6 +1,5 @@
 # pylint: disable=unnecessary-lambda
 # pylint: disable=unused-argument
-import structlog
 from slack_sdk import WebClient
 
 from botchan.agents import MessageIntentAgent
@@ -14,7 +13,9 @@ from botchan.slack import reaction as slack_reaction
 from botchan.slack.data_model import MessageEvent
 from botchan.slack.messages_fetcher import MessagesFetcher
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class MessageMultiIntentAgent:
@@ -26,9 +27,9 @@ class MessageMultiIntentAgent:
 
     def __init__(self, slack_client: WebClient):
         self.slack_client = slack_client
-        self.fetcher = MessagesFetcher(self.slack_client)
+        self.fetcher = MessagesFetcher.get_instance()
         self.bot_user_id = slack_auth.get_bot_user_id(self.slack_client)
-        self.chat_agent = OpenAiChatAgent()
+        self.chat_agent = OpenAiChatAgent.get_instance()
         from botchan.agents.expert.poem_translate import (
             create_poems_translation_task_agent,
         )

@@ -1,12 +1,13 @@
 from typing import Any
 
-import structlog
 from jinja2 import Template
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from botchan.settings import DEBUG_MODE
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def construct_system_prompt(prompt: str, context: dict[str, Any]) -> ChatPromptTemplate:

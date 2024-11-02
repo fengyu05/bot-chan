@@ -1,7 +1,6 @@
 import re
 from functools import cached_property
 
-import structlog
 
 from botchan.constants import GPT_4O_MINI
 from botchan.intent.intent_agent import IntentAgent
@@ -9,7 +8,9 @@ from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.message_intent import MessageIntent, create_intent
 from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class OpenAIIntentMatcher(IntentMatcher):

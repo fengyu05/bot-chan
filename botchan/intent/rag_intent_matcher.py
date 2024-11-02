@@ -1,6 +1,5 @@
 from functools import cached_property
 
-import structlog
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_fireworks import ChatFireworks
 from langgraph.graph import END, START, StateGraph
@@ -18,7 +17,9 @@ from botchan.intent.intent_candidate import (
 from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.message_intent import MessageIntent, create_intent
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 _MATCH_PROMPT = """

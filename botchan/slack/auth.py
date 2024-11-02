@@ -1,10 +1,11 @@
 from functools import cache
 
-import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 @cache

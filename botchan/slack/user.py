@@ -1,11 +1,12 @@
-import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 from .data_model import UserProfile
 from .exception import SlackResponseError
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_user_profile(client: WebClient, user_id) -> UserProfile:

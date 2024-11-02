@@ -1,14 +1,15 @@
 from abc import abstractmethod
 from typing import Any
 
-import structlog
 
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import MessageIntent
 from botchan.slack.data_model import MessageEvent
 from botchan.task import Task
 
-logger = structlog.getLogger(__name__)
+from botchan.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class MessageIntentAgent(Task, IntentAgent):

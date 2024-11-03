@@ -1,13 +1,11 @@
 from abc import abstractmethod
 from typing import Any
 
-
+from botchan.data_model import MessageEvent
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import MessageIntent
-from botchan.slack.data_model import MessageEvent
-from botchan.task import Task
-
 from botchan.logger import get_logger
+from botchan.task import Task
 
 logger = get_logger(__name__)
 

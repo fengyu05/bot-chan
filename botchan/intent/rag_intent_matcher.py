@@ -16,7 +16,6 @@ from botchan.intent.intent_candidate import (
 )
 from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.message_intent import MessageIntent, create_intent
-
 from botchan.logger import get_logger
 
 logger = get_logger(__name__)

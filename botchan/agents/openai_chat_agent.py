@@ -1,7 +1,6 @@
 import time
 from collections import OrderedDict
-from typing import Any
-
+from typing import Any, Callable
 
 from langsmith import traceable
 from openai.types.chat import ChatCompletion
@@ -9,17 +8,15 @@ from openai.types.chat.chat_completion_message_param import ChatCompletionMessag
 
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_intent_agent import MessageIntentAgent
+from botchan.data_model import FileObject, Message, MessageEvent
 from botchan.intent.message_intent import create_intent
+from botchan.logger import get_logger
 from botchan.open import OPENAI_CLIENT
 from botchan.open.chat_utils import get_message_from_completion
 from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
 from botchan.settings import OPENAI_GPT_MODEL_ID, SLACK_TRANSCRIBE_WAIT_SEC
-from botchan.slack.data_model import FileObject, MessageEvent
-from botchan.slack.shared import SLACK_MESSAGE_FETCHER
 from botchan.utt.files import base64_encode_slack_image
 from botchan.utt.retry import retry
-from botchan.logger import get_logger
-from botchan.utt.singleton import Singleton
 
 logger = get_logger(__name__)
 
@@ -31,17 +28,22 @@ _AGENT_DESCRIPTION = """ Use this agent to make a natural converastion between t
 INTENT_KEY = "CHAT"
 
 
-class OpenAiChatAgent(MessageIntentAgent, Singleton):
+class OpenAiChatAgent(MessageIntentAgent):
     """
     A Chat Agent using Open chat.completion API.
     Conversation is kept with message_buffer keyed by thread_id, with a max buffer limit of 100
     converation(respect to LRU).
     """
 
-    def __init__(self, buffer_limit: int = 100) -> None:
+    def __init__(
+        self,
+        get_message_by_event: Callable[[MessageEvent], Message | None] | None = None,
+        buffer_limit: int = 100,
+    ) -> None:
         super().__init__(intent=create_intent(INTENT_KEY))
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
+        self.get_message_by_event = get_message_by_event
 
     @property
     def name(self) -> str:
@@ -133,12 +135,15 @@ class OpenAiChatAgent(MessageIntentAgent, Singleton):
                     }
                 )
             elif self._accept_slack_audio(file_object):
+                assert (
+                    self.get_message_by_event
+                ), "get_message_by_event is required to use Slack Audio transcribed."
                 text_transcribed = ""
 
                 # Use Slack transcribe
                 def transcribed_msg_func():
                     time.sleep(SLACK_TRANSCRIBE_WAIT_SEC)
-                    transcribed_msg = SLACK_MESSAGE_FETCHER.fetch_message(message_event)
+                    transcribed_msg = self.get_message_by_event(message_event)
                     logger.debug(
                         "slack transcribed message", transcribed_msg=transcribed_msg
                     )

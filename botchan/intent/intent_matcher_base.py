@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-
+from botchan.data_model import MessageEvent
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import (
     DEFAULT_CHAT_INTENT,
@@ -8,10 +8,8 @@ from botchan.intent.message_intent import (
     MessageIntent,
     get_message_intent_by_emoji,
 )
-from botchan.settings import LLM_INTENT_MATCHING
-from botchan.slack.data_model import MessageEvent
-
 from botchan.logger import get_logger
+from botchan.settings import LLM_INTENT_MATCHING
 
 logger = get_logger(__name__)
 

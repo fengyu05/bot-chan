@@ -12,6 +12,10 @@ def config_default_float(key: str, default_value: Any = 0.0) -> float:
     return float(os.environ.get(key, default_value))
 
 
+def config_default_int(key: str, default_value: Any = 0) -> float:
+    return int(os.environ.get(key, default_value))
+
+
 _TRUTHY_VALUES = {"true", "1", "yes", "t", "y"}
 
 
@@ -24,6 +28,7 @@ ENV = config_default("ENV", "dev")
 APP_NAME = config_default("APP_NAME", "botchan")
 LOG_LEVEL = config_default("LOG_LEVEL", "INFO")
 DEBUG_MODE = config_default_bool("DEBUG_MODE", False)
+APP_PORT = config_default_int("APP_PORT", 3000)
 
 # Bot config
 BOT_NAME = config_default("BOT_NAME", APP_NAME)

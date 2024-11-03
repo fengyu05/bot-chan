@@ -1,22 +1,22 @@
 """Messages Fetcher."""
 
 import datetime
+from abc import ABC, abstractmethod
 from typing import Callable, Optional, Union
 
 import toolz as T
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from .data_model import Message, MessageEvent
-from botchan.utt.singleton import Singleton
+from botchan.data_model import Message, MessageEvent
 from botchan.logger import get_logger
+from botchan.utt.singleton import Singleton
 
 logger = get_logger(__name__)
 
 
-class MessagesFetcher(Singleton):
-    def __init__(self, client: WebClient) -> None:
-        self.client = client
+class MessagesFetcher(ABC):
+    slack_client: WebClient
 
     @T.curry
     def _apply_filter(self, filter_func, messages):
@@ -25,7 +25,7 @@ class MessagesFetcher(Singleton):
     def _parse_ts_union(self, ts: Union[int, datetime.datetime, None]) -> int:
         return int(ts.timestamp()) if isinstance(ts, datetime.datetime) else ts
 
-    def fetch(
+    def fetch_message(
         self,
         channel_id: str,
         thread_ts: Optional[str] = None,
@@ -55,9 +55,9 @@ class MessagesFetcher(Singleton):
         try:
             # Use 'conversations_reply' if thread_ts is specified otherwise 'conversations_history'
             _api = (
-                self.client.conversations_replies
+                self.slack_client.conversations_replies
                 if thread_ts
-                else self.client.conversations_history
+                else self.slack_client.conversations_history
             )
 
             kwargs = {
@@ -102,7 +102,7 @@ class MessagesFetcher(Singleton):
         This function retrieves all messages with the most replies.
         """
         try:
-            messages = self.fetch(
+            messages = self.fetch_message(
                 channel_id=channel_id,
                 oldest_ts=oldest_ts,
                 latest_ts=latest_ts,
@@ -121,9 +121,9 @@ class MessagesFetcher(Singleton):
             logger.error("Error get_most_replied_message", error=str(e))
 
     def get_last_message(self, channel_id: str) -> Message:
-        return self.fetch(channel_id=channel_id, limit=1)[0]
+        return self.fetch_message(channel_id=channel_id, limit=1)[0]
 
-    def fetch_message(self, message_event: MessageEvent) -> Optional[Message]:
+    def get_message_by_event(self, message_event: MessageEvent) -> Optional[Message]:
         """
         Fetches a single message uniquely identified by its channel and timestamp.
 
@@ -134,7 +134,7 @@ class MessagesFetcher(Singleton):
             Optional[Message]: The fetched message object or None if not found.
         """
         try:
-            response = self.client.conversations_history(
+            response = self.slack_client.conversations_history(
                 channel=message_event.channel,
                 inclusive=True,
                 oldest=message_event.ts,

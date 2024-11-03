@@ -3,9 +3,8 @@ from typing import Any
 from jinja2 import Template
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from botchan.settings import DEBUG_MODE
-
 from botchan.logger import get_logger
+from botchan.settings import DEBUG_MODE
 
 logger = get_logger(__name__)
 

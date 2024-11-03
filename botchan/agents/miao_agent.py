@@ -1,6 +1,6 @@
 from botchan.agents.message_intent_agent import MessageIntentAgent
+from botchan.data_model.message_event import MessageEvent
 from botchan.intent.message_intent import create_intent
-from botchan.slack.data_model.message_event import MessageEvent
 
 _AGENT_DESC = (
     """A miao agent handle the message request such as mimicking a cat voice. """

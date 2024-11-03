@@ -1,14 +1,12 @@
 import re
 from functools import cached_property
 
-
 from botchan.constants import GPT_4O_MINI
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.message_intent import MessageIntent, create_intent
-from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
-
 from botchan.logger import get_logger
+from botchan.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
 
 logger = get_logger(__name__)
 

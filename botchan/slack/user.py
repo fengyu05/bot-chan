@@ -1,10 +1,10 @@
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
+from botchan.logger import get_logger
+
 from .data_model import UserProfile
 from .exception import SlackResponseError
-
-from botchan.logger import get_logger
 
 logger = get_logger(__name__)
 

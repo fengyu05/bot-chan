@@ -1,3 +1,4 @@
+import re
 from functools import cached_property
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
@@ -45,20 +46,15 @@ Example output format:
 """
 
 _REFLECTION_PROMPT = """
-Analyze the JSON payload to refine the intent candidate result. Follow these steps:
-
-1. Check if `intent_key_primary` exactly matches an entry in the `intent_list`.
-2. If `intent_key_primary` does not match, attempt to correct it to the nearest valid entry in `intent_list`.
-3. When `intent_key_primary` cannot be recognized or corrected, utilize `intent_key_secondary` instead.
-4. Remove any unnecessary escape characters from the input.
-5. Output only the final, adjusted `intent_name`.
+Analyze the JSON payload to refine the intent candidate result.
+Check if `intent_key_primary`/`intent_key_secondary` match the `Intent list`, fix it with fuzzy match if possible.
 
 Intent list:
 -------------
 {{intent_choices}}
 
-Output: Singular refined intent name selected from the intent list below. Don't include additional charater.
-Example: {{intent_choices[0]}}
+Output: Output the JSON in a single line format with the same schema as input.
+Incoming user messages are the previous output to analye.
 """
 
 
@@ -66,7 +62,6 @@ class GraphState(TypedDict):
     messages: list[BaseMessage]
     intent_json_payload: str | None  # Json paylod
     intent_candidate: IntentCandidate | None  # LLM generation
-    final_intent: str | None  # Binary decision to run web search
 
 
 class RagIntentMatcher(IntentMatcher):
@@ -93,7 +88,10 @@ class RagIntentMatcher(IntentMatcher):
         self.refine_intent_chain = (
             construct_system_prompt(
                 prompt=_REFLECTION_PROMPT,
-                context={"intent_choices": self.intent_keylist},
+                context={
+                    "intent_choices": self.intent_keylist,
+                    "json_example_payload": EXAMPLE_INTENT_CANDIDATE.perfered_json_serialization,
+                },
             )
             | self.llm
         )
@@ -116,7 +114,6 @@ class RagIntentMatcher(IntentMatcher):
             messages=messages,
             intent_json_payload=output.content,
             intent_candidate=intent_candidate,
-            final_intent=None,
         )
 
     def refine_intent_node(self, state: GraphState) -> GraphState:
@@ -129,18 +126,18 @@ class RagIntentMatcher(IntentMatcher):
         output = self.refine_intent_chain.invoke(
             {
                 "messages": [
-                    HumanMessage(content=question),
-                    AIMessage(content=intent_json_payload),
+                    # HumanMessage(content=question),
+                    HumanMessage(content=intent_json_payload),
                 ]
             }
         )
         logger.info("refine intent output", output=output)
         assert isinstance(output.content, str), "expect output.content to be text"
+        intent_candidate = parse_intent_candidate_json(output.content)
         return GraphState(
             messages=messages,
-            intent_json_payload=intent_json_payload,
+            intent_json_payload=output.content,
             intent_candidate=intent_candidate,
-            final_intent=output.content,
         )
 
     def promote_candidate_node(self, state: GraphState) -> GraphState:
@@ -164,18 +161,16 @@ class RagIntentMatcher(IntentMatcher):
         # Define the nodes
         workflow.add_node("match_intent", self.match_intent_node)
         workflow.add_node("refine_intent", self.refine_intent_node)
-        workflow.add_node("promote_candidate", self.promote_candidate_node)
         # Add edge
         workflow.add_edge(START, "match_intent")
         workflow.add_conditional_edges(
             "match_intent",
             self.need_refine_edge,
             {
-                "NO": "promote_candidate",
+                "NO": END,
                 "YES": "refine_intent",
             },
         )
-        workflow.add_edge("promote_candidate", END)
         workflow.add_edge("refine_intent", END)
         return workflow.compile()
 
@@ -205,10 +200,14 @@ class RagIntentMatcher(IntentMatcher):
     def parse_final_state(self, state: GraphState) -> MessageIntent:
         metadata = {
             "method": "rag_matcher",
-            "final_intent": state["final_intent"],
         }
-        if state["final_intent"]:
-            for intent_key in self.intent_keylist:
-                if intent_key in state["final_intent"]:
-                    return MessageIntent(key=intent_key, metadata=metadata)
+        intent_candidate = state["intent_candidate"]
+        assert intent_candidate, "intent candidate cannot be None"
+        for intent_key in self.intent_keylist:
+            if intent_key in intent_candidate.intent_primary:
+                return MessageIntent(key=intent_key, metadata=metadata)
+        ## secondary
+        for intent_key in self.intent_keylist:
+            if intent_key in intent_candidate.intent_secondary:
+                return MessageIntent(key=intent_key, metadata=metadata)
         return create_intent(unknown=True)

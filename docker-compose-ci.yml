@@ -16,6 +16,7 @@ services:
     env_file:
      - .env
     environment:
+      - LLM_INTENT_MATCHING=true
       - RUN_INTEGRATION_TESTS=1
     command: pytest --verbose
 

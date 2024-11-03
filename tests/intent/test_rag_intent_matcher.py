@@ -48,7 +48,6 @@ class TestRagIntentMatcher(unittest.TestCase):
             messages=[HumanMessage("静夜思 English")],
             intent_candidate=None,
             intent_json_payload=None,
-            final_intent=None,
         )
         result_state = self.intent_matcher.match_intent_node(state)
         self.assertIsNotNone(result_state["intent_candidate"])
@@ -63,30 +62,35 @@ class TestRagIntentMatcher(unittest.TestCase):
             messages=[HumanMessage("Help me order sth")],
             intent_candidate=None,
             intent_json_payload="""{"understanding":"The user wants to place an order for a product.","intent_primary":"SHOPPING\\_ASSIST","intent_secondary":"CHAT"}""",
-            final_intent=None,
         )
         result_state = self.intent_matcher.refine_intent_node(state)
-        self.assertEqual(result_state["final_intent"], shopping_assisist_intent_key)
-
-    def test_promote_candidate_node(self):
-        state = GraphState(
-            messages=[HumanMessage("静夜思 English")],
-            intent_candidate=IntentCandidate(
-                understanding="test understanding",
-                intent_primary=poem_translate_intent_key,
-            ),
-            intent_json_payload="test json",
-            final_intent=None,
+        self.assertEqual(
+            result_state["intent_candidate"].intent_primary,
+            shopping_assisist_intent_key,
         )
-        result_state = self.intent_matcher.promote_candidate_node(state)
-        self.assertEqual(result_state["final_intent"], poem_translate_intent_key)
 
-    def test_parse_final_state_with_valid_intent(self):
+    def test_parse_final_state_with_primary_intent(self):
         state = GraphState(
             messages=[],
-            intent_candidate=None,
+            intent_candidate=IntentCandidate(
+                understanding="",
+                intent_primary=shopping_assisist_intent_key,
+                intent_secondary="other",
+            ),
             intent_json_payload=None,
-            final_intent=f"it's {shopping_assisist_intent_key}",
+        )
+        message_intent = self.intent_matcher.parse_final_state(state)
+        self.assertEqual(message_intent.key, shopping_assisist_intent_key)
+
+    def test_parse_final_state_with_secondary_intent(self):
+        state = GraphState(
+            messages=[],
+            intent_candidate=IntentCandidate(
+                understanding="",
+                intent_primary="other",
+                intent_secondary=shopping_assisist_intent_key,
+            ),
+            intent_json_payload=None,
         )
         message_intent = self.intent_matcher.parse_final_state(state)
         self.assertEqual(message_intent.key, shopping_assisist_intent_key)

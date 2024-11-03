@@ -22,7 +22,7 @@ def parse_intent_candidate_json(text: str) -> IntentCandidate | None:
         data = json.loads(text)
         return IntentCandidate(**data)
     except (json.JSONDecodeError, ValidationError) as e:
-        logger.error("Error parsing JSON", err=e)
+        logger.error(f"Error parsing JSON:({text})", err=e)
         return None
 
 

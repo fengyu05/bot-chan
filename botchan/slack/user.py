@@ -1,20 +1,24 @@
+from abc import ABC
+
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
+from botchan.data_model import UserProfile
 from botchan.logger import get_logger
-
-from .data_model import UserProfile
-from .exception import SlackResponseError
+from botchan.slack.exception import SlackResponseError
 
 logger = get_logger(__name__)
 
 
-def get_user_profile(client: WebClient, user_id) -> UserProfile:
-    try:
-        response = client.users_profile_get(user=user_id)
-        if not response["ok"]:
-            raise SlackResponseError(response=response)
+class SlackReaction(ABC):
+    slack_client: WebClient
 
-        return UserProfile.from_dict(response["profile"])
-    except SlackApiError as e:
-        logger.error("Error getting user profile", error=str(e))
+    def get_user_profile(self, user_id: str) -> UserProfile:
+        try:
+            response = self.slack_client.users_profile_get(user=user_id)
+            if not response["ok"]:
+                raise SlackResponseError(response=response)
+
+            return UserProfile.from_dict(response["profile"])
+        except SlackApiError as e:
+            logger.error("Error getting user profile", error=str(e))

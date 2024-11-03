@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile.ci
     env_file:
       - .env
+    environment:
+      - LLM_INTENT_MATCHING=true
     command: pytest --verbose
 
   test-int:

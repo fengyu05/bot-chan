@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.data_model import MessageEvent
+from botchan.data_model.slack import MessageEvent
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.message_intent import UNKNOWN_INTENT, MessageIntent, create_intent

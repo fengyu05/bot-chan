@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from botchan.data_model import MessageEvent
+from botchan.data_model.slack import MessageEvent
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import (
     DEFAULT_CHAT_INTENT,

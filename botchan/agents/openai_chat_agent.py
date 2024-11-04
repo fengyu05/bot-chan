@@ -8,7 +8,7 @@ from openai.types.chat.chat_completion_message_param import ChatCompletionMessag
 
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.data_model import FileObject, Message, MessageEvent
+from botchan.data_model.slack import FileObject, Message, MessageEvent
 from botchan.intent.message_intent import create_intent
 from botchan.logger import get_logger
 from botchan.open import OPENAI_CLIENT

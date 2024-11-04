@@ -7,7 +7,7 @@ from jinja2 import Environment, meta
 from botchan.agents.expert.data_model import IntakeMessage, TaskConfig
 from botchan.agents.expert.task_node import TaskNode
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.data_model.message_event import MessageEvent
+from botchan.data_model.slack.message_event import MessageEvent
 from botchan.intent.message_intent import MessageIntent
 
 logger = structlog.getLogger(__name__)

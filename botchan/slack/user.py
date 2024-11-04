@@ -3,7 +3,7 @@ from abc import ABC
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from botchan.data_model import UserProfile
+from botchan.data_model.slack import UserProfile
 from botchan.logger import get_logger
 from botchan.slack.exception import SlackResponseError
 

@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Any
 
-from botchan.data_model import MessageEvent
+from botchan.data_model.slack import MessageEvent
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import MessageIntent
 from botchan.logger import get_logger

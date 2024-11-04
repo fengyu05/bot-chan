@@ -2,10 +2,15 @@ import logging
 import signal
 import sys
 
-from botchan.discord.discord_bot_proxy import DiscordBotProxy
+from botchan.discord.bot_client import DiscordBotClient
 from botchan.logger import get_logger
-from botchan.settings import BOT_CLIENT, LOG_LEVEL
-from botchan.slack.slack_bot_proxy import SlackBotProxy
+from botchan.settings import (
+    BOT_CLIENT,
+    DISCORD_BOT_TOKEN,
+    LOG_LEVEL,
+    SLACK_APP_LEVEL_TOKEN,
+)
+from botchan.slack.bot_client import SlackBotClient
 from botchan.types import AppType
 
 logger = get_logger(__name__)
@@ -17,11 +22,11 @@ def start_server() -> None:
     signal.signal(signal.SIGINT, cleanup)
 
     if BOT_CLIENT == AppType.SLACK.name:
-        proxy = SlackBotProxy.get_instance()
-        proxy.start()
+        client = SlackBotClient.get_instance()
+        client.run(SLACK_APP_LEVEL_TOKEN)
     elif BOT_CLIENT == AppType.DISCORD.name:
-        proxy = DiscordBotProxy.get_instance()
-        proxy.start()
+        client = DiscordBotClient.get_instance()
+        client.run(DISCORD_BOT_TOKEN)
     else:
         raise Exception(f"Unknown app type {BOT_CLIENT}")
 

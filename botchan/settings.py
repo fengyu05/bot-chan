@@ -30,12 +30,17 @@ LOG_LEVEL = config_default("LOG_LEVEL", "INFO")
 DEBUG_MODE = config_default_bool("DEBUG_MODE", False)
 APP_PORT = config_default_int("APP_PORT", 3000)
 
+BOT_CLIENT = config_default("BOT_CLIENT", "SLACK")
+
 # Bot config
 BOT_NAME = config_default("BOT_NAME", APP_NAME)
 
 # Slack credential
 SLACK_APP_OAUTH_TOKENS_FOR_WS = config_default("SLACK_APP_OAUTH_TOKENS_FOR_WS")
 SLACK_APP_LEVEL_TOKEN = config_default("SLACK_APP_LEVEL_TOKEN")
+
+# Discord credential
+DISCORD_BOT_TOKEN = config_default("DISCORD_BOT_TOKEN")
 
 # OPENAI API KEY
 OPENAI_API_KEY = config_default("OPENAI_API_KEY")

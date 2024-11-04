@@ -11,6 +11,18 @@ services:
     ports:
       - 3000:3000
 
+  app-async:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=info
+    command: botchan_async start
+    ports:
+      - 3000:3000
+
   app-debug:
     build:
       context: ./

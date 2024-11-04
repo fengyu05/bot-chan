@@ -7,7 +7,3 @@ class BotProxy(ABC):
     @abstractmethod
     def receive_message(self, message_event: MessageEvent) -> None:
         pass
-
-    @abstractmethod
-    def start(self) -> None:
-        pass

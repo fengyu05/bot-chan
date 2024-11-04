@@ -9,6 +9,7 @@ setup(
     entry_points={
         "console_scripts": [
             "botchan=botchan.cli:main",
+            "botchan_async=botchan.async_cli:main",
         ],
     },
 )

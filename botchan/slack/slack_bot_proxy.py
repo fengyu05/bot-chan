@@ -49,27 +49,23 @@ class SlackBotProxy(BotProxy, MessagesFetcher, SlackChat, SlackReaction, Singlet
             self.bot_user_id
         )
 
-    def on_message(self, message_event: MessageEvent) -> None:
-        if self._should_reply(message_event):  # IM or mentioned
-            self.add_reaction(event=message_event, reaction_name="eyes")
+    def on_message(self, message: MessageEvent) -> None:
+        if self._should_reply(message):  # IM or mentioned
+            self.add_reaction(event=message, reaction_name="eyes")
             message_intent = self.intent_matcher.match_message_intent(
-                message_event=message_event
+                message_event=message
             )
             if DEBUG_MODE:
-                self.reply_to_message(message_event, f"Matched itent {message_intent}")
+                self.reply_to_message(message, f"Matched itent {message_intent}")
             if message_intent.unknown:
-                self.chat_agent(
-                    message_event=message_event, message_intent=message_intent
-                )
+                self.chat_agent(message_event=message, message_intent=message_intent)
             else:
                 for agent in self.agents:
-                    msgs = agent(
-                        message_event=message_event, message_intent=message_intent
-                    )
+                    msgs = agent(message_event=message, message_intent=message_intent)
                     if msgs is None:  ## agent didn't process this intent
                         continue
                     for msg in msgs:
-                        self.reply_to_message(event=message_event, text=msg)
+                        self.reply_to_message(event=message, text=msg)
 
     def get_bot_user_id(self) -> str:
         """

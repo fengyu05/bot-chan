@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
 
-from botchan.data_model import MessageEvent
+from discord.message import Message
+
+from botchan.data_model.slack import MessageEvent
 
 
 class BotProxy(ABC):
     @abstractmethod
-    def receive_message(self, message_event: MessageEvent) -> None:
-        pass
-
-    @abstractmethod
-    def start(self) -> None:
+    def on_message(self, message: MessageEvent | Message) -> None:
         pass

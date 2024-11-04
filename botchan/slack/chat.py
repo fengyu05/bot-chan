@@ -10,7 +10,7 @@ import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from botchan.data_model import MessageEvent, MessageResponse
+from botchan.data_model.slack import MessageEvent, MessageResponse
 from botchan.slack.exception import SlackResponseError
 
 logger = structlog.getLogger(__name__)

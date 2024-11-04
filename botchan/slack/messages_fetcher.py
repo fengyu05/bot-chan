@@ -1,16 +1,15 @@
 """Messages Fetcher."""
 
 import datetime
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Callable, Optional, Union
 
 import toolz as T
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from botchan.data_model import Message, MessageEvent
+from botchan.data_model.slack import Message, MessageEvent
 from botchan.logger import get_logger
-from botchan.utt.singleton import Singleton
 
 logger = get_logger(__name__)
 

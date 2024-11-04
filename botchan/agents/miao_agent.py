@@ -1,5 +1,5 @@
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.data_model.message_event import MessageEvent
+from botchan.data_model.slack.message_event import MessageEvent
 from botchan.intent.message_intent import create_intent
 
 _AGENT_DESC = (

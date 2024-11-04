@@ -21,6 +21,7 @@ colorama==0.4.6 ; python_full_version >= "3.11.10" and python_version < "4.0" an
 coloredlogs==15.0.1 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"
 dataclasses-json==0.6.7 ; python_full_version >= "3.11.10" and python_version < "4.0"
 deprecated==1.2.14 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"
+discord-py==2.4.0 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"
 distro==1.9.0 ; python_full_version >= "3.11.10" and python_version < "4.0"
 durationpy==0.9 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"
 fake-useragent==1.5.1 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 from botchan.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.agents.expert.task_node import TaskNode
-from botchan.data_model import MessageEvent
+from botchan.data_model.slack import MessageEvent
 from botchan.intent.message_intent import MessageIntent
 from tests.data.messages import MESSAGE_EVENT_SIMPLE_1
 

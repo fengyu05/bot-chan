@@ -6,14 +6,14 @@ All methods return a MessageResponse.
 from abc import ABC
 from typing import Optional
 
-import structlog
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 from botchan.data_model.slack import MessageEvent, MessageResponse
+from botchan.logger import get_logger
 from botchan.slack.exception import SlackResponseError
 
-logger = structlog.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class SlackChat(ABC):
@@ -45,7 +45,7 @@ class SlackChat(ABC):
         else:
             raise SlackResponseError(response)
 
-    def send_slack_message(self, channel_id: str, text: str) -> MessageResponse:
+    def send_message(self, channel_id: str, text: str) -> MessageResponse:
         """
         This function sends a Slack message to the specified channel using the given client object.
         """

@@ -8,7 +8,6 @@ from botchan.data_model.slack import MessageEvent
 from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.rag_intent_matcher import RagIntentMatcher
 from botchan.logger import get_logger
-from botchan.settings import DEBUG_MODE
 from botchan.slack.chat import SlackChat
 from botchan.slack.messages_fetcher import MessagesFetcher
 from botchan.slack.reaction import SlackReaction
@@ -50,22 +49,20 @@ class SlackBotProxy(BotProxy, MessagesFetcher, SlackChat, SlackReaction, Singlet
         )
 
     def on_message(self, message: MessageEvent) -> None:
-        if self._should_reply(message):  # IM or mentioned
-            self.add_reaction(event=message, reaction_name="eyes")
-            message_intent = self.intent_matcher.match_message_intent(
-                message_event=message
-            )
-            if DEBUG_MODE:
-                self.reply_to_message(message, f"Matched itent {message_intent}")
-            if message_intent.unknown:
-                self.chat_agent(message_event=message, message_intent=message_intent)
-            else:
-                for agent in self.agents:
-                    msgs = agent(message_event=message, message_intent=message_intent)
-                    if msgs is None:  ## agent didn't process this intent
-                        continue
-                    for msg in msgs:
-                        self.reply_to_message(event=message, text=msg)
+        if not self._should_reply(message):
+            return
+
+        self.add_reaction(event=message, reaction_name="eyes")
+        message_intent = self.intent_matcher.match_message_intent(message_event=message)
+        if message_intent.unknown:
+            self.chat_agent(message_event=message, message_intent=message_intent)
+        else:
+            for agent in self.agents:
+                msgs = agent(message_event=message, message_intent=message_intent)
+                if msgs is None:  ## agent didn't process this intent
+                    continue
+                for msg in msgs:
+                    self.reply_to_message(event=message, text=msg)
 
     def get_bot_user_id(self) -> str:
         """

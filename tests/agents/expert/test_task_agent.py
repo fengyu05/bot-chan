@@ -4,9 +4,8 @@ from unittest.mock import MagicMock, patch
 from botchan.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
 from botchan.agents.expert.task_agent import TaskAgent
 from botchan.agents.expert.task_node import TaskNode
-from botchan.data_model.slack import MessageEvent
 from botchan.intent.message_intent import MessageIntent
-from tests.data.messages import MESSAGE_EVENT_SIMPLE_1
+from tests.data.imessages import MESSAGE_HELLO_WORLD
 
 
 class Te1(TaskEntity):
@@ -32,8 +31,8 @@ class TestTaskAgent(unittest.TestCase):
                 output_schema=str,
             ),
         ]
-        self.message_event = MessageEvent(**MESSAGE_EVENT_SIMPLE_1)
-        self.intake_message = IntakeMessage(text=self.message_event.text)
+        self.message = MESSAGE_HELLO_WORLD
+        self.intake_message = IntakeMessage(text=self.message.text)
 
     def test_process_message(self):
         task1 = TaskNode(self.task_graph[0])
@@ -52,7 +51,7 @@ class TestTaskAgent(unittest.TestCase):
                 task_graph=self.task_graph,
             )
 
-        responses = agent.process_message(message_event=self.message_event)
+        responses = agent.process_message(message_event=self.message)
         task1.process.assert_called_once_with(message=self.intake_message)
         task2.process.assert_called_once_with(
             message=self.intake_message, poem_translation="output_task1"
@@ -85,7 +84,7 @@ class TestTaskAgent(unittest.TestCase):
                 task_graph=self.task_graph,
             )
 
-        agent.process_message(message_event=self.message_event)
+        agent.process_message(message_event=self.message)
 
         # First time, task1 called, stuck_task called and break
         task1.process.assert_called_once_with(message=self.intake_message)
@@ -100,7 +99,7 @@ class TestTaskAgent(unittest.TestCase):
         task2.process = MagicMock(return_value="output_task2")
         stuck_task.process = MagicMock(return_value="pass")  # Change to pass
 
-        agent.process_message(message_event=self.message_event)
+        agent.process_message(message_event=self.message)
         task1.process.assert_not_called()
         stuck_task.process.assert_called_once_with(
             message=self.intake_message,
@@ -134,7 +133,7 @@ class TestTaskAgent(unittest.TestCase):
                 },
             )
 
-        agent.process_message(message_event=self.message_event)
+        agent.process_message(message_event=self.message)
         task1.process.assert_called_once_with(
             message=self.intake_message,
             a="a",

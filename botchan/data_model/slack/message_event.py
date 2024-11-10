@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from pydantic import BaseModel
 
 from .block import RichTextBlock
@@ -11,17 +9,19 @@ class MessageEvent(BaseModel):
     type: str
     subtype: str = "message_created"
     channel: str
-    channel_type: Optional[str] = None
-    user: Optional[str] = None
-    parent_user_id: Optional[str] = None  # only in reply message
+    channel_type: str | None = None
+    team: str | None = None
+    user: str | None = None
+    parent_user_id: str | None = None  # only in reply message
     ts: str
-    text: Optional[str]
+    text: str
     event_ts: str
-    thread_ts: Optional[str] = None  # only in reply message
-    files: Optional[List[FileObject]] = None
-    upload: Optional[bool] = None
-    display_as_bot: Optional[bool] = None
-    client_msg_id: Optional[str] = None
+    thread_ts: str | None = None  # only in reply message
+    files: list[FileObject] | None = None
+    upload: bool | None = None
+    display_as_bot: bool | None = None
+    client_msg_id: str | None = None
+    blocks: list[RichTextBlock] | None = None
 
     @property
     def is_thread_root(self):
@@ -42,22 +42,10 @@ class MessageEvent(BaseModel):
     def has_files(self) -> bool:
         return self.files is not None and len(self.files) > 0
 
-    def find_by_files_type(self, file_type: str) -> list[FileObject]:
-        if self.files:
-            return [f for f in self.files if f.subtype == file_type]
-        else:
-            return []
-
-
-class MessageCreateEvent(MessageEvent):
-    client_msg_id: str
-    blocks: List[RichTextBlock] = []
-    team: str
-
 
 class MessageChangeEvent(MessageEvent):
-    message: Optional[Message]
-    previous_message: Optional[Message]
+    message: Message | None
+    previous_message: Message | None
     hidden: bool
 
     @property
@@ -75,9 +63,3 @@ class MessageDeleteEvent(MessageChangeEvent):
 
 class AppMentionEvent(MessageEvent):
     pass
-
-
-class MessageFileShareEvent(MessageEvent):
-    client_msg_id: str
-    files: List[FileObject]
-    upload: bool

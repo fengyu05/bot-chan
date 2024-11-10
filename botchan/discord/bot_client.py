@@ -14,10 +14,10 @@ class DiscordBotClient(discord.Client, Singleton):
     def __init__(self):
         # Define the intents you want your bot to have
         intents = discord.Intents.default()
-        intents.message_content = (
-            True  # Enable the message content intent for receiving message content
-        )
-        super().__init__(intents=intents)
+        intents.message_content = True
+        intents.guilds = True
+        intents.messages = True
+        super().__init__(command_prefix="!", intents=intents)
 
     def add_proxy(self, proxy: BotProxy) -> None:
         self.proxies.append(proxy)
@@ -26,15 +26,5 @@ class DiscordBotClient(discord.Client, Singleton):
         logger.info(f"Logged in as {self.user}")
 
     async def on_message(self, message: Message):
-        logger.info("recieve message", message=message)
-
         for proxy in self.proxies:
-            proxy.on_message(message)
-
-        # Ignore messages sent by the bot itself
-        if message.author == self.user:
-            return
-
-        # Respond to a specific command
-        if message.content.startswith("!hello"):
-            await message.channel.send("Hello!")
+            await proxy.on_message(message)

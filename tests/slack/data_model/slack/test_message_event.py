@@ -1,5 +1,5 @@
 from botchan.data_model.slack import FileObject, MessageEvent
-from tests.data.messages import (
+from tests.data.slack_messages import (
     MESSAGE_AUDIO_EVENT_1,
     MESSAGE_EVENT_SIMPLE_1,
     MESSAGE_FILE_SHARE_EVENT_1,

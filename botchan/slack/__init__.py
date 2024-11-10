@@ -3,11 +3,7 @@ import os
 from slack_sdk import WebClient
 
 from botchan.data_model.slack import (
-    MessageChangeEvent,
-    MessageCreateEvent,
-    MessageDeleteEvent,
     MessageEvent,
-    MessageFileShareEvent,
 )
 from botchan.logger import get_logger
 from botchan.settings import BOT_CLIENT, SLACK_APP_OAUTH_TOKENS_FOR_WS
@@ -43,14 +39,8 @@ if BOT_CLIENT == "SLACK":
         logger.debug("Message event", message_event=event)
         message_event = MessageEvent(**event)
         if message_event.subtype == "message_created":
-            message_event = MessageCreateEvent(**event)
             SLACK_BOT_PROXY.on_message(message=message_event)
-        elif message_event.subtype == "message_changed":
-            message_event = MessageChangeEvent(**event)
-        elif message_event.subtype == "message_deleted":
-            message_event = MessageDeleteEvent(**event)
         elif message_event.subtype == "file_share":
-            message_event = MessageFileShareEvent(**event)
             SLACK_BOT_PROXY.on_message(message=message_event)
         else:
-            logger.info("message subtype has not handle", subtype=message_event.subtype)
+            logger.warn("message subtype has not handle", subtype=message_event.subtype)

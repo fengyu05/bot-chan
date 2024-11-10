@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Any
 
-from botchan.data_model.slack import MessageEvent
+from botchan.data_model.interface import IMessage
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.message_intent import MessageIntent
 from botchan.logger import get_logger
@@ -12,22 +12,17 @@ logger = get_logger(__name__)
 
 class MessageIntentAgent(Task, IntentAgent):
     """
-    This class provides a framework for processing messages by defining
-    abstract methods that must be implemented in subclasses. It offers
-    mechanisms to process messages, check if a certain intent should be
-    processed, and includes properties for the agent's name, intent, and
-    description.
+    Provides an abstract framework for multi intent message processing agent.
 
     Methods:
-        __init__(): Initializes the MessageIntentAgent object.
-        process(*args: Any, **kwds: Any) -> Any: Processes a message event.
-        process_message(message_event: MessageEvent) -> list[str]: Abstract method to process a message event.
-        should_process(*args: Any, **kwds: Any) -> bool: Determines if the intent should be processed based on input arguments.
+        __init__(): Constructs a new instance of MessageIntentAgent.
+        process(*args: Any, **kwds: Any) -> Any: Executes the main logic to handle a message event.
+        process_message(message: CoreMessage) -> list[str]: An abstract method that must be overridden to define how a message event is processed.
+        should_process(*args: Any, **kwds: Any) -> bool: Evaluates whether the specified intent requires processing based on the arguments provided.
 
     Properties:
-        name (str): Returns the name of the agent.
-        intent (MessageIntent): Abstract property representing the intent of the agent.
-        description (str): Abstract property describing the agent's function.
+        name (str): Provides the name identifier of the agent.
+        intent (MessageIntent): An abstract property returning the agent's intent.
     """
 
     def __init__(self, intent: MessageIntent) -> None:
@@ -35,20 +30,20 @@ class MessageIntentAgent(Task, IntentAgent):
         self._intent = intent
 
     def process(self, *args: Any, **kwds: Any) -> Any:
-        message_event: MessageEvent = self._require_input(
-            kwargs=kwds, key="message_event"
+        message: IMessage = self._require_input(
+            kwargs=kwds, key="message", value_type=IMessage
         )
-        msgs = self.process_message(message_event)
+        msgs = self.process_message(message)
         logger.debug("agent process messult result", agent=self.name, msg=msgs)
         return msgs
 
     @abstractmethod
-    def process_message(self, message_event: MessageEvent) -> list[str]:
+    def process_message(self, message: IMessage) -> list[str]:
         pass
 
     def should_process(self, *args: Any, **kwds: Any) -> bool:  # pylint: disable=unused-argument
         message_intent: MessageIntent = self._require_input(
-            kwargs=kwds, key="message_intent"
+            kwargs=kwds, key="message_intent", value_type=MessageIntent
         )
         return message_intent.equal_wo_metadata(self.intent)
 

@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import requests
 import structlog
 
-from botchan.settings import SLACK_APP_OAUTH_TOKENS_FOR_WS, TMP_PATH
+from botchan.settings import TMP_PATH
 
 logger = structlog.get_logger(__name__)
 
@@ -21,9 +21,7 @@ def read_file_content(file_path: str, length: int = 0) -> str:
             return file.read(length)
 
 
-def download_slack_downloadable(
-    url: str, token: str = SLACK_APP_OAUTH_TOKENS_FOR_WS
-) -> str:
+def download_slack_downloadable(url: str, token: str) -> str:
     filename = str(uuid.uuid4())
     # Extract the file extension from the URL
     parsed_url = urlparse(url)
@@ -49,10 +47,13 @@ def download_slack_downloadable(
     return local_path
 
 
-def base64_encode_slack_image(
-    url: str, token: str = SLACK_APP_OAUTH_TOKENS_FOR_WS
+def base64_encode_image(
+    url: str, bearer_token: str | None = None, timeout: int = 60
 ) -> str:
-    headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(url, headers=headers, timeout=60)
+    if bearer_token:
+        headers = {"Authorization": f"Bearer {bearer_token}"}
+    else:
+        headers = {}
+    response = requests.get(url, headers=headers, timeout=timeout)
     response.raise_for_status()
     return base64.b64encode(response.content).decode("utf-8")

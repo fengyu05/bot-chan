@@ -30,7 +30,7 @@ LOG_LEVEL = config_default("LOG_LEVEL", "INFO")
 DEBUG_MODE = config_default_bool("DEBUG_MODE", False)
 APP_PORT = config_default_int("APP_PORT", 3000)
 
-BOT_CLIENT = config_default("BOT_CLIENT", "SLACK")
+BOT_CLIENT = config_default("BOT_CLIENT", "SLACK").upper()
 
 # Bot config
 BOT_NAME = config_default("BOT_NAME", APP_NAME)
@@ -66,3 +66,12 @@ TTS_ENGINE = config_default("TTS_ENGINE", "ELEVEN_LABS_API_KEY")
 
 # LEVEN_LABS TTS
 ELEVEN_LABS_API_KEY = config_default("ELEVEN_LABS_API_KEY")
+
+
+# Setting methods
+def is_slack_bot() -> bool:
+    return BOT_CLIENT == "SLACK"
+
+
+def is_discord_bot() -> bool:
+    return BOT_CLIENT == "DISCORD"

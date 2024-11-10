@@ -1,4 +1,3 @@
-import time
 from collections import OrderedDict
 from typing import Any, Callable
 
@@ -8,15 +7,18 @@ from openai.types.chat.chat_completion_message_param import ChatCompletionMessag
 
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_intent_agent import MessageIntentAgent
-from botchan.data_model.slack import FileObject, Message, MessageEvent
+from botchan.data_model.interface import IAttachment, IMessage
 from botchan.intent.message_intent import create_intent
 from botchan.logger import get_logger
 from botchan.open import OPENAI_CLIENT
 from botchan.open.chat_utils import get_message_from_completion
 from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
-from botchan.settings import OPENAI_GPT_MODEL_ID, SLACK_TRANSCRIBE_WAIT_SEC
-from botchan.utt.files import base64_encode_slack_image
-from botchan.utt.retry import retry
+from botchan.settings import (
+    OPENAI_GPT_MODEL_ID,
+    SLACK_APP_OAUTH_TOKENS_FOR_WS,
+    is_slack_bot,
+)
+from botchan.utt.files import base64_encode_image
 
 logger = get_logger(__name__)
 
@@ -37,13 +39,13 @@ class OpenAiChatAgent(MessageIntentAgent):
 
     def __init__(
         self,
-        get_message_by_event: Callable[[MessageEvent], Message | None] | None = None,
-        buffer_limit: int = 100,
+        transcribe_slack_audio: Any = None,
+        buffer_limit: int = 20,
     ) -> None:
         super().__init__(intent=create_intent(INTENT_KEY))
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
-        self.get_message_by_event = get_message_by_event
+        self.transcribe_slack_audio = transcribe_slack_audio
 
     @property
     def name(self) -> str:
@@ -53,22 +55,15 @@ class OpenAiChatAgent(MessageIntentAgent):
     def description(self) -> str:
         return _AGENT_DESCRIPTION
 
-    def process_message(self, message_event: MessageEvent) -> list[str]:
+    def process_message(self, message: IMessage) -> list[str]:
         """
         Processes a message event and generates a response using an AI model.
 
         This method handles incoming message events, processes any attached files,
         and generates a response from the AI. It maintains a conversation history
         for each unique thread identified by `thread_id`.
-
-        Args:
-            message_event (MessageEvent): The message event containing text,
-                                          thread information, and possible attachments.
-
-        Returns:
-            str: The generated response from the AI.
         """
-        thread_id = message_event.thread_message_id
+        thread_id = message.thread_message_id
 
         # Move the accessed thread_id to the end to mark it as recently used
         if thread_id in self.message_buffer:
@@ -78,13 +73,13 @@ class OpenAiChatAgent(MessageIntentAgent):
                 {"role": "system", "content": prompt_bank.CONVERSATION_BOT_1}
             ]
 
-        # If the buffer exceeds 100 items, remove the oldest one
+        # If the buffer exceeds limit items, remove the oldest one
         if len(self.message_buffer) > self.buffer_limit:
             self.message_buffer.popitem(last=False)
 
-        content = [{"type": "text", "text": message_event.text}]
-        if message_event.has_files:
-            content_from_files = self.process_files(message_event)
+        content = [{"type": "text", "text": message.text}]
+        if message.has_attachments:
+            content_from_files = self.process_files(message)
             content.extend(content_from_files)
 
         self.message_buffer[thread_id].append(
@@ -114,16 +109,17 @@ class OpenAiChatAgent(MessageIntentAgent):
             messages=messages,
         )
 
-    def process_files(self, message_event: MessageEvent) -> list[dict]:
+    def process_files(self, message: IMessage) -> list[dict]:
         """
         Process data by examining each file and determining its type.
         """
         data = []
-        assert message_event.files, "message_event.files can not be None"
-        for file_object in message_event.files:
-            if self._accept_image_filetype(file_object):
-                base64_image = base64_encode_slack_image(
-                    file_object.url_private_download
+        assert message.attachments, "message_event.files can not be None"
+        for attachment in message.attachments:
+            if self._accept_vision_content_type(attachment):
+                bearer_token = SLACK_APP_OAUTH_TOKENS_FOR_WS if is_slack_bot() else None
+                base64_image = base64_encode_image(
+                    attachment.url, bearer_token=bearer_token
                 )
                 data.append(
                     {
@@ -134,42 +130,29 @@ class OpenAiChatAgent(MessageIntentAgent):
                         },
                     }
                 )
-            elif self._accept_slack_audio(file_object):
-                assert (
-                    self.get_message_by_event
-                ), "get_message_by_event is required to use Slack Audio transcribed."
-                text_transcribed = ""
-
-                # Use Slack transcribe
-                def transcribed_msg_func():
-                    time.sleep(SLACK_TRANSCRIBE_WAIT_SEC)
-                    transcribed_msg = self.get_message_by_event(message_event)
-                    logger.debug(
-                        "slack transcribed message", transcribed_msg=transcribed_msg
-                    )
-                    assert transcribed_msg
-                    assert isinstance(transcribed_msg.files, list)
-                    audio_file = transcribed_msg.files[0]
-                    return audio_file.get_transcription_preview()
-
-                text_transcribed = retry(
-                    transcribed_msg_func, retry_time_sec=SLACK_TRANSCRIBE_WAIT_SEC
-                )
-                if not text_transcribed:
-                    text_transcribed = "audio not recognizable."
+            elif self._accept_slack_audio(attachment):
                 data.append(
                     {
                         "type": "text",
-                        "text": text_transcribed,
+                        "text": self.transcribe_slack_audio(
+                            channel=message.channel.id, timestamp=message.ts
+                        ),
                     }
                 )
         return data
 
-    def _accept_image_filetype(self, file_object: FileObject) -> bool:
-        return file_object.filetype.lower() in VISION_INPUT_SUPPORT_TYPE
+    def _accept_vision_content_type(self, attachment: IAttachment) -> bool:
+        return attachment.content_type in VISION_INPUT_SUPPORT_TYPE
 
-    def _accept_slack_audio(self, file_object: FileObject) -> bool:
-        return file_object.subtype == "slack_audio"
+    def _accept_slack_audio(self, attachment: IAttachment) -> bool:
+        if attachment.subtype == "slack_audio":
+            if self.transcribe_slack_audio is None:
+                logger.warn(
+                    "transcribe_slack_audio didn't setup for the agent, ignore the transcribe request"
+                )
+                return False
+            return True
+        return False
 
     def _format_buffer(self, buffer: list[dict[str, Any]]) -> list[str]:
         output = []

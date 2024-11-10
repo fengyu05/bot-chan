@@ -8,7 +8,7 @@ from botchan.data_model.slack import MessageEvent
 from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.rag_intent_matcher import RagIntentMatcher
 from botchan.logger import get_logger
-from botchan.settings import DEBUG_MODE
+from botchan.slack.adaper import Adapter
 from botchan.slack.chat import SlackChat
 from botchan.slack.messages_fetcher import MessagesFetcher
 from botchan.slack.reaction import SlackReaction
@@ -22,14 +22,13 @@ class SlackBotProxy(BotProxy, MessagesFetcher, SlackChat, SlackReaction, Singlet
     intent_matcher: IntentMatcher
     bot_user_id: str
     agents: list[MessageIntentAgent]
+    adapter: Adapter
 
     def __init__(self, slack_client: WebClient):
         self.slack_client = slack_client
         self.bot_user_id = self.get_bot_user_id()
-        self.chat_agent = OpenAiChatAgent(
-            get_message_by_event=self.get_message_by_event
-        )
-
+        self.chat_agent = OpenAiChatAgent(transcribe_slack_audio=self.transcribe_audio)
+        self.adapter = Adapter()
         from botchan.agents.expert.poem_translate import (
             create_poems_translation_task_agent,
         )
@@ -50,22 +49,22 @@ class SlackBotProxy(BotProxy, MessagesFetcher, SlackChat, SlackReaction, Singlet
         )
 
     def on_message(self, message: MessageEvent) -> None:
-        if self._should_reply(message):  # IM or mentioned
-            self.add_reaction(event=message, reaction_name="eyes")
-            message_intent = self.intent_matcher.match_message_intent(
-                message_event=message
-            )
-            if DEBUG_MODE:
-                self.reply_to_message(message, f"Matched itent {message_intent}")
-            if message_intent.unknown:
-                self.chat_agent(message_event=message, message_intent=message_intent)
-            else:
-                for agent in self.agents:
-                    msgs = agent(message_event=message, message_intent=message_intent)
-                    if msgs is None:  ## agent didn't process this intent
-                        continue
-                    for msg in msgs:
-                        self.reply_to_message(event=message, text=msg)
+        if not self._should_reply(message):
+            return
+        imessage = self.adapter.cast_message(message)
+        logger.info("imessage", message=imessage)
+
+        self.add_reaction(event=message, reaction_name="eyes")
+        message_intent = self.intent_matcher.match_message_intent(message=imessage)
+        if message_intent.unknown:
+            self.chat_agent(message=imessage, message_intent=message_intent)
+        else:
+            for agent in self.agents:
+                msgs = agent(message=imessage, message_intent=message_intent)
+                if msgs is None:  ## agent didn't process this intent
+                    continue
+                for msg in msgs:
+                    self.reply_to_message(event=message, text=msg)
 
     def get_bot_user_id(self) -> str:
         """

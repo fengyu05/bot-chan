@@ -7,5 +7,5 @@ from botchan.data_model.slack import MessageEvent
 
 class BotProxy(ABC):
     @abstractmethod
-    def on_message(self, message: MessageEvent | Message) -> None:
+    async def on_message(self, message: MessageEvent | Message) -> None:
         pass

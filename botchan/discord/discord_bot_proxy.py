@@ -28,7 +28,7 @@ class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, Singleton):
     def __init__(self):
         super().__init__()
         self.adapter = Adapter()
-        self.chat_agent = OpenAiChatAgent(get_message_by_event=None)
+        self.chat_agent = OpenAiChatAgent()
         from botchan.agents.expert.poem_translate import (
             create_poems_translation_task_agent,
         )
@@ -67,6 +67,7 @@ class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, Singleton):
             return True
 
     async def on_message(self, message: Message) -> None:
+        logger.debug("on message", message=message)
         if not self._should_reply(message):
             return
 

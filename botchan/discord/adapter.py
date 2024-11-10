@@ -1,8 +1,7 @@
-from typing import Any
-
 import discord
 
 from botchan.data_model.interface import IAttachment, IChannel, IMessage
+from botchan.utt.snowflake import extract_timestamp_from_snowflake
 
 
 class Adapter:
@@ -15,8 +14,8 @@ class Adapter:
         return IMessage(
             channel=channel,
             text=message.content,
-            ts="fake_ts",
             message_id=message.id,
+            ts=extract_timestamp_from_snowflake(message.id),
             attachments=attachments,
             thread_message_id=cls.get_conversation_thread_id(message=message),
         )

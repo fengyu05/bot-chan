@@ -84,7 +84,7 @@ class MessagesFetcher:
             messages = T.pipe(
                 response["messages"],
                 # 'apply Message.from_dict to each element' as a lamabda func
-                lambda x: map(Message.parse_obj, x),
+                lambda x: map(Message.model_validate, x),
                 # batch conver filters_function to a list of lambda that T.pipe expect
                 *map(self._apply_filter, filters_function),
                 list,
@@ -140,8 +140,8 @@ class MessagesFetcher:
             )
             if response["messages"]:
                 messages = response["messages"]
-                logger.info("fetch_message get messages", messages=messages)
-                return Message.parse_obj(messages[0])
+                logger.debug("fetch_message get messages", messages=messages)
+                return Message(**messages[0])
             return None
         except SlackApiError as e:
             logger.error("Error fetching message", error=str(e))
@@ -158,7 +158,7 @@ class MessagesFetcher:
             logger.debug("slack transcribed message", transcribed_msg=transcribed_msg)
             assert transcribed_msg
             assert isinstance(transcribed_msg.files, list)
-            audio_file = transcribed_msg.files[0]
+            audio_file = transcribed_msg.files[0]  # pylint: disable=unsubscriptable-object
             return audio_file.get_transcription_preview()
 
         text_transcribed = retry(

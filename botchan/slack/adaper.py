@@ -14,7 +14,7 @@ class Adapter:
         return IMessage(
             channel=channel,
             text=message.text,
-            ts=message.ts,
+            ts=float(message.ts),
             message_id=message.message_id,
             attachments=attachments,
             thread_message_id=message.thread_message_id,

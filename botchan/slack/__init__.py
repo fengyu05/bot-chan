@@ -36,12 +36,11 @@ if BOT_CLIENT == "SLACK":
     @SLACK_BOT_CLIENT.event("message")
     def handle_message_events(event: dict) -> None:
         """Handle message to the bot."""
-        logger.info("Message event", message_event=event)
-        logger.info("typing", t=event["type"])
+        logger.debug("Message event", message_event=event)
         message_event = MessageEvent(**event)
         if message_event.subtype == "message_created":
             SLACK_BOT_PROXY.on_message(message=message_event)
         elif message_event.subtype == "file_share":
             SLACK_BOT_PROXY.on_message(message=message_event)
         else:
-            logger.info("message subtype has not handle", subtype=message_event.subtype)
+            logger.warn("message subtype has not handle", subtype=message_event.subtype)

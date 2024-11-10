@@ -1,4 +1,3 @@
-from abc import ABC
 from typing import Optional
 
 from slack_sdk import WebClient
@@ -11,7 +10,7 @@ from botchan.logger import get_logger
 logger = get_logger(__name__)
 
 
-class SlackChat(ABC):
+class SlackChat:
     slack_client: WebClient
 
     def _post_message(

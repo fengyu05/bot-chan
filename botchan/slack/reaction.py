@@ -3,8 +3,6 @@
 All methods return a ReactionResponse.
 """
 
-from abc import ABC
-
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web.slack_response import SlackResponse
@@ -15,7 +13,7 @@ from botchan.logger import get_logger
 logger = get_logger(__name__)
 
 
-class SlackReaction(ABC):
+class SlackReaction:
     slack_client: WebClient
 
     def add_reaction(self, event: MessageEvent, reaction_name: str) -> SlackResponse:

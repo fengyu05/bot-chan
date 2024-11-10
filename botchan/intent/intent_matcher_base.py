@@ -42,7 +42,7 @@ class IntentMatcher(ABC):
         if message.thread_message_id in self.intent_by_thread:
             return self.intent_by_thread[message.thread_message_id]
         if not message.text:
-            return UNKNOWN_INTENT
+            return DEFAULT_CHAT_INTENT
         message_intent = get_message_intent_by_emoji(message.text)
         if message_intent.unknown:
             if LLM_INTENT_MATCHING:

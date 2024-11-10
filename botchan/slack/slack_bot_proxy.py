@@ -27,9 +27,7 @@ class SlackBotProxy(BotProxy, MessagesFetcher, SlackChat, SlackReaction, Singlet
     def __init__(self, slack_client: WebClient):
         self.slack_client = slack_client
         self.bot_user_id = self.get_bot_user_id()
-        self.chat_agent = OpenAiChatAgent(
-            get_message_by_event=self.get_message_by_event
-        )
+        self.chat_agent = OpenAiChatAgent(transcribe_slack_audio=self.transcribe_audio)
         self.adapter = Adapter()
         from botchan.agents.expert.poem_translate import (
             create_poems_translation_task_agent,

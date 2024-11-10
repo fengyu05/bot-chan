@@ -7,6 +7,7 @@ from botchan.data_model.interface.common import IdType
 
 class IMessage(BaseModel):
     text: str
+    ts: str | int
     message_id: IdType
     thread_message_id: IdType
     channel: IChannel

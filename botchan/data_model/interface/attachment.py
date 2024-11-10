@@ -8,3 +8,4 @@ class IAttachment(BaseModel):
     content_type: str
     filename: str
     url: str
+    subtype: str | None

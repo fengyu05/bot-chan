@@ -1,4 +1,3 @@
-import time
 from collections import OrderedDict
 from typing import Any, Callable
 
@@ -9,7 +8,6 @@ from openai.types.chat.chat_completion_message_param import ChatCompletionMessag
 import botchan.agents.prompt_bank as prompt_bank
 from botchan.agents.message_intent_agent import MessageIntentAgent
 from botchan.data_model.interface import IAttachment, IMessage
-from botchan.data_model.slack import Message, MessageEvent
 from botchan.intent.message_intent import create_intent
 from botchan.logger import get_logger
 from botchan.open import OPENAI_CLIENT
@@ -18,11 +16,9 @@ from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
 from botchan.settings import (
     OPENAI_GPT_MODEL_ID,
     SLACK_APP_OAUTH_TOKENS_FOR_WS,
-    SLACK_TRANSCRIBE_WAIT_SEC,
     is_slack_bot,
 )
 from botchan.utt.files import base64_encode_image
-from botchan.utt.retry import retry
 
 logger = get_logger(__name__)
 
@@ -43,13 +39,13 @@ class OpenAiChatAgent(MessageIntentAgent):
 
     def __init__(
         self,
-        get_message_by_event: Callable[[MessageEvent], Message | None] | None = None,
+        transcribe_slack_audio: Any = None,
         buffer_limit: int = 20,
     ) -> None:
         super().__init__(intent=create_intent(INTENT_KEY))
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
-        self.get_message_by_event = get_message_by_event
+        self.transcribe_slack_audio = transcribe_slack_audio
 
     @property
     def name(self) -> str:
@@ -138,39 +134,25 @@ class OpenAiChatAgent(MessageIntentAgent):
                 data.append(
                     {
                         "type": "text",
-                        "text": self._transcribe_audio(message=message),
+                        "text": self.transcribe_slack_audio(
+                            channel=message.channel.id, timestamp=message.ts
+                        ),
                     }
                 )
         return data
-
-    def _transcribe_audio(self, message: IMessage) -> str:
-        assert (
-            self.get_message_by_event
-        ), "get_message_by_event is required to use Slack Audio transcribed."
-        text_transcribed = ""
-
-        # Use Slack transcribe
-        def transcribed_msg_func():
-            time.sleep(SLACK_TRANSCRIBE_WAIT_SEC)
-            transcribed_msg = self.get_message_by_event(message)
-            logger.debug("slack transcribed message", transcribed_msg=transcribed_msg)
-            assert transcribed_msg
-            assert isinstance(transcribed_msg.files, list)
-            audio_file = transcribed_msg.files[0]
-            return audio_file.get_transcription_preview()
-
-        text_transcribed = retry(
-            transcribed_msg_func, retry_time_sec=SLACK_TRANSCRIBE_WAIT_SEC
-        )
-        if not text_transcribed:
-            text_transcribed = "audio not recognizable."
-        return text_transcribed
 
     def _accept_vision_content_type(self, attachment: IAttachment) -> bool:
         return attachment.content_type in VISION_INPUT_SUPPORT_TYPE
 
     def _accept_slack_audio(self, attachment: IAttachment) -> bool:
-        return attachment.content_type == "slack_audio"
+        if attachment.subtype == "slack_audio":
+            if self.transcribe_slack_audio is None:
+                logger.warn(
+                    "transcribe_slack_audio didn't setup for the agent, ignore the transcribe request"
+                )
+                return False
+            return True
+        return False
 
     def _format_buffer(self, buffer: list[dict[str, Any]]) -> list[str]:
         output = []

@@ -15,13 +15,20 @@ class Adapter:
         return IMessage(
             channel=channel,
             text=message.content,
+            ts="fake_ts",
             message_id=message.id,
             attachments=attachments,
             thread_message_id=cls.get_conversation_thread_id(message=message),
         )
 
     @classmethod
-    def cast_channel(cls, channel: Any) -> IChannel:
+    def cast_channel(
+        cls,
+        channel: discord.Thread
+        | discord.TextChannel
+        | discord.DMChannel
+        | discord.GroupChannel,
+    ) -> IChannel:
         if isinstance(channel, discord.Thread):
             channel_type = IChannel.Type.THREAD
         elif isinstance(channel, discord.TextChannel):
@@ -33,7 +40,7 @@ class Adapter:
         else:
             channel_type = IChannel.Type.NOT_SUPPORT
 
-        return IChannel(channel_type=channel_type)
+        return IChannel(id=channel.id, channel_type=channel_type)
 
     @classmethod
     def cast_attachment(cls, attachment: discord.Attachment) -> IAttachment:

@@ -1,20 +1,24 @@
 """Messages Fetcher."""
 
 import datetime
-from abc import ABC
+import time
 from typing import Callable, Optional, Union
 
 import toolz as T
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from botchan.data_model.slack import Message, MessageEvent
+from botchan.data_model.slack import Message
 from botchan.logger import get_logger
+from botchan.settings import (
+    SLACK_TRANSCRIBE_WAIT_SEC,
+)
+from botchan.utt.retry import retry
 
 logger = get_logger(__name__)
 
 
-class MessagesFetcher(ABC):
+class MessagesFetcher:
     slack_client: WebClient
 
     @T.curry
@@ -122,31 +126,44 @@ class MessagesFetcher(ABC):
     def get_last_message(self, channel_id: str) -> Message:
         return self.fetch_message(channel_id=channel_id, limit=1)[0]
 
-    def get_message_by_event(self, message_event: MessageEvent) -> Optional[Message]:
+    def get_last_message_by_ts(self, channel: str, timestamp: str) -> Optional[Message]:
         """
         Fetches a single message uniquely identified by its channel and timestamp.
-
-        Args:
-            message_event (dict): A dictionary containing 'channel' and 'ts' keys to identify the message.
-
-        Returns:
-            Optional[Message]: The fetched message object or None if not found.
         """
         try:
             response = self.slack_client.conversations_history(
-                channel=message_event.channel,
+                channel=channel,
                 inclusive=True,
-                oldest=message_event.ts,
-                latest=message_event.ts,
+                oldest=timestamp,
+                latest=timestamp,
                 limit=1,
             )
-
             if response["messages"]:
                 messages = response["messages"]
-                logger.debug("fetch_message get messages", messages=messages)
+                logger.info("fetch_message get messages", messages=messages)
                 return Message.parse_obj(messages[0])
             return None
-
         except SlackApiError as e:
             logger.error("Error fetching message", error=str(e))
             return None
+
+    def transcribe_audio(self, channel: str, timestamp: str) -> str:
+        text_transcribed = ""
+
+        def transcribed_msg_func():
+            time.sleep(SLACK_TRANSCRIBE_WAIT_SEC)
+            transcribed_msg = self.get_last_message_by_ts(
+                channel=channel, timestamp=timestamp
+            )
+            logger.debug("slack transcribed message", transcribed_msg=transcribed_msg)
+            assert transcribed_msg
+            assert isinstance(transcribed_msg.files, list)
+            audio_file = transcribed_msg.files[0]
+            return audio_file.get_transcription_preview()
+
+        text_transcribed = retry(
+            transcribed_msg_func, retry_time_sec=SLACK_TRANSCRIBE_WAIT_SEC
+        )
+        if not text_transcribed:
+            text_transcribed = "audio not recognizable."
+        return text_transcribed

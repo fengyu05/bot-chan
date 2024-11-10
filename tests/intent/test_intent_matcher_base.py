@@ -5,7 +5,12 @@ from botchan.agents.miao_agent import MiaoAgent
 from botchan.agents.openai_chat_agent import OpenAiChatAgent
 from botchan.intent.intent_agent import IntentAgent
 from botchan.intent.intent_matcher_base import IntentMatcher
-from botchan.intent.message_intent import UNKNOWN_INTENT, MessageIntent, create_intent
+from botchan.intent.message_intent import (
+    DEFAULT_CHAT_INTENT,
+    UNKNOWN_INTENT,
+    MessageIntent,
+    create_intent,
+)
 from tests.data.imessages import (
     MESSAGE_HELLO_WORLD,
     MESSAGE_HELLO_WORLD2,
@@ -52,12 +57,12 @@ class TestMessageIntentAgent(unittest.TestCase):
         # Assert the two intents should be equal since they are from the same thread
         self.assertEqual(intent_1, intent_2)
 
-    def test_no_text_returns_unknown_intent(self):
+    def test_no_text_returns_chat_intent(self):
         message = MESSAGE_HELLO_WORLD
-        message.text = None
+        message.text = ""
         result = self.intent_matcher.match_message_intent(message)
 
-        self.assertEqual(result, UNKNOWN_INTENT)
+        self.assertEqual(result, DEFAULT_CHAT_INTENT)
 
     @patch("botchan.intent.intent_matcher_base.get_message_intent_by_emoji")
     def test_emoji_based_intent(self, mock_get_message_intent_by_emoji):

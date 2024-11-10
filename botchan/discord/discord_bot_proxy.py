@@ -67,9 +67,6 @@ class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, Singleton):
             return True
 
     async def on_message(self, message: Message) -> None:
-        logger.info("on message", message=message)
-        logger.info("on attachemennts", att=message.attachments)
-
         if not self._should_reply(message):
             return
 
@@ -80,7 +77,6 @@ class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, Singleton):
             thread = await message.create_thread(
                 name=imessage.re_topic, auto_archive_duration=60
             )
-            logger.info(f"Thread created: {thread.name}", thread=thread)
         elif imessage.channel.channel_type == IChannel.Type.THREAD:
             # append to existing thread
             thread = message.thread

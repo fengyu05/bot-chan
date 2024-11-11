@@ -9,10 +9,12 @@ from botchan.data_model.interface import IChannel
 from botchan.discord.adapter import Adapter
 from botchan.discord.bot_client import DiscordBotClient
 from botchan.discord.chat import DiscordChat
+from botchan.discord.guild import DiscordGuild
 from botchan.discord.reaction import DiscordReaction
 from botchan.intent.intent_matcher_base import IntentMatcher
 from botchan.intent.rag_intent_matcher import RagIntentMatcher
 from botchan.logger import get_logger
+from botchan.settings import DISCORD_BOT_DEVELOPER_ROLE
 from botchan.utt.singleton import Singleton
 
 logger = get_logger(__name__)
@@ -20,7 +22,7 @@ logger = get_logger(__name__)
 DEFAULT_EYES_EMOJI = "eyes"
 
 
-class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, Singleton):
+class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, DiscordGuild, Singleton):
     client: DiscordBotClient
     agents: list[MessageIntentAgent]
     intent_matcher: IntentMatcher
@@ -29,16 +31,7 @@ class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, Singleton):
         super().__init__()
         self.adapter = Adapter()
         self.chat_agent = OpenAiChatAgent()
-        from botchan.agents.expert.poem_translate import (
-            create_poems_translation_task_agent,
-        )
-        from botchan.agents.expert.shopping_assist import (
-            create_shopping_assisist_task_agent,
-        )
-
         self.agents = [
-            create_poems_translation_task_agent(),
-            create_shopping_assisist_task_agent(),
             self.chat_agent,
         ]
         self.intent_matcher = RagIntentMatcher(self.agents)
@@ -50,21 +43,39 @@ class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, Singleton):
         if message.author == self.bot_user:
             return False
         if message.content.startswith("!react"):
-            logger.info("Ingore !react message")
+            logger.info("Ingore !react message", message=message)
             return False
 
         # Reply to direct messages
-        if isinstance(message.channel, discord.DMChannel):
+        if self._is_trust_dm(message) or self._bot_has_reply(message):
             return True
-        # Reply to thread that create by the bot
-        if isinstance(message.channel, discord.Thread):
-            if message.channel.owner_id == self.bot_user.id:
-                return True
-        # Reply if the bot is mentioned in a guild channel
         if isinstance(
             message.channel, discord.TextChannel
         ) and self.bot_user.mentioned_in(message):
             return True
+
+        return False
+
+    def _is_trust_dm(self, message: Message) -> bool:
+        """Trust DM is when the DM author is with developer role of Fluctlight."""
+        if not isinstance(message.channel, discord.DMChannel):
+            return False
+
+        member = self.get_message_author_member(message)
+        if not member:
+            return False
+        # Check if any of the author's roles match the developer role
+        for role in member.roles:
+            if role.name == DISCORD_BOT_DEVELOPER_ROLE:
+                return True
+        return False
+
+    def _bot_has_reply(self, message: Message) -> bool:
+        """The bot has reply to the message"""
+        return (
+            isinstance(message.channel, discord.Thread)
+            and message.channel.owner_id == self.bot_user.id
+        )
 
     async def on_message(self, message: Message) -> None:
         logger.debug("on message", message=message)

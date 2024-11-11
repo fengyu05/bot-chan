@@ -1,5 +1,3 @@
-from abc import ABC
-
 import discord.utils
 from discord.emoji import Emoji
 from discord.message import Message
@@ -10,7 +8,7 @@ from botchan.logger import get_logger
 logger = get_logger(__name__)
 
 
-class DiscordReaction(ABC):
+class DiscordReaction:
     async def add_reaction(self, message: Message, reaction_name: str) -> None:
         try:
             await message.add_reaction(

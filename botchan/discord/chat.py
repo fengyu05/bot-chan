@@ -1,5 +1,3 @@
-from abc import ABC
-
 import discord
 
 from botchan.logger import get_logger
@@ -7,7 +5,7 @@ from botchan.logger import get_logger
 logger = get_logger(__name__)
 
 
-class DiscordChat(ABC):
+class DiscordChat:
     client: discord.Client
 
     async def _post_message(self, channel_id: int, text: str) -> discord.Message:

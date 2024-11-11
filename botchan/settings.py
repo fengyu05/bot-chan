@@ -42,6 +42,10 @@ SLACK_APP_LEVEL_TOKEN = config_default("SLACK_APP_LEVEL_TOKEN")
 # Discord credential
 DISCORD_BOT_TOKEN = config_default("DISCORD_BOT_TOKEN")
 
+DISCORD_BOT_GUILD_ID = config_default_int("DISCORD_BOT_GUILD_ID")
+
+DISCORD_BOT_DEVELOPER_ROLE = config_default("DISCORD_BOT_DEVELOPER_ROLE", "developer")
+
 # OPENAI API KEY
 OPENAI_API_KEY = config_default("OPENAI_API_KEY")
 

@@ -14,10 +14,31 @@ class DiscordBotClient(discord.Client, Singleton):
     def __init__(self):
         # Define the intents you want your bot to have
         intents = discord.Intents.default()
-        intents.message_content = True
+        intents.members = True  # To access members list
+        intents.message_content = True  # To access message content
         intents.guilds = True
         intents.messages = True
-        super().__init__(command_prefix="!", intents=intents)
+        super().__init__(command_prefix="!", intents=self.get_intents())
+
+    def get_intents(self):
+        """
+        Configures and returns the bot's intents.
+
+        Intents requested:
+        - members: To access the member list of guilds.
+        - message_content: To read the content of messages.
+        - guilds: To receive events related to guilds.
+        - messages: To process events involving messages.
+
+        Returns:
+            discord.Intents: The configured intents for the bot.
+        """
+        intents = discord.Intents.default()
+        intents.members = True  # To access members list
+        intents.message_content = True  # To access message content
+        intents.guilds = True  # To receive guild-related events
+        intents.messages = True  # To handle message events
+        return intents
 
     def add_proxy(self, proxy: BotProxy) -> None:
         self.proxies.append(proxy)

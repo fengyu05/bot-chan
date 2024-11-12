@@ -8,12 +8,7 @@ include makefiles/poetry.mk
 app: requirements.txt ## start app server
 	docker compose up --build app
 
-app-async: requirements.txt ## start app server in aysnc
-	docker compose up --build app-async
-
 app-debug: requirements.txt ## start app server with debug mode
 	docker compose up --build app-debug
 
 test: docker-test  ## Test
-lint: docker-lint  ## Lint
-fmt: docker-fmt  ## Fmt

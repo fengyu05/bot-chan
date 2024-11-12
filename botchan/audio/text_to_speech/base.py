@@ -5,7 +5,7 @@ from fastapi import WebSocket
 
 from botchan.utt.timed import timed
 
-TTS_LANG_US = "en-US"
+LANG_US = "en-US"
 
 
 class TextToSpeech(ABC):
@@ -19,7 +19,7 @@ class TextToSpeech(ABC):
         *args,
         voice_id: str = "",
         first_sentence: bool = False,
-        language: str = TTS_LANG_US,
+        language: str = LANG_US,
         **kwargs,
     ):
         pass
@@ -31,7 +31,7 @@ class TextToSpeech(ABC):
         text: str,
         *args,
         voice_id: str = "",
-        language: str = TTS_LANG_US,
+        language: str = LANG_US,
         **kwargs,
     ) -> bytes:
         pass

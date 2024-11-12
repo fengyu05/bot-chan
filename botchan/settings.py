@@ -59,10 +59,9 @@ LLM_INTENT_MATCHING = config_default_bool("LLM_INTENT_MATCHING", False)
 # Default tmp path
 TMP_PATH = config_default("TMP", "/tmp/")
 
-# Slack transcrition callback waiting time
-SLACK_TRANSCRIBE_WAIT_SEC = config_default_float("SLACK_TRANSCRIBE_WAIT_SEC", 10)
 
-TTS_ENGINE = config_default("TTS_ENGINE", "ELEVEN_LABS_API_KEY")
+# TTS section
+TTS_ENGINE = config_default("TTS_ENGINE", "ELEVEN_LABS")
 # TTS API
 # XTTS
 # XTTS_API_KEY = config_default("XTTS_API_KEY", "")
@@ -71,6 +70,12 @@ TTS_ENGINE = config_default("TTS_ENGINE", "ELEVEN_LABS_API_KEY")
 # LEVEN_LABS TTS
 ELEVEN_LABS_API_KEY = config_default("ELEVEN_LABS_API_KEY")
 
+# Speech to text section
+SPEECH_TO_TEXT_ENGINE = config_default("SPEECH_TO_TEXT_ENGINE", "OPENAI_WHISPER")
+
+
+# Slack transcrition callback waiting time
+SLACK_TRANSCRIBE_WAIT_SEC = config_default_float("SLACK_TRANSCRIBE_WAIT_SEC", 10)
 
 # Setting methods
 def is_slack_bot() -> bool:

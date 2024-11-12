@@ -13,9 +13,20 @@ Unleash the power of dynamic communication with Fluctlight, the ultimate framewo
 
 Transform your interaction experiences with Fluctlight, where innovation meets simplicity and versatility. Get started today and redefine what's possible!
 
+## Design
+
+![High Level Design](./design/design.png)
+
+
+
 ## Spotlights
 
+| ![Spotlight 1](./design/spotlight1.jpeg) | ![Spotlight 2](./design/spotlight2.jpeg) | ![Spotlight 3](./design/spotlight3.png) |
+|:--------------------------------:|:--------------------------------:|:--------------------------------:|
 
+
+
+# Development
 
 ## Setup
 
@@ -23,28 +34,12 @@ Rename env.template to .env and fill in the required APIKEY there.
 
 Make that, simple run command `docker compose up app`
 
-### Requirements env.
+## Requirements env.
 We use [Docker](https://www.docker.com) to run the application.
 
 We recommand asdf to manage your local dev env if you're on a MacOS.
 
-## Development
-
-
-
-## Deployment
-
-Botchan is fully functional and running on your local dev machine or laptop.
-If you are looking at optional to turn it into a 24/7 online bot here are some suggestions.
-
-  - Deploying the application in a cloud Kubernetes environment is recommended since it is already containerized.
-  - Deploy on serverless env like Heroku.
-
-
-
-## Developer guide
-
-### Tooling
+## Tooling
 
 Command make will list all the tasks.
 
@@ -62,11 +57,22 @@ requirements.txt               Export requirements.txt from pyproject.toml
 requirements-dev.txt           Export requirements-dev.txt from pyproject.toml
 ```
 
-### Discord Bot Setup
+# Deployment
+
+Botchan is fully functional and running on your local dev machine or laptop.
+If you are looking at optional to turn it into a 24/7 online bot here are some suggestions.
+
+  - Deploying the application in a cloud Kubernetes environment is recommended since it is already containerized.
+  - Deploy on serverless env like Heroku.
+
+
+
+
+## Discord Bot Setup
 
 [Discord Bot Setup Guide](https://discordpy.readthedocs.io/en/stable/discord.html)
 
-### Slack Bot Setup
+## Slack Bot Setup
 
 [Slack Bot Setup Tutorial](https://api.slack.com/tutorials/tracks/create-bot-to-welcome-users)
 

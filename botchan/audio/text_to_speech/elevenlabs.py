@@ -5,7 +5,7 @@ import types
 import httpx
 from fastapi import WebSocket
 
-from botchan.audio.text_to_speech.base import TTS_LANG_US, TextToSpeech
+from botchan.audio.text_to_speech.base import LANG_US, TextToSpeech
 from botchan.logger import get_logger
 from botchan.settings import ELEVEN_LABS_API_KEY
 from botchan.utt.singleton import Singleton
@@ -48,7 +48,7 @@ class ElevenLabs(Singleton, TextToSpeech):
         *args,
         voice_id: str = "",
         first_sentence: bool = False,
-        language: str = TTS_LANG_US,
+        language: str = LANG_US,
         sid: str = "",
         platform: str = "",
         **kwargs,
@@ -56,7 +56,7 @@ class ElevenLabs(Singleton, TextToSpeech):
         if voice_id == "":
             voice_id = DEFAULT_VOICE_ID
         headers = config.headers
-        if language != TTS_LANG_US:
+        if language != LANG_US:
             config.data["model_id"] = ELEVEN_LABS_MULTILINGUAL_MODEL
         data = {
             "text": text,
@@ -104,13 +104,13 @@ class ElevenLabs(Singleton, TextToSpeech):
         text: str,
         *args,
         voice_id: str = "",
-        language: str = TTS_LANG_US,
+        language: str = LANG_US,
         **kwargs,
     ) -> bytes:
         if voice_id == "":
             voice_id = DEFAULT_VOICE_ID
         headers = config.headers
-        if language != TTS_LANG_US:
+        if language != LANG_US:
             config.data["model_id"] = ELEVEN_LABS_MULTILINGUAL_MODEL
         data = {
             "text": text,

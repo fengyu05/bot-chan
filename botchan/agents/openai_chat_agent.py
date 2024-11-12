@@ -12,14 +12,14 @@ from botchan.intent.message_intent import create_intent
 from botchan.logger import get_logger
 from botchan.open import OPENAI_CLIENT
 from botchan.open.chat_utils import get_message_from_completion
-from botchan.open.common import VISION_INPUT_SUPPORT_TYPE
+from botchan.open.common import VISION_INPUT_SUPPORT_TYPE, AUDIO_INPUT_SUPPORT_TYPE
 from botchan.settings import (
     OPENAI_GPT_MODEL_ID,
     SLACK_APP_OAUTH_TOKENS_FOR_WS,
     is_slack_bot,
 )
-from botchan.utt.files import base64_encode_image
-
+from botchan.utt.files import base64_encode_media, download_media
+from botchan.audio.speech_to_text import get_speech_to_text
 logger = get_logger(__name__)
 
 
@@ -39,13 +39,15 @@ class OpenAiChatAgent(MessageIntentAgent):
 
     def __init__(
         self,
-        transcribe_slack_audio: Any = None,
+        transcribe_slack_audio: Callable[[str, str], str] = None,
         buffer_limit: int = 20,
     ) -> None:
         super().__init__(intent=create_intent(INTENT_KEY))
         self.message_buffer = OrderedDict()
         self.buffer_limit = buffer_limit
         self.transcribe_slack_audio = transcribe_slack_audio
+        self.speech_to_text = get_speech_to_text()
+        self.bearer_token = SLACK_APP_OAUTH_TOKENS_FOR_WS if is_slack_bot() else None
 
     @property
     def name(self) -> str:
@@ -117,9 +119,9 @@ class OpenAiChatAgent(MessageIntentAgent):
         assert message.attachments, "message_event.files can not be None"
         for attachment in message.attachments:
             if self._accept_vision_content_type(attachment):
-                bearer_token = SLACK_APP_OAUTH_TOKENS_FOR_WS if is_slack_bot() else None
-                base64_image = base64_encode_image(
-                    attachment.url, bearer_token=bearer_token
+                
+                base64_image = base64_encode_media(
+                    attachment.url, bearer_token=self.bearer_token
                 )
                 data.append(
                     {
@@ -139,10 +141,20 @@ class OpenAiChatAgent(MessageIntentAgent):
                         ),
                     }
                 )
+            elif self._accept_audio_content_type(attachment):
+                data.append(
+                    {
+                        "type": "text",
+                        "text": self._transcribe_audio(attachment),
+                    }
+                )                
         return data
 
     def _accept_vision_content_type(self, attachment: IAttachment) -> bool:
         return attachment.content_type in VISION_INPUT_SUPPORT_TYPE
+
+    def _accept_audio_content_type(self, attachment: IAttachment) -> bool:
+        return attachment.content_type in AUDIO_INPUT_SUPPORT_TYPE
 
     def _accept_slack_audio(self, attachment: IAttachment) -> bool:
         if attachment.subtype == "slack_audio":
@@ -153,6 +165,15 @@ class OpenAiChatAgent(MessageIntentAgent):
                 return False
             return True
         return False
+
+    def _transcribe_audio(self, attachment: IAttachment) -> str:
+        logger.info("attachment for transcribe", attachment=attachment)
+        media = download_media(attachment.url, bearer_token=self.bearer_token)
+        logger.info("medata", media_type=type(media), lenn=len(media))
+        return self.speech_to_text.transcribe(
+            audio_bytes=media
+        )
+
 
     def _format_buffer(self, buffer: list[dict[str, Any]]) -> list[str]:
         output = []

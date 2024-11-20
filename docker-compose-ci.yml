@@ -28,6 +28,6 @@ services:
     env_file:
      - .env
     volumes:
-      - './botchan:/app/home/botchan'
+      - './fluctlight:/app/home/fluctlight'
       - './tests:/app/home/tests'
     command: /bin/bash -c "while true; do sleep 3600; done"

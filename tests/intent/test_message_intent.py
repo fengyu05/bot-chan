@@ -1,6 +1,6 @@
 import unittest
 
-from botchan.intent.message_intent import (
+from fluctlight.intent.message_intent import (
     _EMOJI,
     _UNKNOWN,
     MessageIntent,

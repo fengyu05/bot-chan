@@ -1,4 +1,4 @@
-from botchan.data_model.slack import FileObject
+from fluctlight.data_model.slack import FileObject
 
 
 def test_create_file_object():

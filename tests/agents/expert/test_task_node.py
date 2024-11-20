@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch
 
-from botchan.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
-from botchan.agents.expert.task_node import TaskNode
-from botchan.constants import GTP_4O_WITH_STRUCT
-from botchan.settings import OPENAI_GPT_MODEL_ID
+from fluctlight.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
+from fluctlight.agents.expert.task_node import TaskNode
+from fluctlight.constants import GTP_4O_WITH_STRUCT
+from fluctlight.settings import OPENAI_GPT_MODEL_ID
 
 
 class Te1(TaskEntity):
@@ -21,7 +21,7 @@ class TestTaskNode(unittest.TestCase):
         self.intake_message = IntakeMessage(text=self.secret_word)
         return super().setUp()
 
-    @patch("botchan.agents.expert.task_node.simple_assistant_with_struct_ouput")
+    @patch("fluctlight.agents.expert.task_node.simple_assistant_with_struct_ouput")
     def test_process_with_root_struct_output(self, mock_assistant):
         config = TaskConfig(
             task_key="task1",
@@ -45,7 +45,7 @@ class TestTaskNode(unittest.TestCase):
         )
         self.assertEqual(result, expect_result)
 
-    @patch("botchan.agents.expert.task_node.simple_assistant")
+    @patch("fluctlight.agents.expert.task_node.simple_assistant")
     def test_process_root_with_text_output(self, mock_simple_assistant):
         mock_simple_assistant.return_value = "Mocked structured response"
 
@@ -66,7 +66,7 @@ class TestTaskNode(unittest.TestCase):
         )
         self.assertEqual(result, "Mocked structured response")
 
-    @patch("botchan.agents.expert.task_node.simple_assistant")
+    @patch("fluctlight.agents.expert.task_node.simple_assistant")
     def test_process_with_non_root(self, mock_simple_assistant):
         mock_simple_assistant.return_value = "Processed data"
 

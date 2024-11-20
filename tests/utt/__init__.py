@@ -1,6 +1,6 @@
 import unittest
 
-from botchan.utt.template import fstring_format
+from fluctlight.utt.template import fstring_format
 
 
 class TestFStringFormat(unittest.TestCase):

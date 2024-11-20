@@ -1,6 +1,6 @@
 import unittest
 
-from botchan.intent.intent_candidate import IntentCandidate, parse_intent_candidate_json
+from fluctlight.intent.intent_candidate import IntentCandidate, parse_intent_candidate_json
 
 
 class TestIntentCandidate(unittest.TestCase):

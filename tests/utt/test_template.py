@@ -1,7 +1,7 @@
 import unittest
 
-from botchan.agents.expert.data_model import TaskEntity
-from botchan.utt.template import collect_placeholders, fstring_format
+from fluctlight.agents.expert.data_model import TaskEntity
+from fluctlight.utt.template import collect_placeholders, fstring_format
 
 
 class TestFStringFormat(unittest.TestCase):

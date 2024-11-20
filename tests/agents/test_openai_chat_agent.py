@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from botchan.agents.openai_chat_agent import OpenAiChatAgent
+from fluctlight.agents.openai_chat_agent import OpenAiChatAgent
 from tests.data.imessages import MESSAGE_HELLO_WORLD, MESSAGE_HELLO_WORLD2
 
 
 class TestOpenAiChatAgent(unittest.TestCase):
-    @patch("botchan.agents.openai_chat_agent.OPENAI_CLIENT.chat.completions.create")
+    @patch("fluctlight.agents.openai_chat_agent.OPENAI_CLIENT.chat.completions.create")
     def test_process_message_plain_text(self, mock_create):
         # Mocking OpenAI response
         mock_response_text = "mocked response from OpenAI"
@@ -36,7 +36,7 @@ class TestOpenAiChatAgent(unittest.TestCase):
             # Replace 'type' with the actual key used to determine message type
             self.assertEqual(expected_order[i], message["role"])
 
-    @patch("botchan.agents.openai_chat_agent.OPENAI_CLIENT.chat.completions.create")
+    @patch("fluctlight.agents.openai_chat_agent.OPENAI_CLIENT.chat.completions.create")
     def test_process_message_plain_text_same_thread(self, mock_create):
         # Mocking OpenAI response
         mock_response_text = "mocked response from OpenAI"

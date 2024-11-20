@@ -12,9 +12,9 @@ from readerwriterlock import rwlock
 from fluctlight.embedding.chroma import get_chroma
 from fluctlight.database.connection import get_db
 from fluctlight.logger import get_logger
-from fluctlight.database.models.character import Character as CharacterModel
+from fluctlight.database.models.character import DbCharacter as CharacterModel
 from fluctlight.utt.singleton import Singleton
-from fluctlight.agent_catalog.data_models import Character
+from fluctlight.data_model.interface.character import Character
 
 
 logger = get_logger(__name__)

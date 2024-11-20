@@ -12,6 +12,6 @@ server-debug: requirements.txt ## start app server with debug mode
 	docker compose up --build app-debug
 
 api-server: requirements.txt ## start app server
-	docker compose up --build api db
+	docker compose up --build api
 
 test: docker-test  ## Test

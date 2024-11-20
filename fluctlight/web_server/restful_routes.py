@@ -16,8 +16,6 @@ from fastapi import (
     status as http_status,
     UploadFile,
 )
-from firebase_admin import auth, credentials
-from firebase_admin.exceptions import FirebaseError
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -38,7 +36,7 @@ from fluctlight.database.models.character import (
     GenerateHighlightRequest,
     GeneratePromptRequest,
 )
-from fluctlight import utils
+from fluctlight.data_model.interface import Character as ICharacter
 
 router = APIRouter()
 
@@ -66,7 +64,7 @@ async def characters(user=Depends(get_current_user)):
     #         detail="GCP_STORAGE_URL is not set",
     #     )
 
-    def get_image_url(character: utils.Character) -> str:
+    def get_image_url(character: ICharacter) -> str:
         if character.location == "repo" and character.author_name == "Eden":
             # TODO: new local storage service
             return f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.jpg"
@@ -82,7 +80,7 @@ async def characters(user=Depends(get_current_user)):
         # else:
         #     return f"{gcs_path}/static/realchar/{character.character_id}.jpg"
 
-    def get_audio_url(character: utils.Character) -> str:
+    def get_audio_url(character: ICharacter) -> str:
         if character.location == "repo" and character.author_name == "Eden":
             # TODO: new local storage service
             return f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.mp3"
@@ -92,7 +90,7 @@ async def characters(user=Depends(get_current_user)):
             # return f"{gcs_path}/static/realchar/{character.character_id}.mp3"
 
     uid = user["uid"] if user else None
-    from realtime_ai_character.character_catalog.catalog_manager import CatalogManager
+    from fluctlight.agent_catalog.catalog_manager import CatalogManager
 
     catalog: CatalogManager = CatalogManager.get_instance()
     return [

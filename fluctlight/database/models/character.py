@@ -8,7 +8,7 @@ from sqlalchemy.inspection import inspect
 from fluctlight.database.base import Base
 
 
-class Character(Base):
+class DbCharacter(Base):
     __tablename__ = "characters"
 
     id = Column(String(), primary_key=True, index=True, nullable=False)

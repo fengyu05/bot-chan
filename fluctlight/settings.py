@@ -78,7 +78,7 @@ SPEECH_TO_TEXT_ENGINE = config_default("SPEECH_TO_TEXT_ENGINE", "OPENAI_WHISPER"
 SLACK_TRANSCRIBE_WAIT_SEC = config_default_float("SLACK_TRANSCRIBE_WAIT_SEC", 10)
 
 # Web server config
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "")
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "")
 
 # Setting methods
 def is_slack_bot() -> bool:

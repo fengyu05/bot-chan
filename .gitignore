@@ -155,7 +155,7 @@ dmypy.json
 cython_debug/
 
 # Code example
-botchan/examples
+fluctlight/examples
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

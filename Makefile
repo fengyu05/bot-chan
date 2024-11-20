@@ -5,10 +5,13 @@ include makefiles/poetry.mk
 
 .PHONY: app app-debug
 
-app: requirements.txt ## start app server
+server: requirements.txt ## start app server
 	docker compose up --build app
 
-app-debug: requirements.txt ## start app server with debug mode
+server-debug: requirements.txt ## start app server with debug mode
 	docker compose up --build app-debug
+
+api-server: requirements.txt ## start app server
+	docker compose up --build api db
 
 test: docker-test  ## Test

@@ -32,6 +32,7 @@ speechrecognition = "^3.11.0"
 aiofiles = "^24.1.0"
 readerwriterlock = "^1.0.9"
 pgvector = "^0.3.6"
+psycopg2-binary = "^2.9.10"
 
 
 [tool.poetry.group.dev.dependencies]

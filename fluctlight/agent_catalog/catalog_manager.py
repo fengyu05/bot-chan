@@ -12,10 +12,10 @@ from readerwriterlock import rwlock
 from fluctlight.embedding.chroma import get_chroma
 from fluctlight.database.connection import get_db
 from fluctlight.logger import get_logger
-from fluctlight.database.models.character import DbCharacter as CharacterModel
+from fluctlight.database.models.character import Character as CharacterModel
 from fluctlight.utt.singleton import Singleton
 from fluctlight.data_model.interface.character import Character
-
+from fluctlight.settings import OVERWRITE_CHROMA
 
 logger = get_logger(__name__)
 
@@ -23,35 +23,29 @@ logger = get_logger(__name__)
 class CatalogManager(Singleton):
     def __init__(self):
         super().__init__()
-        overwrite = os.getenv("OVERWRITE_CHROMA") != "false"
-        # skip Chroma if Openai API key is not set
-        if os.getenv("OPENAI_API_KEY"):
-            self.db = get_chroma()
-        else:
-            self.db = get_chroma(embedding=False)
-            overwrite = False
-            logger.warning("OVERWRITE_CHROMA disabled due to OPENAI_API_KEY not set")
+
+        self.db = get_chroma()
         self.sql_db = next(get_db())
         self.sql_load_interval = 30
         self.sql_load_lock = rwlock.RWLockFair()
 
-        if overwrite:
+        if OVERWRITE_CHROMA:
             logger.info("Overwriting existing data in the chroma.")
             self.db.delete_collection()
             self.db = get_chroma()
 
         self.characters: dict[str, Character] = {}
         self.author_name_cache: dict[str, str] = {}
-        self.load_characters("default", overwrite)
-        #self.load_characters("community", overwrite)
-        if overwrite:
+        self.load_characters(OVERWRITE_CHROMA)
+        if OVERWRITE_CHROMA:
             logger.info("Persisting data in the chroma.")
             self.db.persist()
+
         logger.info(f"Total document load: {self.db._client.get_collection('llm').count()}")
         self.run_load_sql_db_thread = True
         self.load_sql_db_thread = threading.Thread(target=self.load_sql_db_loop)
         self.load_sql_db_thread.daemon = True
-        self.load_sql_db_thread.start()
+        #self.load_sql_db_thread.start()
 
     def load_sql_db_loop(self):
         while self.run_load_sql_db_thread:
@@ -65,9 +59,9 @@ class CatalogManager(Singleton):
         with self.sql_load_lock.gen_rlock():
             return self.characters.get(name)
 
-    def load_character(self, directory: Path, source: str):
+    def load_character(self, directory: Path):
         with ExitStack() as stack:
-            f_yaml = stack.enter_context(open(directory / "config.yaml"))
+            f_yaml = stack.enter_context(open(directory / "config.yaml", encoding="utf8"))
             yaml_content = cast(dict, yaml.safe_load(f_yaml))
 
             character_id = yaml_content["character_id"]
@@ -80,11 +74,11 @@ class CatalogManager(Singleton):
                 name=character_name,
                 llm_system_prompt=yaml_content["system"],
                 llm_user_prompt=yaml_content["user"],
-                source=source,
+                source="local",
                 location="repo",
                 voice_id=voice_id,
                 author_name=yaml_content.get("author_name", ""),
-                visibility="public" if source == "default" else yaml_content["visibility"],
+                visibility=yaml_content["visibility"],
                 tts=yaml_content["text_to_speech_use"],
                 order=order,
                 # rebyte config
@@ -112,28 +106,18 @@ class CatalogManager(Singleton):
         )
         self.db.add_documents(docs)
 
-    def load_characters(self, source: str, overwrite: bool):
+    def load_characters(self, overwrite: bool):
         """
         Load characters from the character_catalog directory. Use /data to create
         documents and add them to the chroma.
 
-        :param source: 'default' or 'community'
-
         :param overwrite: if True, overwrite existing data in the chroma.
         """
-        if source == "default":
-            path = Path(__file__).parent
-            excluded_dirs = {"__pycache__", "archive", "community"}
-        elif source == "community":
-            path = Path(__file__).parent / "community"
-            excluded_dirs = {"__pycache__", "archive"}
-        else:
-            raise ValueError(f"Invalid source: {source}")
-
+        path = Path(__file__).parent
+        excluded_dirs = {"__pycache__", "archive", "community"}
         directories = [d for d in path.iterdir() if d.is_dir() and d.name not in excluded_dirs]
-
         for directory in directories:
-            character_name = self.load_character(directory, source)
+            character_name = self.load_character(directory)
             if character_name and overwrite:
                 logger.info("Overwriting data for character: " + character_name)
                 self.load_data(character_name, directory / "data")

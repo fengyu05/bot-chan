@@ -5,12 +5,10 @@ import uuid
 from typing import Optional
 
 import aiofiles
-import httpx
 from fastapi import (
     APIRouter,
     Depends,
     File,
-    Form,
     HTTPException,
     Request,
     status as http_status,
@@ -21,22 +19,18 @@ from sqlalchemy.orm import Session
 
 from fluctlight.audio.text_to_speech import get_text_to_speech
 from fluctlight.database.connection import get_db
-from fluctlight.llm.highlight_action_generator import (
-    generate_highlight_action,
-    generate_highlight_based_on_prompt,
-)
-from fluctlight.llm.system_prompt_generator import generate_system_prompt
 from fluctlight.database.models.interaction import Interaction
 from fluctlight.database.models.feedback import Feedback, FeedbackRequest
 from fluctlight.database.models.character import (
+    Character as DbCharacter,
+)
+from fluctlight.data_model.interface.character import (
     Character,
     CharacterRequest,
     EditCharacterRequest,
     DeleteCharacterRequest,
-    GenerateHighlightRequest,
-    GeneratePromptRequest,
 )
-from fluctlight.data_model.interface import Character as ICharacter
+from fluctlight.agent_catalog.catalog_manager import CatalogManager
 
 router = APIRouter()
 
@@ -56,15 +50,7 @@ async def status():
 
 @router.get("/characters")
 async def characters(user=Depends(get_current_user)):
-    # # Old: GCS
-    # gcs_path = os.getenv("GCP_STORAGE_URL")
-    # if not gcs_path:
-    #     raise HTTPException(
-    #         status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail="GCP_STORAGE_URL is not set",
-    #     )
-
-    def get_image_url(character: ICharacter) -> str:
+    def get_image_url(character: DbCharacter) -> str:
         if character.location == "repo" and character.author_name == "Eden":
             # TODO: new local storage service
             return f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.jpg"
@@ -74,24 +60,15 @@ async def characters(user=Depends(get_current_user)):
         return (
             f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.jpg"
         )
-        # # Old: GCS
-        # if character.data and "avatar_filename" in character.data:
-        #     return f'{gcs_path}/{character.data["avatar_filename"]}'
-        # else:
-        #     return f"{gcs_path}/static/realchar/{character.character_id}.jpg"
 
-    def get_audio_url(character: ICharacter) -> str:
+    def get_audio_url(character: Character) -> str:
         if character.location == "repo" and character.author_name == "Eden":
             # TODO: new local storage service
             return f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.mp3"
         else:
             return f"http://localhost:3000/{character.author_id}/{character.voice_id}.mp3"
-            # # Old: GCS
-            # return f"{gcs_path}/static/realchar/{character.character_id}.mp3"
 
     uid = user["uid"] if user else None
-    from fluctlight.agent_catalog.catalog_manager import CatalogManager
-
     catalog: CatalogManager = CatalogManager.get_instance()
     return [
         {
@@ -111,13 +88,6 @@ async def characters(user=Depends(get_current_user)):
         for character in sorted(catalog.characters.values(), key=lambda c: c.order)
         if character.author_id == uid or character.visibility == "public"
     ]
-
-
-@router.get("/configs")
-async def configs():
-    return {
-        "llms": ["gpt-4", "gpt-3.5-turbo-16k", "claude-2", "meta-llama/Llama-2-70b-chat-hf"],
-    }
 
 
 @router.get("/session_history")
@@ -170,33 +140,6 @@ async def upload_file(file: UploadFile = File(...), user=Depends(get_current_use
         await buffer.write(content)
     return {"filename": new_filename[1:], "content-type": file.content_type}
 
-    # Old: upload to gcp stroage
-    # storage_client = storage.Client()
-    # bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
-    # if not bucket_name:
-    #     raise HTTPException(
-    #         status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail="GCP_STORAGE_BUCKET_NAME is not set",
-    #     )
-
-    # bucket = storage_client.bucket(bucket_name)
-
-    # # Create a new filename with a timestamp and a random uuid to avoid duplicate filenames
-    # file_extension = os.path.splitext(file.filename)[1] if file.filename else ""
-    # new_filename = (
-    #     f"user_upload/{user['uid']}/"
-    #     f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-    #     f"{uuid.uuid4()}{file_extension}"
-    # )
-
-    # blob = bucket.blob(new_filename)
-
-    # contents = await file.read()
-
-    # await asyncio.to_thread(blob.upload_from_string, contents)
-
-    # return {"filename": new_filename, "content-type": file.content_type}
-
 
 @router.post("/create_character")
 async def create_character(
@@ -210,7 +153,7 @@ async def create_character(
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    character = Character(**character_request.dict())
+    character = DbCharacter(**character_request.dict())
     character.id = str(uuid.uuid4().hex)  # type: ignore
     character.background_text = character_request.background_text  # type: ignore
     character.author_id = user["uid"]
@@ -234,7 +177,7 @@ async def edit_character(
         )
     character_id = edit_character_request.id
     character = await asyncio.to_thread(
-        db.query(Character).filter(Character.id == character_id).one
+        db.query(DbCharacter).filter(DbCharacter.id == character_id).one
     )
     if not character:
         raise HTTPException(
@@ -248,7 +191,7 @@ async def edit_character(
             detail="Unauthorized to edit this character",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    character = Character(**edit_character_request.dict())
+    character = DbCharacter(**edit_character_request.dict())
     character.updated_at = datetime.datetime.now()  # type: ignore
     db.merge(character)
     db.commit()
@@ -268,7 +211,7 @@ async def delete_character(
         )
     character_id = delete_character_request.character_id
     character = await asyncio.to_thread(
-        db.query(Character).filter(Character.id == character_id).one
+        db.query(DbCharacter).filter(DbCharacter.id == character_id).one
     )
     if not character:
         raise HTTPException(
@@ -320,127 +263,6 @@ async def generate_audio(text: str, tts: Optional[str] = None, user=Depends(get_
 
     return {"filename": new_filename[1:], "content-type": "audio/mpeg"}
 
-    # # Old: save to GCS
-    # # save audio to a file on GCS
-    # storage_client = storage.Client()
-    # bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
-    # if not bucket_name:
-    #     raise HTTPException(
-    #         status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail="GCP_STORAGE_BUCKET_NAME is not set",
-    #     )
-    # bucket = storage_client.bucket(bucket_name)
-
-    # # Create a new filename with a timestamp and a random uuid to avoid duplicate filenames
-    # file_extension = ".mp3"
-    # new_filename = (
-    #     f"user_upload/{user['uid']}/"
-    #     f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-    #     f"{uuid.uuid4()}{file_extension}"
-    # )
-
-    # blob = bucket.blob(new_filename)
-
-    # await asyncio.to_thread(blob.upload_from_string, audio_bytes)
-
-    # return {"filename": new_filename, "content-type": "audio/mpeg"}
-
-
-@router.post("/clone_voice")
-async def clone_voice(filelist: list[UploadFile] = Form(...), user=Depends(get_current_user)):
-    if not user:
-        raise HTTPException(
-            status_code=http_status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    if len(filelist) > MAX_FILE_UPLOADS:
-        raise HTTPException(
-            status_code=http_status.HTTP_400_BAD_REQUEST,
-            detail=f"Number of files exceeds the limit ({MAX_FILE_UPLOADS})",
-        )
-
-    voice_request_id = str(uuid.uuid4().hex)
-    for file in filelist:
-        # Create a new filename with a timestamp and a random uuid to avoid duplicate filenames
-        file_extension = os.path.splitext(file.filename)[1] if file.filename else ""
-        new_filename = (
-            f"/user_uploads/{user['uid']}/{voice_request_id}/"
-            f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-            f"{uuid.uuid4()}{file_extension}"
-        )
-        # save
-        async with aiofiles.open(new_filename, "wb") as buffer:
-            content = await file.read()
-            await buffer.write(content)
-
-    # # Old: upload voice to gcp storage
-    # storage_client = storage.Client()
-    # bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
-    # if not bucket_name:
-    #     raise HTTPException(
-    #         status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail="GCP_STORAGE_BUCKET_NAME is not set",
-    #     )
-
-    # bucket = storage_client.bucket(bucket_name)
-    # voice_request_id = str(uuid.uuid4().hex)
-
-    # for file in filelist:
-    #     # Create a new filename with a timestamp and a random uuid to avoid duplicate filenames
-    #     file_extension = os.path.splitext(file.filename)[1] if file.filename else ""
-    #     new_filename = (
-    #         f"user_upload/{user['uid']}/{voice_request_id}/"
-    #         f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-    #         f"{uuid.uuid4()}{file_extension}"
-    #     )
-
-    #     blob = bucket.blob(new_filename)
-
-    #     contents = await file.read()
-
-    #     await asyncio.to_thread(blob.upload_from_string, contents)
-
-    # Construct the data for the API request
-    # TODO: support more voice cloning services.
-    data = {
-        "name": user["uid"] + "_" + voice_request_id,
-    }
-
-    files = [("files", (file.filename, file.file)) for file in filelist]
-
-    headers = {
-        "xi-api-key": os.getenv("ELEVEN_LABS_API_KEY", ""),
-    }
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://api.elevenlabs.io/v1/voices/add", headers=headers, data=data, files=files
-        )
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=response.text)
-
-    return response.json()
-
-
-@router.post("/system_prompt")
-async def system_prompt(request: GeneratePromptRequest, user=Depends(get_current_user)):
-    """Generate System Prompt according to name and background."""
-    name = request.name
-    background = request.background
-    if not isinstance(name, str) or name == "":
-        raise HTTPException(
-            status_code=http_status.HTTP_400_BAD_REQUEST,
-            detail="Name is empty",
-        )
-    if not user:
-        raise HTTPException(
-            status_code=http_status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return {"system_prompt": await generate_system_prompt(name, background)}
 
 
 @router.get("/conversations", response_model=list[dict])
@@ -489,7 +311,7 @@ async def get_character(
             headers={"WWW-Authenticate": "Bearer"},
         )
     character = await asyncio.to_thread(
-        db.query(Character).filter(Character.id == character_id).one
+        db.query(DbCharacter).filter(DbCharacter.id == character_id).one
     )
     if not character:
         raise HTTPException(
@@ -505,24 +327,3 @@ async def get_character(
     character_json = character.to_dict()
     return character_json
 
-
-@router.post("/generate_highlight")
-async def generate_highlight(
-    generate_highlight_request: GenerateHighlightRequest, user=Depends(get_current_user)
-):
-    # Only allow for authorized user.
-    if not user:
-        raise HTTPException(
-            status_code=http_status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    context = generate_highlight_request.context
-    prompt = generate_highlight_request.prompt
-    result = ""
-    if prompt:
-        result = await generate_highlight_based_on_prompt(context, prompt)
-    else:
-        result = await generate_highlight_action(context)
-
-    return {"highlight": result}

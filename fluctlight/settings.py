@@ -78,7 +78,10 @@ SPEECH_TO_TEXT_ENGINE = config_default("SPEECH_TO_TEXT_ENGINE", "OPENAI_WHISPER"
 SLACK_TRANSCRIBE_WAIT_SEC = config_default_float("SLACK_TRANSCRIBE_WAIT_SEC", 10)
 
 # Web server config
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "")
+SQLALCHEMY_DATABASE_URL = config_default("SQLALCHEMY_DATABASE_URL")
+
+# Override Chroma DB
+OVERWRITE_CHROMA = config_default_bool("OVERWRITE_CHROMA", False)
 
 # Setting methods
 def is_slack_bot() -> bool:

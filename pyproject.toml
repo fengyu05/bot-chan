@@ -33,6 +33,7 @@ aiofiles = "^24.1.0"
 readerwriterlock = "^1.0.9"
 pgvector = "^0.3.6"
 psycopg2-binary = "^2.9.10"
+python-multipart = "^0.0.17"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -10,7 +10,7 @@ setup(
         "console_scripts": [
             "fluctlight=fluctlight.cli:main",
             "fluctlight_async=fluctlight.async_cli:main",
-            "fluctlight_api=fluctlight.web_server.api",
+            "fluctlight_api=fluctlight.web_server.api:main",
         ],
     },
 )

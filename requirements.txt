@@ -111,6 +111,7 @@ pyproject-hooks==1.2.0 ; python_full_version >= "3.11.10" and python_full_versio
 pyreadline3==3.5.4 ; sys_platform == "win32" and python_full_version >= "3.11.10" and python_full_version < "4.0.0"
 python-dateutil==2.9.0.post0 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"
 python-dotenv==1.0.1 ; python_full_version >= "3.11.10" and python_version < "4.0"
+python-multipart==0.0.17 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"
 pyyaml==6.0.2 ; python_full_version >= "3.11.10" and python_version < "4.0"
 readerwriterlock==1.0.9 ; python_full_version >= "3.11.10" and python_full_version < "4.0.0"
 regex==2024.11.6 ; python_full_version >= "3.11.10" and python_version < "4.0"

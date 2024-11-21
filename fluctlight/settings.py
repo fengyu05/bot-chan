@@ -52,13 +52,17 @@ OPENAI_API_KEY = config_default("OPENAI_API_KEY")
 # OPENAI GPT MODEL ID
 OPENAI_GPT_MODEL_ID = config_default("OPENAI_GPT_MODEL_ID", GPT_4O)
 
+# Whether to use char agent to match intent
+CHAR_AGENT_MATCHING = config_default_bool("CHAR_AGENT_MATCHING", True)
+
 # Whether to use LLM to match message intent
 LLM_INTENT_MATCHING = config_default_bool("LLM_INTENT_MATCHING", False)
 
+# Whether to use SQL char DB
+USE_SQL_CHAR_DB = config_default_bool("USE_SQL_CHAR_DB", False)
 
 # Default tmp path
 TMP_PATH = config_default("TMP", "/tmp/")
-
 
 # TTS section
 TTS_ENGINE = config_default("TTS_ENGINE", "ELEVEN_LABS")

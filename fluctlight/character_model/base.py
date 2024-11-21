@@ -1,14 +1,16 @@
 import asyncio
 import re
 from abc import ABC, abstractmethod
-from typing import Callable, Coroutine, Optional
+from typing import Callable, Coroutine
 
 import emoji
 from fastapi import WebSocket
 from langchain.callbacks.base import AsyncCallbackHandler
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.schema.messages import BaseMessage
-
+from langchain_core.language_models.chat_models import (
+    BaseChatModel,
+)
 from fluctlight.audio.text_to_speech.base import TextToSpeech
 from fluctlight.logger import get_logger
 from fluctlight.utt.timed import timed, get_timer
@@ -28,8 +30,8 @@ class AsyncCallbackTextHandler(AsyncCallbackHandler):
         on_new_token: Callable[[str], Coroutine],
         token_buffer: list[str],
         on_llm_end: Callable[[str], Coroutine],
-        tts_event: Optional[asyncio.Event] = None,
         *args,
+        tts_event: asyncio.Event | None = None,
         **kwargs
     ):
         super().__init__(*args, **kwargs)
@@ -63,11 +65,11 @@ class AsyncCallbackAudioHandler(AsyncCallbackHandler):
         text_to_speech: TextToSpeech,
         websocket: WebSocket,
         tts_event: asyncio.Event,
+        *args,
         voice_id: str = "",
         language: str = "en-US",
         sid: str = "",
         platform: str = "",
-        *args,
         **kwargs
     ):
         super().__init__(*args, **kwargs)
@@ -158,7 +160,10 @@ class AsyncCallbackAudioHandler(AsyncCallbackHandler):
         return filtered_text
 
 
-class LLM(ABC):
+class ChatAgent(ABC):
+    config: dict
+    chat_model: BaseChatModel
+
     @abstractmethod
     @timed
     async def achat(
@@ -168,13 +173,13 @@ class LLM(ABC):
         user_id: str,
         character: Character,
         callback: AsyncCallbackTextHandler,
-        audioCallback: Optional[AsyncCallbackAudioHandler] = None,
-        metadata: Optional[dict] = None,
         *args,
+        audioCallback: AsyncCallbackAudioHandler | None = None,
+        metadata: dict | None = None,
         **kwargs
     ):
         pass
 
     @abstractmethod
     def get_config(self):
-        pass
+        return self.config

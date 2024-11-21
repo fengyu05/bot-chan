@@ -1,26 +1,27 @@
-from typing import Optional
-
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chat_models import ChatAnthropic
 from langchain.schema import BaseMessage, HumanMessage
 
 from fluctlight.embedding.chroma import get_chroma
-from fluctlight.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, LLM
+from fluctlight.character_model.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, ChatAgent
 from fluctlight.logger import get_logger
 from fluctlight.utt.timed import timed
 from fluctlight.data_model.interface.character import Character
+from langchain_community.chat_models import ChatOpenAI
 
 logger = get_logger(__name__)
 
 
-class AnthropicLlm(LLM):
-    def __init__(self, model):
-        self.chat_anthropic = ChatAnthropic(model_name=model, temperature=0.5, streaming=True)
-        self.config = {"model": model, "temperature": 0.5, "streaming": True}
+class OpenaiLlm(ChatAgent):
+    def __init__(self, model: str, temperature: float = 0.5, openai_api_base: str | None = None, openai_api_key: str | None = None):
+        self.chat_model = ChatOpenAI(
+            model=model,
+            temperature=temperature,
+            streaming=True,
+            openai_api_base=openai_api_base,
+            openai_api_key=openai_api_key,
+        )
+        self.config = {"model": model, "temperature": temperature, "streaming": True, "openai_api_base": openai_api_base}
         self.db = get_chroma()
-
-    def get_config(self):
-        return self.config
 
     @timed
     async def achat(
@@ -30,10 +31,8 @@ class AnthropicLlm(LLM):
         user_id: str,
         character: Character,
         callback: AsyncCallbackTextHandler,
-        audioCallback: Optional[AsyncCallbackAudioHandler] = None,
-        metadata: Optional[dict] = None,
-        *args,
-        **kwargs,
+        audioCallback: AsyncCallbackAudioHandler | None = None,
+        metadata: dict | None = None,
     ) -> str:
         # 1. Generate context
         context = self._generate_context(user_input, character)
@@ -49,7 +48,7 @@ class AnthropicLlm(LLM):
         callbacks = [callback, StreamingStdOutCallbackHandler()]
         if audioCallback is not None:
             callbacks.append(audioCallback)
-        response = await self.chat_anthropic.agenerate(
+        response = await self.chat_model.agenerate(
             [history], callbacks=callbacks, metadata=metadata
         )
         logger.info(f"Response: {response}")

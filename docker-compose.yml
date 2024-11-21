@@ -1,5 +1,5 @@
 services:
-  app:
+  server-slack:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -7,11 +7,23 @@ services:
       - .env
     environment:
       - LOG_LEVEL=info
+      - BOT_CLIENT=slack
     ports:
       - 3000:3000
 
+  server-discord:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=info
+      - BOT_CLIENT=discord
+    ports:
+      - 3000:3000
 
-  app-debug:
+  server-debug:
     build:
       context: ./
       dockerfile: Dockerfile

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, field_validator
 from typing_extensions import TypeAlias
+import re
 
 _UNKNOWN = "unknown"
 _METHOD = "method"
@@ -60,9 +61,17 @@ _INTENT_BY_EMOJI = {
 
 
 def get_message_intent_by_emoji(text: str) -> MessageIntent:
-    for emoji in _INTENT_BY_EMOJI:
-        if text.startswith(f":{emoji}:"):
-            return MessageIntent(
-                key=_INTENT_BY_EMOJI[emoji], metadata={_METHOD: _EMOJI, _EMOJI: emoji}
-            )
+    emoji = get_leading_emoji(text)
+    if emoji in _INTENT_BY_EMOJI:
+        return MessageIntent(
+            key=_INTENT_BY_EMOJI[emoji], metadata={_METHOD: _EMOJI, _EMOJI: emoji}
+        )
     return UNKNOWN_INTENT
+
+def get_leading_emoji(text: str) -> str:
+    pattern = r'^:(\w+):'
+    match = re.match(pattern, text)
+    if match:
+        return match.group(1)
+    else:
+        return ""

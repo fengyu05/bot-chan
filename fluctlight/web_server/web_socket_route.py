@@ -5,36 +5,33 @@ import time
 from dataclasses import dataclass
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, WebSocket, WebSocketDisconnect
-from firebase_admin import auth
-from firebase_admin.exceptions import FirebaseError
 from sqlalchemy.orm import Session
 
 from fluctlight.audio.speech_to_text import get_speech_to_text, SpeechToText
 from fluctlight.audio.text_to_speech import get_text_to_speech, TextToSpeech
-from fluctlight.character_catalog.catalog_manager import (
+from fluctlight.agent_catalog.catalog_manager import (
     CatalogManager,
     get_catalog_manager,
 )
 from fluctlight.database.connection import get_db
-from fluctlight.llm import get_llm, LLM
-from fluctlight.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler
+from fluctlight.character_model import get_chat_agent, ChatAgent
+from fluctlight.character_model.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler
 from fluctlight.logger import get_logger
-from fluctlight.models.interaction import Interaction
-from fluctlight.utils import (
+from fluctlight.database.models.interaction import Interaction
+from fluctlight.web_server.utils import (
     build_history,
     ConversationHistory,
-    get_connection_manager,
-    get_timer,
     task_done_callback,
     Transcript,
 )
-
+from fluctlight.utt.timed import get_timer
+from fluctlight.utt.web_socket import ConnectionManager
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-manager = get_connection_manager()
+manager = ConnectionManager.get_instance()
 
 timer = get_timer()
 
@@ -139,7 +136,7 @@ async def websocket_endpoint(
         return
     logger.info(f"User #{user_id} is authorized to access session {session_id}")
 
-    llm = get_llm(model=llm_model)
+    llm = get_chat_agent(model=llm_model)
     await manager.connect(websocket)
     try:
         main_task = asyncio.create_task(
@@ -171,7 +168,7 @@ async def handle_receive(
     session_id: str,
     user_id: str,
     db: Session,
-    llm: LLM,
+    llm: ChatAgent,
     catalog_manager: CatalogManager,
     character_id: str,
     platform: str,

@@ -109,8 +109,8 @@ class CatalogManager(Singleton):
 
         :param overwrite: if True, overwrite existing data in the chroma.
         """
-        if not CHAR_CATALOG_DIR:
-            logger.warn("CHAR_CATALOG_DIR not config, cannot load character from folder")
+        if not CHAR_CATALOG_DIR or not os.path.exists(CHAR_CATALOG_DIR):
+            logger.warn("CHAR_CATALOG_DIR not configured or does not exist, cannot load character from folder")
             return
         path = Path(CHAR_CATALOG_DIR)
         excluded_dirs = {"archive", "community"}

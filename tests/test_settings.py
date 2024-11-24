@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from botchan.settings import _TRUTHY_VALUES, config_default_bool
+from fluctlight.settings import _TRUTHY_VALUES, config_default_bool
 
 
 class TestConfigDefaultBool(unittest.TestCase):

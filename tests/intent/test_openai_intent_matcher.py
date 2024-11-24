@@ -2,10 +2,10 @@ import unittest
 from unittest import skip
 from unittest.mock import patch
 
-from botchan.agents.miao_agent import MiaoAgent
-from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.intent.message_intent import create_intent
-from botchan.intent.openai_intent_matcher import OpenAIIntentMatcher
+from fluctlight.agents.miao_agent import MiaoAgent
+from fluctlight.agents.openai_chat_agent import OpenAiChatAgent
+from fluctlight.intent.message_intent import create_intent
+from fluctlight.intent.openai_intent_matcher import OpenAIIntentMatcher
 from tests.data.imessages import MESSAGE_HELLO_WORLD
 
 
@@ -14,7 +14,7 @@ class TestIntentMatcher(unittest.TestCase):
         pass
 
     @skip("Disabled temporarily: pass locally but failed on CI")
-    @patch("botchan.intent.openai_intent_matcher.simple_assistant_with_struct_ouput")
+    @patch("fluctlight.intent.openai_intent_matcher.simple_assistant_with_struct_ouput")
     def test_message_intent_match_llm_with_struct(self, mock_simple_assistant):
         test_intent = create_intent("CHAT")
         mock_simple_assistant.return_value = test_intent
@@ -30,7 +30,7 @@ class TestIntentMatcher(unittest.TestCase):
         mock_simple_assistant.assert_called_once()
 
     @skip("Disabled temporarily: pass locally but failed on CI")
-    @patch("botchan.intent.openai_intent_matcher.simple_assistant")
+    @patch("fluctlight.intent.openai_intent_matcher.simple_assistant")
     def test_message_intent_match_llm_with_plain_text(self, mock_simple_assistant):
         mock_simple_assistant.return_value = "0"
         matcher = OpenAIIntentMatcher(

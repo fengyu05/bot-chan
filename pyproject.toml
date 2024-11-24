@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "botchan"
+name = "fluctlight"
 version = "0.1.0"
-description = "botchan python deps"
+description = "fluctlight python API"
 authors = ["ZF"]
 
 [tool.poetry.dependencies]
@@ -29,6 +29,11 @@ pydub = "^0.25.1"
 discord-py = "^2.4.0"
 emoji = "^2.14.0"
 speechrecognition = "^3.11.0"
+aiofiles = "^24.1.0"
+readerwriterlock = "^1.0.9"
+pgvector = "^0.3.6"
+psycopg2-binary = "^2.9.10"
+python-multipart = "^0.0.17"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -39,6 +44,3 @@ pytest-asyncio = "^0.24.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-cli = "botchan.cli:main"

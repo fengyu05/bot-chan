@@ -1,4 +1,4 @@
-from botchan.data_model.interface import IChannel, IMessage
+from fluctlight.data_model.interface import IChannel, IMessage
 
 MESSAGE_HELLO_WORLD = IMessage(
     text="Hello World!!!",

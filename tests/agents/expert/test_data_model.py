@@ -1,6 +1,6 @@
 import unittest
 
-from botchan.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
+from fluctlight.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
 
 
 class Te1(TaskEntity):

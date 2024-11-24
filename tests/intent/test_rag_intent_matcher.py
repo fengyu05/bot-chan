@@ -3,16 +3,16 @@ import unittest
 
 from langchain_core.messages import HumanMessage
 
-from botchan.agents.expert.poem_translate import INTENT_KEY as poem_translate_intent_key
-from botchan.agents.expert.poem_translate import create_poems_translation_task_agent
-from botchan.agents.expert.shopping_assist import (
+from fluctlight.agents.expert.poem_translate import INTENT_KEY as poem_translate_intent_key
+from fluctlight.agents.expert.poem_translate import create_poems_translation_task_agent
+from fluctlight.agents.expert.shopping_assist import (
     INTENT_KEY as shopping_assisist_intent_key,
 )
-from botchan.agents.expert.shopping_assist import create_shopping_assisist_task_agent
-from botchan.agents.miao_agent import MiaoAgent
-from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.intent.intent_candidate import IntentCandidate
-from botchan.intent.rag_intent_matcher import GraphState, RagIntentMatcher
+from fluctlight.agents.expert.shopping_assist import create_shopping_assisist_task_agent
+from fluctlight.agents.miao_agent import MiaoAgent
+from fluctlight.agents.openai_chat_agent import OpenAiChatAgent
+from fluctlight.intent.intent_candidate import IntentCandidate
+from fluctlight.intent.rag_intent_matcher import GraphState, RagIntentMatcher
 from tests.intergation_test_utils import skip_integration_tests
 
 

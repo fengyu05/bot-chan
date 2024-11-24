@@ -3,13 +3,14 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="botchan",
+    name="fluctlight",
     version="0.1",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "botchan=botchan.cli:main",
-            "botchan_async=botchan.async_cli:main",
+            "fluctlight=fluctlight.cli:main",
+            "fluctlight_async=fluctlight.async_cli:main",
+            "fluctlight_api=fluctlight.web_server.api:main",
         ],
     },
 )

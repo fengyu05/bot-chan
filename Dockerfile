@@ -6,15 +6,12 @@ WORKDIR /app/home
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Add the bot-chan application
-ADD botchan ./botchan
-
-# Miscellaneous additions
+# Add the application
+ADD fluctlight ./fluctlight
 ADD tests ./tests
-ADD ./bin /app/bin/
 ADD setup.py ./setup.py
 
 # Install the app
 RUN pip install -e .
 # Set the default command
-CMD ["botchan", "start"]
+CMD ["fluctlight", "start"]

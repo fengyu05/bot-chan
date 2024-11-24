@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from discord import DMChannel, Message, TextChannel, Thread
 
-from botchan.discord.bot_client import DiscordBotClient
-from botchan.discord.discord_bot_proxy import DiscordBotProxy
+from fluctlight.discord.bot_client import DiscordBotClient
+from fluctlight.discord.discord_bot_proxy import DiscordBotProxy
 
 DISCORD_BOT_DEVELOPER_ROLE = "developer"
 

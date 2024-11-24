@@ -6,10 +6,7 @@ WORKDIR /app/home
 COPY requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt
 
-# Add the bot-chan application
-ADD botchan ./botchan
-
-# Miscellaneous additions
+# Add the application
+ADD fluctlight ./fluctlight
 ADD tests ./tests
-ADD ./bin /app/bin/
 ADD setup.py ./setup.py

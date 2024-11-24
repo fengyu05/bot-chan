@@ -1,13 +1,12 @@
 import unittest
 from unittest.mock import patch
 
-from botchan.agents.miao_agent import MiaoAgent
-from botchan.agents.openai_chat_agent import OpenAiChatAgent
-from botchan.intent.intent_agent import IntentAgent
-from botchan.intent.intent_matcher_base import IntentMatcher
-from botchan.intent.message_intent import (
+from fluctlight.agents.miao_agent import MiaoAgent
+from fluctlight.agents.openai_chat_agent import OpenAiChatAgent
+from fluctlight.intent.intent_agent import IntentAgent
+from fluctlight.intent.intent_matcher_base import IntentMatcher
+from fluctlight.intent.message_intent import (
     DEFAULT_CHAT_INTENT,
-    UNKNOWN_INTENT,
     MessageIntent,
     create_intent,
 )
@@ -64,12 +63,10 @@ class TestMessageIntentAgent(unittest.TestCase):
 
         self.assertEqual(result, DEFAULT_CHAT_INTENT)
 
-    @patch("botchan.intent.intent_matcher_base.get_message_intent_by_emoji")
+    @patch("fluctlight.intent.intent_matcher_base.get_message_intent_by_emoji")
     def test_emoji_based_intent(self, mock_get_message_intent_by_emoji):
         mock_get_message_intent_by_emoji.return_value = create_intent("HAPPY")
-        message1 = MESSAGE_HELLO_WORLD
-
-        result = self.intent_matcher.match_message_intent(message1)
+        result = self.intent_matcher.match_message_intent(MESSAGE_HELLO_WORLD)
         mock_get_message_intent_by_emoji.assert_called_once()
         self.assertEqual(result.key, "HAPPY")
 

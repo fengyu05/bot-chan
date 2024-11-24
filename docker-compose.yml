@@ -1,5 +1,5 @@
 services:
-  app:
+  server-slack:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -7,11 +7,27 @@ services:
       - .env
     environment:
       - LOG_LEVEL=info
+      - BOT_CLIENT=slack
+    volumes:
+      - './data/chars_catalog:/chars_catalog'
     ports:
       - 3000:3000
 
+  server-discord:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=info
+      - BOT_CLIENT=discord
+    volumes:
+      - './data/chars_catalog:/chars_catalog'
+    ports:
+      - 3000:3000
 
-  app-debug:
+  server-debug:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -19,9 +35,52 @@ services:
       - .env
     environment:
       - DEBUG_MODE=true
-      - LOG_LEVEL=debug  
+      - LOG_LEVEL=debug
+    volumes:
+      - './data/chars_catalog:/chars_catalog'  
     ports:
       - 3000:3000
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=info
+      - SQLALCHEMY_DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    volumes:
+      - './data/chars_catalog:/chars_catalog'
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 100000 
+    command: fluctlight_api
+
+  db:
+    build:
+      dockerfile: Dockerfile.db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/fluctlight
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 5s
+      retries: 10 
 
   backdoor:
     build:
@@ -31,7 +90,7 @@ services:
       - .env
     volumes:
       - './tmp:/tmp'
-    command: botchan backdoor
+    command: fluctlight backdoor
     
   shell:
     build:
@@ -39,3 +98,10 @@ services:
       dockerfile: Dockerfile
     command: /bin/bash -c "while true; do sleep 3600; done"
 
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  db:
+    driver: local

@@ -1,9 +1,9 @@
 import unittest
 
-from botchan.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
-from botchan.agents.expert.task_agent import TaskAgent
-from botchan.agents.expert.task_node import TaskNode
-from botchan.intent.message_intent import MessageIntent
+from fluctlight.agents.expert.data_model import IntakeMessage, TaskConfig, TaskEntity
+from fluctlight.agents.expert.task_agent import TaskAgent
+from fluctlight.agents.expert.task_node import TaskNode
+from fluctlight.intent.message_intent import MessageIntent
 
 
 class Te1(TaskEntity):

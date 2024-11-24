@@ -1,14 +1,27 @@
 from dataclasses import dataclass
-from typing import Any, Optional
+import time
+from typing import Any, Dict, Optional
 
 import structlog
 from jinja2 import Environment, meta
 
-from fluctlight.agents.expert.data_model import IntakeMessage, TaskConfig
-from fluctlight.agents.expert.task_node import TaskNode
-from fluctlight.agents.message_intent_agent import MessageIntentAgent
-from fluctlight.data_model.slack.message_event import MessageEvent
-from fluctlight.intent.message_intent import MessageIntent
+from botchan.agents.expert.data_model import (
+    IntakeHistoryMessage,
+    IntakeMessage,
+    TaskConfig,
+)
+from botchan.agents.expert.task_node import TaskNode
+from botchan.agents.expert.task_workflow_config import (
+    INTERNAL_UPSTREAM_HISTORY_MESSAGES,
+    INTERNAL_UPSTREAM_INPUT_MESSAGE,
+    WorkflowRunnerConfig,
+    WorkflowRunningState,
+    is_internal_upstream,
+)
+from botchan.agents.expert.task_workflow_runner import WorkflowRunner
+from botchan.agents.message_intent_agent import MessageIntentAgent
+from botchan.data_model.slack.message_event import MessageEvent
+from botchan.intent.message_intent import MessageIntent
 
 logger = structlog.getLogger(__name__)
 
@@ -29,13 +42,19 @@ class TaskAgent(MessageIntentAgent):
         intent: MessageIntent,
         task_graph: list[TaskConfig],
         context: Optional[dict[str, Any]] = None,
+        workflow_runner_config: Optional[WorkflowRunnerConfig] = None,
     ) -> None:
         super().__init__(intent=intent)
         self._name = name
         self._description = description
         self._intent = intent
         self._context = context or {}
-        self._tasks = self.build_task_graph(task_graph)
+        self._tasks = []
+        self._workflow_runner_config: Optional[WorkflowRunnerConfig] = None
+        if workflow_runner_config:
+            self._workflow_runner_config = workflow_runner_config
+        else:
+            self._tasks = self.build_task_graph(task_graph)
         self._invocation_contexts = {}
 
     def build_task_graph(self, task_graph: list[TaskConfig]) -> list[TaskNode]:
@@ -140,27 +159,100 @@ class TaskAgent(MessageIntentAgent):
         assert message_event.text, "message text is missing"
         return self.run_task_with_ic(message_event.text, ic=ic)
 
+    def _process_workflow_upstream_input(
+        self, workflow_runner: WorkflowRunner, message_text: str
+    ):
+        upstreams = workflow_runner.get_current_upstreams()
+        for upstream in upstreams:
+            if not is_internal_upstream(upstream):
+                continue
+            if upstream == INTERNAL_UPSTREAM_INPUT_MESSAGE:
+                workflow_runner.update_running_state(
+                    {
+                        INTERNAL_UPSTREAM_INPUT_MESSAGE: IntakeMessage(
+                            text=message_text,
+                        )
+                    }
+                )
+            elif upstream == INTERNAL_UPSTREAM_HISTORY_MESSAGES:
+                pass
+
+    def run_task_with_workflow_session(
+        self,
+        message_text: str,
+        ic: TaskInvocationContext,
+        workflow_runner_config: WorkflowRunnerConfig,
+        workflow_session: WorkflowRunningState,
+    ) -> list[str]:
+        responses: list[str] = []
+
+        # build or restore worflow runner
+        workflow_runner = WorkflowRunner(
+            workflow_runner_config,
+            workflow_session=workflow_session,
+        )
+
+        cur_node = workflow_runner.get_current_node()
+        assistant_response = ""
+        while cur_node != "END":
+            # handle workflow upstream input
+            self._process_workflow_upstream_input(workflow_runner, message_text)
+
+            # workflow process
+            task_name, assistant_response = workflow_runner.process_message()
+
+            # if current unhandled node have input message, break to obtain new input message
+            # otherwise continue to handle next node
+            cur_node = workflow_runner.get_current_node()
+            if workflow_runner.current_has_internal_upstreams():
+                break
+
+        # update ic context
+        responses.append(assistant_response)
+        workflow_runner.append_history_message(message_text, str(assistant_response))
+        ic.context.update({"workflow_session": workflow_runner.get_session_state()})
+
+        return responses
+
     def run_task_with_ic(
         self, message_text: str, ic: TaskInvocationContext
     ) -> list[str]:
-        ic.context.update({"message": IntakeMessage(text=message_text)})
         responses = []
 
-        for index, task in enumerate(self._tasks):
-            if index != ic.current_task_index:
-                continue
+        if self._workflow_runner_config:
+            if "workflow_session" in ic.context:
+                workflow_session: WorkflowRunningState = ic.context["workflow_session"]
+            else:
+                workflow_session: WorkflowRunningState = WorkflowRunningState(
+                    session_id=str(int(time.time())),
+                    current_node=self._workflow_runner_config.config.begin,
+                    running_state=ic.context.copy(),
+                    output_state={},
+                )
+                workflow_session["running_state"][
+                    INTERNAL_UPSTREAM_HISTORY_MESSAGES
+                ] = IntakeHistoryMessage(messages=[])
 
-            output = task(**ic.context)
-            ic.context[task.config.task_key] = output
+            responses = self.run_task_with_workflow_session(
+                message_text, ic, self._workflow_runner_config, workflow_session
+            )
+        else:
+            ic.context.update({"message": IntakeMessage(text=message_text)})
+            for index, task in enumerate(self._tasks):
+                if index != ic.current_task_index:
+                    continue
 
-            responses.append(str(task.config))
-            responses.append(str(output))
-            if self.stuck_in_loop(task=task, output=output):
-                responses.append(task.config.loop_message or EMPTY_LOOP_MESSAGE)
-                break
+                output = task(**ic.context)
+                ic.context[task.config.task_key] = output
 
-            # Task success update ic status
-            ic.current_task_index += 1
+                responses.append(str(task.config))
+                responses.append(str(output))
+                if self.stuck_in_loop(task=task, output=output):
+                    responses.append(task.config.loop_message or EMPTY_LOOP_MESSAGE)
+                    break
+
+                # Task success update ic status
+                ic.current_task_index += 1
 
         logger.info(
             "Task agent process message", name=self._name, all_output=ic.context

@@ -126,9 +126,6 @@ async def websocket_endpoint(
             except HTTPException:
                 await websocket.close(code=1008, reason="Unauthorized")
                 return
-        elif llm_model != "rebyte":
-            await websocket.close(code=1008, reason="Unauthorized")
-            return
     session_auth_result = await check_session_auth(session_id=session_id, user_id=user_id, db=db)
     if not session_auth_result.is_authenticated_user:
         logger.info(f"User #{user_id} is not authorized to access session {session_id}")

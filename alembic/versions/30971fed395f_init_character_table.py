@@ -1,8 +1,8 @@
 """init character table
 
-Revision ID: c6b7898db79a
+Revision ID: 30971fed395f
 Revises: 
-Create Date: 2024-11-24 20:30:37.335704
+Create Date: 2024-11-24 22:23:38.135098
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c6b7898db79a'
+revision: str = '30971fed395f'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,9 +35,6 @@ def upgrade() -> None:
     sa.Column('tts', sa.String(length=64), nullable=True),
     sa.Column('avatar_id', sa.String(length=100), nullable=True),
     sa.Column('background_text', sa.String(length=262144), nullable=True),
-    sa.Column('rebyte_api_project_id', sa.String(length=100), nullable=True),
-    sa.Column('rebyte_api_agent_id', sa.String(length=100), nullable=True),
-    sa.Column('rebyte_api_version', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_characters_id'), 'characters', ['id'], unique=False)

@@ -107,7 +107,3 @@ class OpenAICharacterAgent(CharacterAgent, MessageIntentAgent):
         return context
 
 
-def create_default_character_agent() -> CharacterAgent:
-    return OpenAICharacterAgent(
-        model=GPT_4O
-    )

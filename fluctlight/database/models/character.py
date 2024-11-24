@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, DateTime, Integer, JSON, String
+from sqlalchemy import Column, DateTime, JSON, String
 from sqlalchemy.inspection import inspect
 
 from fluctlight.database.base import Base
@@ -23,9 +23,6 @@ class Character(Base):
     tts = Column(String(64), nullable=True)
     avatar_id = Column(String(100), nullable=True)
     background_text = Column(String(262144), nullable=True)
-    rebyte_api_project_id = Column(String(100), nullable=True)
-    rebyte_api_agent_id = Column(String(100), nullable=True)
-    rebyte_api_version = Column(Integer(), nullable=True)
 
     def to_dict(self):
         return {

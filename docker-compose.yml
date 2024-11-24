@@ -52,6 +52,7 @@ services:
       - SQLALCHEMY_DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     volumes:
       - './data/chars_catalog:/chars_catalog'
+      - './alembic:/app/home/alembic'
     ports:
       - "8000:8000"
     depends_on:

@@ -16,6 +16,7 @@ from fluctlight.intent.rag_intent_matcher import RagIntentMatcher
 from fluctlight.logger import get_logger
 from fluctlight.settings import DISCORD_BOT_DEVELOPER_ROLE
 from fluctlight.utt.singleton import Singleton
+from fluctlight.agents.character import create_default_character_agent
 
 logger = get_logger(__name__)
 
@@ -32,6 +33,7 @@ class DiscordBotProxy(BotProxy, DiscordChat, DiscordReaction, DiscordGuild, Sing
         self.adapter = Adapter()
         self.chat_agent = OpenAiChatAgent()
         self.agents = [
+            create_default_character_agent(),
             self.chat_agent,
         ]
         self.intent_matcher = RagIntentMatcher(self.agents)

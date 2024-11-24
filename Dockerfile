@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 ADD fluctlight ./fluctlight
 ADD tests ./tests
 ADD setup.py ./setup.py
+ADD alembic.ini ./alembic.ini
 
 # Install the app
 RUN pip install -e .

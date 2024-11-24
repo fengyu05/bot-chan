@@ -34,7 +34,7 @@ readerwriterlock = "^1.0.9"
 pgvector = "^0.3.6"
 psycopg2-binary = "^2.9.10"
 python-multipart = "^0.0.17"
-
+alembic = "^1.14.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

@@ -8,6 +8,8 @@ services:
     environment:
       - LOG_LEVEL=info
       - BOT_CLIENT=slack
+    volumes:
+      - './data/chars_catalog:/chars_catalog'
     ports:
       - 3000:3000
 
@@ -20,6 +22,8 @@ services:
     environment:
       - LOG_LEVEL=info
       - BOT_CLIENT=discord
+    volumes:
+      - './data/chars_catalog:/chars_catalog'
     ports:
       - 3000:3000
 
@@ -31,7 +35,9 @@ services:
       - .env
     environment:
       - DEBUG_MODE=true
-      - LOG_LEVEL=debug  
+      - LOG_LEVEL=debug
+    volumes:
+      - './data/chars_catalog:/chars_catalog'  
     ports:
       - 3000:3000
 
@@ -44,6 +50,8 @@ services:
     environment:
       - LOG_LEVEL=info
       - SQLALCHEMY_DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    volumes:
+      - './data/chars_catalog:/chars_catalog'
     ports:
       - "8000:8000"
     depends_on:

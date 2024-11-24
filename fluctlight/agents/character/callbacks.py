@@ -1,28 +1,11 @@
 import asyncio
 import re
-from abc import ABC, abstractmethod
 from typing import Callable, Coroutine
 
 import emoji
 from fastapi import WebSocket
 from langchain.callbacks.base import AsyncCallbackHandler
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.schema.messages import BaseMessage
-from langchain_core.language_models.chat_models import (
-    BaseChatModel,
-)
 from fluctlight.audio.text_to_speech.base import TextToSpeech
-from fluctlight.logger import get_logger
-from fluctlight.utt.timed import timed, get_timer
-from fluctlight.data_model.interface.character import Character
-
-
-logger = get_logger(__name__)
-
-timer = get_timer()
-
-StreamingStdOutCallbackHandler.on_chat_model_start = lambda *args, **kwargs: None
-
 
 class AsyncCallbackTextHandler(AsyncCallbackHandler):
     def __init__(
@@ -158,28 +141,3 @@ class AsyncCallbackAudioHandler(AsyncCallbackHandler):
         )
         filtered_text = re.sub(pattern, "", text)
         return filtered_text
-
-
-class ChatAgent(ABC):
-    config: dict
-    chat_model: BaseChatModel
-
-    @abstractmethod
-    @timed
-    async def achat(
-        self,
-        history: list[BaseMessage],
-        user_input: str,
-        user_id: str,
-        character: Character,
-        callback: AsyncCallbackTextHandler,
-        *args,
-        audioCallback: AsyncCallbackAudioHandler | None = None,
-        metadata: dict | None = None,
-        **kwargs
-    ):
-        pass
-
-    @abstractmethod
-    def get_config(self):
-        return self.config

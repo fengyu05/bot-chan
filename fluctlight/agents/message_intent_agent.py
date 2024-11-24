@@ -33,12 +33,15 @@ class MessageIntentAgent(Task, IntentAgent):
         message: IMessage = self._require_input(
             kwargs=kwds, key="message", value_type=IMessage
         )
-        msgs = self.process_message(message)
+        message_intent: MessageIntent = self._require_input(
+            kwargs=kwds, key="message_intent", value_type=MessageIntent
+        )
+        msgs = self.process_message(message=message, message_intent=message_intent)
         logger.debug("agent process messult result", agent=self.name, msg=msgs)
         return msgs
 
     @abstractmethod
-    def process_message(self, message: IMessage) -> list[str]:
+    def process_message(self, message: IMessage, message_intent: MessageIntent) -> list[str]:
         pass
 
     def should_process(self, *args: Any, **kwds: Any) -> bool:  # pylint: disable=unused-argument
@@ -46,6 +49,11 @@ class MessageIntentAgent(Task, IntentAgent):
             kwargs=kwds, key="message_intent", value_type=MessageIntent
         )
         return message_intent.equal_wo_metadata(self.intent)
+    
+    @property
+    def llm_matchable(self) -> bool:
+        """ Whether allow LLM intent matcher to match again this agent."""
+        return True
 
     @property
     def name(self) -> str:

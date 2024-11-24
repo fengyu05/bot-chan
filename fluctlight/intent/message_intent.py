@@ -1,6 +1,7 @@
 from pydantic import BaseModel, field_validator
 from typing_extensions import TypeAlias
-import re
+from fluctlight.utt.emoji import get_leading_emoji
+
 
 _UNKNOWN = "unknown"
 _METHOD = "method"
@@ -68,10 +69,3 @@ def get_message_intent_by_emoji(text: str) -> MessageIntent:
         )
     return UNKNOWN_INTENT
 
-def get_leading_emoji(text: str) -> str:
-    pattern = r'^:(\w+):'
-    match = re.match(pattern, text)
-    if match:
-        return match.group(1)
-    else:
-        return ""

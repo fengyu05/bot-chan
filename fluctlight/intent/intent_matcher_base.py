@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+from functools import cache
 from fluctlight.data_model.interface import IMessage
 from fluctlight.intent.intent_agent import IntentAgent
 from fluctlight.intent.message_intent import (
@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 class IntentMatcher(ABC):
     intent_by_thread: dict[str, MessageIntent]
     agents: list[IntentAgent]
+    _chars_map: dict[str, str] | None = None
 
     def __init__(
         self,
@@ -25,6 +26,7 @@ class IntentMatcher(ABC):
     ) -> None:
         self.intent_by_thread = {}
         self.agents = agents
+        self.catalog_manager = get_catalog_manager()
 
     @abstractmethod
     def parse_intent(self, text: str) -> MessageIntent:
@@ -42,32 +44,38 @@ class IntentMatcher(ABC):
         """
         if message.thread_message_id in self.intent_by_thread:
             return self.intent_by_thread[message.thread_message_id]
+        
         if not message.text:
-            return DEFAULT_CHAT_INTENT
-        message_intent = get_message_intent_by_emoji(message.text)
-        if CHAR_AGENT_MATCHING:
-            message_intent = self.get_char_agent_intent(message.text)
-        if message_intent.unknown:
-            if LLM_INTENT_MATCHING:
+            message_intent = DEFAULT_CHAT_INTENT
+        else:
+            message_intent = get_message_intent_by_emoji(message.text)
+            if CHAR_AGENT_MATCHING and message_intent.unknown:
+                message_intent = self.get_char_agent_intent(message.text)
+            if LLM_INTENT_MATCHING and message_intent.unknown:
                 message_intent = self.parse_intent(message.text)
-            else:
-                message_intent = DEFAULT_CHAT_INTENT
+        
+        if message_intent.unknown:
+            message_intent = DEFAULT_CHAT_INTENT
 
         logger.info("Matched intent", intent=message_intent)
         self.intent_by_thread[message.thread_message_id] = message_intent
         return message_intent
 
-    def get_char_agent_intent(self, text: str) -> MessageIntent:
-        catalog_manager = get_catalog_manager()
-        emoji = get_leading_emoji(text)
-        chars_map = {}
-        for char_id, character in catalog_manager.characters.items():
-            chars_map[char_id] = char_id
-            chars_map[character.name] = char_id
+    def get_char_emoji_map(self) -> dict[str, str]:
+        if self._chars_map is None:
+            chars_map = {}
+            for char_id, character in self.catalog_manager.characters.items():
+                chars_map[char_id] = char_id
+                chars_map[character.name] = char_id
+            self._chars_map = chars_map
+        return self._chars_map 
 
+    def get_char_agent_intent(self, text: str) -> MessageIntent:
+        emoji = get_leading_emoji(text)
+        chars_map = self.get_char_emoji_map()
         if emoji in chars_map:
             return MessageIntent(
-                key="char",
+                key="CHAR",
                 metadata={
                     "char_id": chars_map[emoji]
                 }

@@ -13,3 +13,8 @@ class IntentAgent(ABC):
     @abstractmethod
     def description(self) -> str:
         pass
+
+    @property
+    @abstractmethod
+    def llm_matchable(self) -> str:
+        pass

@@ -66,9 +66,7 @@ class TestMessageIntentAgent(unittest.TestCase):
     @patch("fluctlight.intent.intent_matcher_base.get_message_intent_by_emoji")
     def test_emoji_based_intent(self, mock_get_message_intent_by_emoji):
         mock_get_message_intent_by_emoji.return_value = create_intent("HAPPY")
-        message1 = MESSAGE_HELLO_WORLD
-
-        result = self.intent_matcher.match_message_intent(message1)
+        result = self.intent_matcher.match_message_intent(MESSAGE_HELLO_WORLD)
         mock_get_message_intent_by_emoji.assert_called_once()
         self.assertEqual(result.key, "HAPPY")
 

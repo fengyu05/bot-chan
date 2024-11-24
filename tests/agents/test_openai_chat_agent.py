@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from fluctlight.agents.openai_chat_agent import OpenAiChatAgent
+from fluctlight.intent.message_intent import DEFAULT_CHAT_INTENT
 from tests.data.imessages import MESSAGE_HELLO_WORLD, MESSAGE_HELLO_WORLD2
 
 
@@ -15,11 +16,10 @@ class TestOpenAiChatAgent(unittest.TestCase):
             MagicMock(message=MagicMock(content=mock_response_text))
         ]
         mock_create.return_value = mock_response
-
         agent = OpenAiChatAgent()
 
-        response1 = agent.process_message(MESSAGE_HELLO_WORLD)
-        response2 = agent.process_message(MESSAGE_HELLO_WORLD2)
+        response1 = agent.process_message(message=MESSAGE_HELLO_WORLD, message_intent=DEFAULT_CHAT_INTENT)
+        response2 = agent.process_message(message=MESSAGE_HELLO_WORLD2, message_intent=DEFAULT_CHAT_INTENT)
 
         self.assertEqual(response1, [mock_response_text])
         self.assertEqual(response2, [mock_response_text])
@@ -48,7 +48,7 @@ class TestOpenAiChatAgent(unittest.TestCase):
 
         agent = OpenAiChatAgent()
 
-        response = agent.process_message(MESSAGE_HELLO_WORLD)
+        response = agent.process_message(MESSAGE_HELLO_WORLD, message_intent=DEFAULT_CHAT_INTENT)
 
         self.assertEqual(response, [mock_response_text])
         self.assertIn(MESSAGE_HELLO_WORLD.thread_message_id, agent.message_buffer)

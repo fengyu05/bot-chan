@@ -3,7 +3,7 @@ import threading
 import time
 from contextlib import ExitStack
 from pathlib import Path
-from typing import cast, Optional
+from typing import cast
 
 import yaml
 from langchain.text_splitter import CharacterTextSplitter
@@ -15,7 +15,7 @@ from fluctlight.logger import get_logger
 from fluctlight.database.models.character import Character as CharacterModel
 from fluctlight.utt.singleton import Singleton
 from fluctlight.data_model.interface.character import Character
-from fluctlight.settings import OVERWRITE_CHROMA
+from fluctlight.settings import OVERWRITE_CHROMA, CHAR_CATALOG_DIR
 
 logger = get_logger(__name__)
 
@@ -36,7 +36,7 @@ class CatalogManager(Singleton):
 
         self.characters: dict[str, Character] = {}
         self.author_name_cache: dict[str, str] = {}
-        self.load_characters(OVERWRITE_CHROMA)
+        self.load_characters_from_folder(OVERWRITE_CHROMA)
         if OVERWRITE_CHROMA:
             logger.info("Persisting data in the chroma.")
             self.db.persist()
@@ -55,9 +55,9 @@ class CatalogManager(Singleton):
     def stop_load_sql_db_loop(self):
         self.run_load_sql_db_thread = False
 
-    def get_character(self, name) -> Optional[Character]:
+    def get_character(self, character_id: str) -> Character | None:
         with self.sql_load_lock.gen_rlock():
-            return self.characters.get(name)
+            return self.characters.get(character_id)
 
     def load_character(self, directory: Path):
         with ExitStack() as stack:
@@ -106,15 +106,18 @@ class CatalogManager(Singleton):
         )
         self.db.add_documents(docs)
 
-    def load_characters(self, overwrite: bool):
+    def load_characters_from_folder(self, overwrite: bool):
         """
         Load characters from the character_catalog directory. Use /data to create
         documents and add them to the chroma.
 
         :param overwrite: if True, overwrite existing data in the chroma.
         """
-        path = Path(__file__).parent
-        excluded_dirs = {"__pycache__", "archive", "community"}
+        if not CHAR_CATALOG_DIR:
+            logger.warn("CHAR_CATALOG_DIR not config, cannot load character from folder")
+            return
+        path = Path(CHAR_CATALOG_DIR)
+        excluded_dirs = {"archive", "community"}
         directories = [d for d in path.iterdir() if d.is_dir() and d.name not in excluded_dirs]
         for directory in directories:
             character_name = self.load_character(directory)
@@ -140,11 +143,7 @@ class CatalogManager(Singleton):
             # add all characters from sql database
             for character_model in character_models:
                 if character_model.author_id not in self.author_name_cache:
-                    author_name = (
-                        auth.get_user(character_model.author_id).display_name
-                        if os.getenv("USE_AUTH") == "true"
-                        else "anonymous author"
-                    )
+                    author_name = ""
                     self.author_name_cache[character_model.author_id] = author_name  # type: ignore
                 else:
                     author_name = self.author_name_cache[character_model.author_id]

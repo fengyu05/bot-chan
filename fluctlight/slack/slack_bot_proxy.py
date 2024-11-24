@@ -35,10 +35,14 @@ class SlackBotProxy(BotProxy, MessagesFetcher, SlackChat, SlackReaction, Singlet
         from fluctlight.agents.expert.shopping_assist import (
             create_shopping_assisist_task_agent,
         )
+        from fluctlight.agents.character.openai_character_agent import (
+            create_default_character_agent
+        )
 
         self.agents = [
             create_poems_translation_task_agent(),
             create_shopping_assisist_task_agent(),
+            create_default_character_agent(),
             self.chat_agent,
         ]
         self.intent_matcher = RagIntentMatcher(self.agents)

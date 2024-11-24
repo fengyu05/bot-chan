@@ -67,13 +67,14 @@ output:"""
             [
                 f"key={agent.intent.key}: {agent.description} \n---\n"
                 for agent in self.agents
+                if agent.llm_matchable
             ]
         )
         return result
 
     @cached_property
     def joined_agents_selection(self) -> str:
-        return "".join([f"key={agent.intent.key} \n---\n" for agent in self.agents])
+        return "".join([f"key={agent.intent.key} \n---\n" for agent in self.agents if agent.llm_matchable])
 
     def match_intent_prompt_non_structure(self, message: str) -> str:
         return f"""Select one of the below task based on the user message. 

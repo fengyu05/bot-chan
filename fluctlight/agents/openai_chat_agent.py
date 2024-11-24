@@ -8,7 +8,7 @@ from openai.types.chat.chat_completion_message_param import ChatCompletionMessag
 import fluctlight.agents.prompt_bank as prompt_bank
 from fluctlight.agents.message_intent_agent import MessageIntentAgent
 from fluctlight.data_model.interface import IAttachment, IMessage
-from fluctlight.intent.message_intent import create_intent
+from fluctlight.intent.message_intent import create_intent, MessageIntent
 from fluctlight.logger import get_logger
 from fluctlight.open import OPENAI_CLIENT
 from fluctlight.open.chat_utils import get_message_from_completion
@@ -57,7 +57,7 @@ class OpenAiChatAgent(MessageIntentAgent):
     def description(self) -> str:
         return _AGENT_DESCRIPTION
 
-    def process_message(self, message: IMessage) -> list[str]:
+    def process_message(self, message: IMessage, message_intent: MessageIntent) -> list[str]:
         """
         Processes a message event and generates a response using an AI model.
 

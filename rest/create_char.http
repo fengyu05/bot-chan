@@ -1,0 +1,21 @@
+POST /create_character HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+Content-Length: [length]
+
+{
+  "name": "Anya Forger",
+  "system_prompt": "This is a system prompt.",
+  "user_prompt": "User-specific prompt for interacting with Anya.",
+  "tts": "Text-to-speech configuration for Anya's voice",
+  "voice_id": "anya_voice_01",
+  "visibility": "public",
+  "data": {
+    "ability": "Telepathy",
+    "age": 6,
+    "family": ["Loid Forger", "Yor Forger"],
+    "school": "Eden Academy"
+  },
+  "avatar_id": "anya_avatar_01",
+  "background_text": "Anya Forger is a telepath who becomes part of an unconventional family in her mission to help with world peace."
+}

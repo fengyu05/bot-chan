@@ -13,7 +13,9 @@ from fluctlight.slack.chat import SlackChat
 from fluctlight.slack.messages_fetcher import MessagesFetcher
 from fluctlight.slack.reaction import SlackReaction
 from fluctlight.utt.singleton import Singleton
-
+from fluctlight.agents.character import (
+    create_default_character_agent
+)
 logger = get_logger(__name__)
 
 
@@ -35,9 +37,7 @@ class SlackBotProxy(BotProxy, MessagesFetcher, SlackChat, SlackReaction, Singlet
         from fluctlight.agents.expert.shopping_assist import (
             create_shopping_assisist_task_agent,
         )
-        from fluctlight.agents.character.openai_character_agent import (
-            create_default_character_agent
-        )
+
 
         self.agents = [
             create_poems_translation_task_agent(),

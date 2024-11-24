@@ -81,10 +81,6 @@ class CatalogManager(Singleton):
                 visibility=yaml_content["visibility"],
                 tts=yaml_content["text_to_speech_use"],
                 order=order,
-                # rebyte config
-                rebyte_api_project_id=yaml_content["rebyte_api_project_id"],
-                rebyte_api_agent_id=yaml_content["rebyte_api_agent_id"],
-                rebyte_api_version=yaml_content.get("rebyte_api_version"),
             )
 
             return character_name
@@ -160,10 +156,6 @@ class CatalogManager(Singleton):
                     visibility=character_model.visibility,  # type: ignore
                     tts=character_model.tts,  # type: ignore
                     data=character_model.data,  # type: ignore
-                    # rebyte config
-                    rebyte_api_project_id=character_model.rebyte_api_project_id,  # type: ignore
-                    rebyte_api_agent_id=character_model.rebyte_api_agent_id,  # type: ignore
-                    rebyte_api_version=character_model.rebyte_api_version,  # type: ignore
                 )
                 self.characters[character_model.id] = character  # type: ignore
                 # TODO: load context data from storage

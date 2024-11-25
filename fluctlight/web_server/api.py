@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from fluctlight.agent_catalog.catalog_manager import CatalogManager
-from fluctlight.web_server.restful_routes import router as restful_router
 from fluctlight.utt.web_socket import ConnectionManager
+from fluctlight.web_server.restful_routes import router as restful_router
 
 
 def create_app():
@@ -29,8 +29,9 @@ def create_app():
 
     return app
 
+
 def main():
     app = create_app()
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,5 +1,7 @@
-from fluctlight.utt.singleton import Singleton
 from starlette.websockets import WebSocket, WebSocketState
+
+from fluctlight.utt.singleton import Singleton
+
 
 class ConnectionManager(Singleton):
     def __init__(self):

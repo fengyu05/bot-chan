@@ -1,7 +1,8 @@
-
 import json
 import os
+
 import requests
+
 from fluctlight.audio.speech_to_text.base import SpeechToText
 from fluctlight.audio.speech_to_text.data_model import (
     WhisperXResponse,
@@ -40,13 +41,9 @@ class WhisperX(Singleton, SpeechToText):
         super().__init__()
 
     @timed
-    def transcribe(
-        self, audio_bytes, prompt="", language="", suppress_tokens=[-1]
-    ):
+    def transcribe(self, audio_bytes, prompt="", language="", suppress_tokens=[-1]):
         logger.info("Transcribing audio...")
-        result = self._transcribe_api(
-            audio_bytes, prompt, language, suppress_tokens
-        )
+        result = self._transcribe_api(audio_bytes, prompt, language, suppress_tokens)
         if isinstance(result, dict):
             segments = result.get("segments", [])
             text = " ".join([seg.get("text", "").strip() for seg in segments])

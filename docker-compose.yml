@@ -37,7 +37,7 @@ services:
       - DEBUG_MODE=true
       - LOG_LEVEL=debug
     volumes:
-      - './data/chars_catalog:/chars_catalog'  
+      - './data/chars_catalog:/chars_catalog'
     ports:
       - 3000:3000
 
@@ -63,7 +63,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8000/status"]
       interval: 10s
       timeout: 5s
-      retries: 100000 
+      retries: 100000
     command: fluctlight_api
 
   db:
@@ -82,7 +82,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 5s
-      retries: 10 
+      retries: 10
 
   backdoor:
     build:
@@ -93,7 +93,7 @@ services:
     volumes:
       - './tmp:/tmp'
     command: fluctlight backdoor
-    
+
   shell:
     build:
       context: ./

@@ -1,6 +1,6 @@
 # How to setup a Slack bot app and obtain the api tokens
 
-Slack developer [website](https://api.slack.com/start) has provided very details resource, please follow the instruction there. 
+Slack developer [website](https://api.slack.com/start) has provided very details resource, please follow the instruction there.
 
 Below is a recap what the minimum config you need to do.
 

@@ -5,7 +5,10 @@ from jinja2 import Template
 
 from fluctlight.agents.expert.data_model import TaskConfig
 from fluctlight.constants import GTP_4O_WITH_STRUCT
-from fluctlight.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
+from fluctlight.open.chat_utils import (
+    simple_assistant,
+    simple_assistant_with_struct_ouput,
+)
 from fluctlight.settings import OPENAI_GPT_MODEL_ID
 from fluctlight.task import Task
 

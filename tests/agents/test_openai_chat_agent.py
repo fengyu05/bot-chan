@@ -18,8 +18,12 @@ class TestOpenAiChatAgent(unittest.TestCase):
         mock_create.return_value = mock_response
         agent = OpenAiChatAgent()
 
-        response1 = agent.process_message(message=MESSAGE_HELLO_WORLD, message_intent=DEFAULT_CHAT_INTENT)
-        response2 = agent.process_message(message=MESSAGE_HELLO_WORLD2, message_intent=DEFAULT_CHAT_INTENT)
+        response1 = agent.process_message(
+            message=MESSAGE_HELLO_WORLD, message_intent=DEFAULT_CHAT_INTENT
+        )
+        response2 = agent.process_message(
+            message=MESSAGE_HELLO_WORLD2, message_intent=DEFAULT_CHAT_INTENT
+        )
 
         self.assertEqual(response1, [mock_response_text])
         self.assertEqual(response2, [mock_response_text])
@@ -48,7 +52,9 @@ class TestOpenAiChatAgent(unittest.TestCase):
 
         agent = OpenAiChatAgent()
 
-        response = agent.process_message(MESSAGE_HELLO_WORLD, message_intent=DEFAULT_CHAT_INTENT)
+        response = agent.process_message(
+            MESSAGE_HELLO_WORLD, message_intent=DEFAULT_CHAT_INTENT
+        )
 
         self.assertEqual(response, [mock_response_text])
         self.assertIn(MESSAGE_HELLO_WORLD.thread_message_id, agent.message_buffer)

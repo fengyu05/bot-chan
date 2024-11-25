@@ -5,7 +5,6 @@ from langchain_community.vectorstores import Chroma
 
 from fluctlight.logger import get_logger
 
-
 logger = get_logger(__name__)
 
 

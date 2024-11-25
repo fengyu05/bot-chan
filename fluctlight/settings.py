@@ -89,6 +89,7 @@ SQLALCHEMY_DATABASE_URL = config_default("SQLALCHEMY_DATABASE_URL")
 OVERWRITE_CHROMA = config_default_bool("OVERWRITE_CHROMA", False)
 CHAR_CATALOG_DIR = config_default("CHAR_CATALOG_DIR", "/chars_catalog")
 
+
 # Setting methods
 def is_slack_bot() -> bool:
     return BOT_CLIENT == "SLACK"

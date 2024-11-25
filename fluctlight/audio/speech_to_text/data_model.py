@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from typing import TypedDict
 from enum import Enum
+from typing import TypedDict
 
 
 class AudioFormat(Enum):

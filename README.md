@@ -77,5 +77,5 @@ If you are looking at optional to turn it into a 24/7 online bot here are some s
 [Slack Bot Setup Tutorial](https://api.slack.com/tutorials/tracks/create-bot-to-welcome-users)
 
 ## Security and privacy reminder.
-- It is essential to be aware that if you need to log chat messages, the author suggests only doing so when the debug flag is on. 
+- It is essential to be aware that if you need to log chat messages, the author suggests only doing so when the debug flag is on.
 - The repository is not designed to be secure for production use, so use it at your own risk.

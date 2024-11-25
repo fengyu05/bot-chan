@@ -3,7 +3,9 @@ import unittest
 
 from langchain_core.messages import HumanMessage
 
-from fluctlight.agents.expert.poem_translate import INTENT_KEY as poem_translate_intent_key
+from fluctlight.agents.expert.poem_translate import (
+    INTENT_KEY as poem_translate_intent_key,
+)
 from fluctlight.agents.expert.poem_translate import create_poems_translation_task_agent
 from fluctlight.agents.expert.shopping_assist import (
     INTENT_KEY as shopping_assisist_intent_key,

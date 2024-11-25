@@ -1,4 +1,3 @@
-
 from functools import cached_property
 
 from langchain_core.messages import BaseMessage, HumanMessage
@@ -7,7 +6,6 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from typing_extensions import TypedDict
 
-from fluctlight.utt.prompt_utils import construct_system_prompt
 from fluctlight.constants import FIREWORKS_MIXTRAL_22B
 from fluctlight.intent.intent_agent import IntentAgent
 from fluctlight.intent.intent_candidate import (
@@ -18,6 +16,7 @@ from fluctlight.intent.intent_candidate import (
 from fluctlight.intent.intent_matcher_base import IntentMatcher
 from fluctlight.intent.message_intent import MessageIntent, create_intent
 from fluctlight.logger import get_logger
+from fluctlight.utt.prompt_utils import construct_system_prompt
 
 logger = get_logger(__name__)
 
@@ -196,7 +195,11 @@ class RagIntentMatcher(IntentMatcher):
 
     @cached_property
     def intent_keylist(self) -> list[str]:
-        return [agent.intent.key for _, agent in enumerate(self.agents) if agent.llm_matchable]
+        return [
+            agent.intent.key
+            for _, agent in enumerate(self.agents)
+            if agent.llm_matchable
+        ]
 
     def parse_final_state(self, state: GraphState) -> MessageIntent:
         metadata = {

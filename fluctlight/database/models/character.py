@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, DateTime, JSON, String
+from sqlalchemy import JSON, Column, DateTime, String
 from sqlalchemy.inspection import inspect
 
 from fluctlight.database.base import Base
@@ -35,5 +35,3 @@ class Character(Base):
     def save(self, db):
         db.add(self)
         db.commit()
-
-

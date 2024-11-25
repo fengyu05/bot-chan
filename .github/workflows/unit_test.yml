@@ -41,4 +41,4 @@ jobs:
 
 
       - name: Build and run test containers
-        run: docker compose -f docker-compose-ci.yml up --build test
+        run: docker compose -f docker-compose-ci.yml run --rm test

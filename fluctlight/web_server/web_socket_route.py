@@ -1,31 +1,42 @@
 import asyncio
 import os
-import uuid
 import time
+import uuid
 from dataclasses import dataclass
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, WebSocket, WebSocketDisconnect
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Path,
+    Query,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from sqlalchemy.orm import Session
 
-from fluctlight.audio.speech_to_text import get_speech_to_text, SpeechToText
-from fluctlight.audio.text_to_speech import get_text_to_speech, TextToSpeech
 from fluctlight.agent_catalog.catalog_manager import (
     CatalogManager,
     get_catalog_manager,
 )
-from fluctlight.database.connection import get_db
-from fluctlight.character_model import get_chat_agent, ChatAgent
-from fluctlight.character_model.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler
-from fluctlight.logger import get_logger
-from fluctlight.database.models.interaction import Interaction
-from fluctlight.web_server.utils import (
-    build_history,
-    ConversationHistory,
-    task_done_callback,
-    Transcript,
+from fluctlight.audio.speech_to_text import SpeechToText, get_speech_to_text
+from fluctlight.audio.text_to_speech import TextToSpeech, get_text_to_speech
+from fluctlight.character_model import ChatAgent, get_chat_agent
+from fluctlight.character_model.base import (
+    AsyncCallbackAudioHandler,
+    AsyncCallbackTextHandler,
 )
+from fluctlight.database.connection import get_db
+from fluctlight.database.models.interaction import Interaction
+from fluctlight.logger import get_logger
 from fluctlight.utt.timed import get_timer
 from fluctlight.utt.web_socket import ConnectionManager
+from fluctlight.web_server.utils import (
+    ConversationHistory,
+    Transcript,
+    build_history,
+    task_done_callback,
+)
 
 logger = get_logger(__name__)
 
@@ -56,7 +67,9 @@ async def get_current_user(token: str):
         decoded_token = auth.verify_id_token(token)
     except FirebaseError as e:
         logger.info(f"Receveid invalid token: {token} with error {e}")
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials"
+        )
 
     return decoded_token["uid"]
 
@@ -67,7 +80,9 @@ class SessionAuthResult:
     is_authenticated_user: bool
 
 
-async def check_session_auth(session_id: str, user_id: str, db: Session) -> SessionAuthResult:
+async def check_session_auth(
+    session_id: str, user_id: str, db: Session
+) -> SessionAuthResult:
     """
     Helper function to check if the session is authenticated.
     """
@@ -126,7 +141,9 @@ async def websocket_endpoint(
             except HTTPException:
                 await websocket.close(code=1008, reason="Unauthorized")
                 return
-    session_auth_result = await check_session_auth(session_id=session_id, user_id=user_id, db=db)
+    session_auth_result = await check_session_auth(
+        session_id=session_id, user_id=user_id, db=db
+    )
     if not session_auth_result.is_authenticated_user:
         logger.info(f"User #{user_id} is not authorized to access session {session_id}")
         await websocket.close(code=1008, reason="Unauthorized")
@@ -178,8 +195,12 @@ async def handle_receive(
     try:
         conversation_history = ConversationHistory()
         if load_from_existing_session:
-            logger.info(f"User #{user_id} is loading from existing session {session_id}")
-            await asyncio.to_thread(conversation_history.load_from_db, session_id=session_id, db=db)
+            logger.info(
+                f"User #{user_id} is loading from existing session {session_id}"
+            )
+            await asyncio.to_thread(
+                conversation_history.load_from_db, session_id=session_id, db=db
+            )
 
         # 0. Receive client platform info (web, mobile, terminal)
         if not platform:
@@ -189,7 +210,8 @@ async def handle_receive(
             platform = data["text"]
 
         logger.info(
-            f"User #{user_id}:{platform} connected to server with " f"session_id {session_id}"
+            f"User #{user_id}:{platform} connected to server with "
+            f"session_id {session_id}"
         )
 
         # 1. User selected a character
@@ -204,7 +226,10 @@ async def handle_receive(
         character_name_list, character_id_list = zip(*character_list)
         while not character:
             character_message = "\n".join(
-                [f"{i+1} - {character}" for i, character in enumerate(character_name_list)]
+                [
+                    f"{i+1} - {character}"
+                    for i, character in enumerate(character_name_list)
+                ]
             )
             await manager.send_message(
                 message=f"Select your character by entering the corresponding number:\n"
@@ -225,7 +250,9 @@ async def handle_receive(
                         websocket=websocket,
                     )
                     continue
-                character = catalog_manager.get_character(character_id_list[selection - 1])
+                character = catalog_manager.get_character(
+                    character_id_list[selection - 1]
+                )
                 character_id = character_id_list[selection - 1]
 
         if character.tts:
@@ -338,7 +365,9 @@ async def handle_receive(
 
                 async def text_mode_tts_task_done_call_back(response):
                     # Send response to client, indicates the response is done
-                    await manager.send_message(message=f"[end={message_id}]\n", websocket=websocket)
+                    await manager.send_message(
+                        message=f"[end={message_id}]\n", websocket=websocket
+                    )
                     # Update conversation history
                     conversation_history.user.append(msg_data)
                     conversation_history.ai.append(response)
@@ -367,10 +396,16 @@ async def handle_receive(
                         user_id=user_id,
                         character=character,
                         callback=AsyncCallbackTextHandler(
-                            on_new_token, token_buffer, text_mode_tts_task_done_call_back
+                            on_new_token,
+                            token_buffer,
+                            text_mode_tts_task_done_call_back,
                         ),
                         audioCallback=AsyncCallbackAudioHandler(
-                            text_to_speech, websocket, tts_event, character.voice_id, language
+                            text_to_speech,
+                            websocket,
+                            tts_event,
+                            character.voice_id,
+                            language,
                         )
                         if not journal_mode
                         else None,
@@ -397,7 +432,9 @@ async def handle_receive(
                     if did_add_speaker:
                         continue
 
-                    async def journal_transcribe(transcripts: list[Transcript], prompt: str = ""):
+                    async def journal_transcribe(
+                        transcripts: list[Transcript], prompt: str = ""
+                    ):
                         result: list[Transcript] = await asyncio.to_thread(
                             speech_to_text.transcribe_diarize,  # type: ignore
                             transcripts,
@@ -429,14 +466,22 @@ async def handle_receive(
                     transcripts = await journal_transcribe(
                         [
                             Transcript(
-                                id="", audio_bytes=binary_data, slices=[], timestamp=0, duration=0
+                                id="",
+                                audio_bytes=binary_data,
+                                slices=[],
+                                timestamp=0,
+                                duration=0,
                             )
                         ]
                     )
                     if transcripts:
                         audio_cache += transcripts
-                    cached_duration = sum([transcript.duration for transcript in audio_cache])
-                    cached_elapse = time.time() - audio_cache[0].timestamp if audio_cache else 0
+                    cached_duration = sum(
+                        [transcript.duration for transcript in audio_cache]
+                    )
+                    cached_elapse = (
+                        time.time() - audio_cache[0].timestamp if audio_cache else 0
+                    )
                     if cached_duration > 30 or cached_elapse > 60:
                         audio_cache = await journal_transcribe(audio_cache)
                         journal_history += audio_cache
@@ -528,10 +573,16 @@ async def handle_receive(
                         user_id=user_id,
                         character=character,
                         callback=AsyncCallbackTextHandler(
-                            on_new_token, token_buffer, audio_mode_tts_task_done_call_back
+                            on_new_token,
+                            token_buffer,
+                            audio_mode_tts_task_done_call_back,
                         ),
                         audioCallback=AsyncCallbackAudioHandler(
-                            text_to_speech, websocket, tts_event, character.voice_id, language
+                            text_to_speech,
+                            websocket,
+                            tts_event,
+                            character.voice_id,
+                            language,
                         )
                         if not journal_mode
                         else None,

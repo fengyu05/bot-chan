@@ -9,13 +9,13 @@ import yaml
 from langchain.text_splitter import CharacterTextSplitter
 from readerwriterlock import rwlock
 
-from fluctlight.embedding.chroma import get_chroma
-from fluctlight.database.connection import get_db
-from fluctlight.logger import get_logger
-from fluctlight.database.models.character import Character as CharacterModel
-from fluctlight.utt.singleton import Singleton
 from fluctlight.data_model.interface.character import Character
-from fluctlight.settings import OVERWRITE_CHROMA, CHAR_CATALOG_DIR
+from fluctlight.database.connection import get_db
+from fluctlight.database.models.character import Character as CharacterModel
+from fluctlight.embedding.chroma import get_chroma
+from fluctlight.logger import get_logger
+from fluctlight.settings import CHAR_CATALOG_DIR, OVERWRITE_CHROMA
+from fluctlight.utt.singleton import Singleton
 
 logger = get_logger(__name__)
 
@@ -41,11 +41,13 @@ class CatalogManager(Singleton):
             logger.info("Persisting data in the chroma.")
             self.db.persist()
 
-        logger.info(f"Total document load: {self.db._client.get_collection('llm').count()}")
+        logger.info(
+            f"Total document load: {self.db._client.get_collection('llm').count()}"
+        )
         self.run_load_sql_db_thread = True
         self.load_sql_db_thread = threading.Thread(target=self.load_sql_db_loop)
         self.load_sql_db_thread.daemon = True
-        #self.load_sql_db_thread.start()
+        # self.load_sql_db_thread.start()
 
     def load_sql_db_loop(self):
         while self.run_load_sql_db_thread:
@@ -61,7 +63,9 @@ class CatalogManager(Singleton):
 
     def load_character(self, directory: Path):
         with ExitStack() as stack:
-            f_yaml = stack.enter_context(open(directory / "config.yaml", encoding="utf8"))
+            f_yaml = stack.enter_context(
+                open(directory / "config.yaml", encoding="utf8")
+            )
             yaml_content = cast(dict, yaml.safe_load(f_yaml))
 
             character_id = yaml_content["character_id"]
@@ -89,7 +93,9 @@ class CatalogManager(Singleton):
         ## TODO: replace llamda_index directory reader
         loader = SimpleDirectoryReader(data_path.absolute().as_posix())
         documents = loader.load_data()
-        text_splitter = CharacterTextSplitter(separator="\n", chunk_size=500, chunk_overlap=100)
+        text_splitter = CharacterTextSplitter(
+            separator="\n", chunk_size=500, chunk_overlap=100
+        )
         docs = text_splitter.create_documents(
             texts=[d.text for d in documents],
             metadatas=[
@@ -110,18 +116,24 @@ class CatalogManager(Singleton):
         :param overwrite: if True, overwrite existing data in the chroma.
         """
         if not CHAR_CATALOG_DIR or not os.path.exists(CHAR_CATALOG_DIR):
-            logger.warn("CHAR_CATALOG_DIR not configured or does not exist, cannot load character from folder")
+            logger.warn(
+                "CHAR_CATALOG_DIR not configured or does not exist, cannot load character from folder"
+            )
             return
         path = Path(CHAR_CATALOG_DIR)
         excluded_dirs = {"archive", "community"}
-        directories = [d for d in path.iterdir() if d.is_dir() and d.name not in excluded_dirs]
+        directories = [
+            d for d in path.iterdir() if d.is_dir() and d.name not in excluded_dirs
+        ]
         for directory in directories:
             character_name = self.load_character(directory)
             if character_name and overwrite:
                 logger.info("Overwriting data for character: " + character_name)
                 self.load_data(character_name, directory / "data")
 
-        logger.info(f"Loaded {len(self.characters)} characters: IDs {list(self.characters.keys())}")
+        logger.info(
+            f"Loaded {len(self.characters)} characters: IDs {list(self.characters.keys())}"
+        )
 
     def load_character_from_sql_database(self):
         logger.info("Started loading characters from SQL database")
@@ -160,7 +172,6 @@ class CatalogManager(Singleton):
                 self.characters[character_model.id] = character  # type: ignore
                 # TODO: load context data from storage
         logger.info(f"Loaded {len(character_models)} characters from sql database")
-
 
 
 def get_catalog_manager() -> CatalogManager:

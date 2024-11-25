@@ -37,8 +37,9 @@ jobs:
         run: |
           echo "SECRET_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
           echo "FIREWORKS_API_KEY=${{ secrets.FIREWORKS_API_KEY }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
           echo "APP_NAME=GA_TEST" >> .env
 
 
       - name: Build and run test containers
-        run: docker compose -f docker-compose-ci.yml up --build test
+        run: docker compose -f docker-compose-ci.yml run --rm test

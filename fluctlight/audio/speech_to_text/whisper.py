@@ -1,12 +1,14 @@
 import io
+
 import speech_recognition as sr
 from pydub import AudioSegment
 
 from fluctlight.audio.speech_to_text.base import SpeechToText
-from fluctlight.logger import get_logger
-from fluctlight.utt.singleton import Singleton
-from fluctlight.settings import OPENAI_API_KEY
 from fluctlight.audio.speech_to_text.data_model import AudioFormat
+from fluctlight.logger import get_logger
+from fluctlight.settings import OPENAI_API_KEY
+from fluctlight.utt.singleton import Singleton
+
 logger = get_logger(__name__)
 
 
@@ -23,7 +25,6 @@ class Whisper(Singleton, SpeechToText):
             audio_bytes,
             api_key=OPENAI_API_KEY,
         )
-
 
     def _convert_webm_to_wav(self, webm_data):
         webm_audio = AudioSegment.from_file(io.BytesIO(webm_data))

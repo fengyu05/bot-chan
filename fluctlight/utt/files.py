@@ -2,8 +2,9 @@ import base64
 import os
 import uuid
 from functools import lru_cache
-from urllib.parse import urlparse
 from typing import Any
+from urllib.parse import urlparse
+
 import requests
 import structlog
 
@@ -46,21 +47,19 @@ def download_slack_downloadable(url: str, token: str) -> str:
     )
     return local_path
 
-def download_media(
-    url: str, bearer_token: str | None = None, timeout: int = 60
-) -> Any:
+
+def download_media(url: str, bearer_token: str | None = None, timeout: int = 60) -> Any:
     if bearer_token:
         headers = {"Authorization": f"Bearer {bearer_token}"}
     else:
         headers = {}
     response = requests.get(url, headers=headers, timeout=timeout)
     response.raise_for_status()
-    return response.content   
+    return response.content
+
 
 def base64_encode_media(
     url: str, bearer_token: str | None = None, timeout: int = 60
 ) -> str:
     content = download_media(url=url, bearer_token=bearer_token, timeout=timeout)
     return base64.b64encode(content).decode("utf-8")
-
-     

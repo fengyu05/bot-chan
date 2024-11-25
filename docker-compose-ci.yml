@@ -7,6 +7,7 @@ services:
       - .env
     environment:
       - LLM_INTENT_MATCHING=true
+      - TEST_MODE=true
     command: pytest --verbose
 
   test-int:
@@ -18,6 +19,7 @@ services:
     environment:
       - LLM_INTENT_MATCHING=true
       - RUN_INTEGRATION_TESTS=1
+      - TEST_MODE=true
     command: pytest --verbose
 
   ## For shell access and involve tooling, code are mounted

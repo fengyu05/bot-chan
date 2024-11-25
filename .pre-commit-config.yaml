@@ -1,12 +1,25 @@
 repos:
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  # Ruff version.
-  rev: v0.7.2
-  hooks:
-    # Run the linter.
-    - id: ruff
-      types_or: [ python, pyi ]
-      args: [--select,I,--fix]
-    # Run the formatter.
-    - id: ruff-format
-      types_or: [ python, pyi ]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1  # Use the latest stable version
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.7.2
+    hooks:
+      # Ruff import fix
+      - id: ruff
+        name: "ruff fix import"
+        types_or: [ python, pyi ]
+        args: [--select,I,--fix]
+      # Run the formatter.
+      - id: ruff-format
+        types_or: [ python, pyi ]
+      # Ruff check
+      - id: ruff
+        name: "ruff full check"
+        types_or: [ python, pyi ]
+        args: [check, --fix]
+        stages: [manual]

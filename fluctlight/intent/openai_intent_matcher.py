@@ -6,7 +6,10 @@ from fluctlight.intent.intent_agent import IntentAgent
 from fluctlight.intent.intent_matcher_base import IntentMatcher
 from fluctlight.intent.message_intent import MessageIntent, create_intent
 from fluctlight.logger import get_logger
-from fluctlight.open.chat_utils import simple_assistant, simple_assistant_with_struct_ouput
+from fluctlight.open.chat_utils import (
+    simple_assistant,
+    simple_assistant_with_struct_ouput,
+)
 
 logger = get_logger(__name__)
 
@@ -51,7 +54,7 @@ class OpenAIIntentMatcher(IntentMatcher):
             return create_intent("UNKNOWN")
 
     def match_intent_prompt_structure(self, message: str) -> str:
-        return f"""Select one of the below task based on the user message. 
+        return f"""Select one of the below task based on the user message.
 -----------
 {self.joined_agents_description_for_structure}
 You may only use the option from the below.
@@ -74,10 +77,16 @@ output:"""
 
     @cached_property
     def joined_agents_selection(self) -> str:
-        return "".join([f"key={agent.intent.key} \n---\n" for agent in self.agents if agent.llm_matchable])
+        return "".join(
+            [
+                f"key={agent.intent.key} \n---\n"
+                for agent in self.agents
+                if agent.llm_matchable
+            ]
+        )
 
     def match_intent_prompt_non_structure(self, message: str) -> str:
-        return f"""Select one of the below task based on the user message. 
+        return f"""Select one of the below task based on the user message.
 -----------
 {self.joined_agents_description_list}
 You may only use the option from the below. Output format should only include one number for the above tasks.

@@ -10,30 +10,31 @@ from fastapi import (
     Depends,
     File,
     HTTPException,
-    status as http_status,
     UploadFile,
+)
+from fastapi import (
+    status as http_status,
 )
 from sqlalchemy.orm import Session
 
+from fluctlight.agent_catalog.catalog_manager import CatalogManager
 from fluctlight.audio.text_to_speech import get_text_to_speech
+from fluctlight.data_model.interface.character import (
+    Character,
+    CharacterRequest,
+    DeleteCharacterRequest,
+    EditCharacterRequest,
+)
 from fluctlight.database.connection import get_db
 from fluctlight.database.models.character import (
     Character as DbCharacter,
 )
-from fluctlight.data_model.interface.character import (
-    Character,
-    CharacterRequest,
-    EditCharacterRequest,
-    DeleteCharacterRequest,
-)
-from fluctlight.agent_catalog.catalog_manager import CatalogManager
 from fluctlight.web_server.auth import get_current_user
 
 router = APIRouter()
 
 
 MAX_FILE_UPLOADS = 5
-
 
 
 @router.get("/status")
@@ -50,16 +51,16 @@ async def characters(user=Depends(get_current_user)):
 
         if character.data and "avatar_filename" in character.data:
             return f"http://localhost:3000/{character.data['avatar_filename']}"
-        return (
-            f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.jpg"
-        )
+        return f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.jpg"
 
     def get_audio_url(character: Character) -> str:
         if character.location == "repo" and character.author_name == "Eden":
             # TODO: new local storage service
             return f"http://localhost:3000/statics/{character.character_id}/{character.character_id}.mp3"
         else:
-            return f"http://localhost:3000/{character.author_id}/{character.voice_id}.mp3"
+            return (
+                f"http://localhost:3000/{character.author_id}/{character.voice_id}.mp3"
+            )
 
     uid = user["uid"] if user else None
     catalog: CatalogManager = CatalogManager.get_instance()
@@ -169,7 +170,9 @@ async def delete_character(
 
 
 @router.post("/generate_audio")
-async def generate_audio(text: str, tts: Optional[str] = None, user=Depends(get_current_user)):
+async def generate_audio(
+    text: str, tts: Optional[str] = None, user=Depends(get_current_user)
+):
     if not isinstance(text, str) or text == "":
         raise HTTPException(
             status_code=http_status.HTTP_400_BAD_REQUEST,
@@ -197,7 +200,6 @@ async def generate_audio(text: str, tts: Optional[str] = None, user=Depends(get_
     return {"filename": new_filename[1:], "content-type": "audio/mpeg"}
 
 
-
 @router.get("/get_character")
 async def get_character(
     character_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)
@@ -218,4 +220,3 @@ async def get_character(
         )
     character_json = character.to_dict()
     return character_json
-

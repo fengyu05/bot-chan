@@ -3,12 +3,11 @@
 import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from fluctlight.database.models.character import Character  # noqa: F401
 from fluctlight.database.base import Base
+from fluctlight.database.models.character import Character  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,16 +19,15 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Read database URL from environment variable
-database_url = os.getenv('SQLALCHEMY_DATABASE_URL')
+database_url = os.getenv("SQLALCHEMY_DATABASE_URL")
 
 if database_url is not None:
-    config.set_main_option('sqlalchemy.url', database_url)
+    config.set_main_option("sqlalchemy.url", database_url)
 else:
     raise EnvironmentError("SQLALCHEMY_DATABASE_URL environment variable not set.")
 
 # Setup the Base
 target_metadata = Base.metadata
-
 
 
 def run_migrations_offline() -> None:
@@ -70,9 +68,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

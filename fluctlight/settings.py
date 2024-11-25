@@ -27,7 +27,8 @@ def config_default_bool(key: str, default_value: bool = False) -> bool:
 ENV = config_default("ENV", "dev")
 APP_NAME = config_default("APP_NAME", "botchan")
 LOG_LEVEL = config_default("LOG_LEVEL", "INFO")
-DEBUG_MODE = config_default_bool("DEBUG_MODE", False)
+DEBUG_MODE = config_default_bool("DEBUG_MODE", False)  # For debug print
+TEST_MODE = config_default_bool("TEST_MODE", False)  # For unit test
 APP_PORT = config_default_int("APP_PORT", 3000)
 
 BOT_CLIENT = config_default("BOT_CLIENT", "SLACK").upper()
@@ -87,6 +88,7 @@ SQLALCHEMY_DATABASE_URL = config_default("SQLALCHEMY_DATABASE_URL")
 # Override Chroma DB
 OVERWRITE_CHROMA = config_default_bool("OVERWRITE_CHROMA", False)
 CHAR_CATALOG_DIR = config_default("CHAR_CATALOG_DIR", "/chars_catalog")
+
 
 # Setting methods
 def is_slack_bot() -> bool:

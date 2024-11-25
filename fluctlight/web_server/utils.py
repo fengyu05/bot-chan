@@ -4,17 +4,12 @@ from typing import Optional, TypedDict
 
 from langchain.schema import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from pydantic.dataclasses import dataclass
-
 from sqlalchemy.orm import Session
 
 from fluctlight.database.models.interaction import Interaction
 from fluctlight.logger import get_logger
 
-
 logger = get_logger(__name__)
-
-
-
 
 
 @dataclass
@@ -30,7 +25,9 @@ class ConversationHistory:
             yield ai_message
 
     def load_from_db(self, session_id: str, db: Session):
-        conversations = db.query(Interaction).filter(Interaction.session_id == session_id).all()
+        conversations = (
+            db.query(Interaction).filter(Interaction.session_id == session_id).all()
+        )
         for conversation in conversations:
             self.user.append(conversation.client_message_unicode)  # type: ignore
             self.ai.append(conversation.server_message_unicode)  # type: ignore
@@ -85,7 +82,6 @@ class WhisperXResponse(TypedDict):
     segments: list[DiarizedSingleSegment]
     language: str
     word_segments: list[SingleWordSegment]
-
 
 
 def task_done_callback(task: asyncio.Task):

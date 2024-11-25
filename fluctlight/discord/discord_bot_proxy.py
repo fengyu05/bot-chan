@@ -2,6 +2,7 @@ import discord
 from discord.message import Message
 from discord.user import User
 
+from fluctlight.agents.character import create_default_character_agent
 from fluctlight.agents.message_intent_agent import MessageIntentAgent
 from fluctlight.agents.openai_chat_agent import OpenAiChatAgent
 from fluctlight.core.bot_proxy import BotProxy
@@ -16,7 +17,6 @@ from fluctlight.intent.rag_intent_matcher import RagIntentMatcher
 from fluctlight.logger import get_logger
 from fluctlight.settings import DISCORD_BOT_DEVELOPER_ROLE
 from fluctlight.utt.singleton import Singleton
-from fluctlight.agents.character import create_default_character_agent
 
 logger = get_logger(__name__)
 

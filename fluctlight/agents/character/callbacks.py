@@ -5,7 +5,9 @@ from typing import Callable, Coroutine
 import emoji
 from fastapi import WebSocket
 from langchain.callbacks.base import AsyncCallbackHandler
+
 from fluctlight.audio.text_to_speech.base import TextToSpeech
+
 
 class AsyncCallbackTextHandler(AsyncCallbackHandler):
     def __init__(
@@ -15,7 +17,7 @@ class AsyncCallbackTextHandler(AsyncCallbackHandler):
         on_llm_end: Callable[[str], Coroutine],
         *args,
         tts_event: asyncio.Event | None = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.on_new_token = on_new_token
@@ -53,7 +55,7 @@ class AsyncCallbackAudioHandler(AsyncCallbackHandler):
         language: str = "en-US",
         sid: str = "",
         platform: str = "",
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.text_to_speech = text_to_speech
@@ -103,7 +105,9 @@ class AsyncCallbackAudioHandler(AsyncCallbackHandler):
         if punctuation and self.current_sentence.strip():
             first_sentence = self.sentence_idx == 0
             if first_sentence:
-                timer.log("LLM First Sentence", lambda: timer.start("TTS First Sentence"))
+                timer.log(
+                    "LLM First Sentence", lambda: timer.start("TTS First Sentence")
+                )
             await self.text_to_speech.stream(
                 text=self.current_sentence.strip(),
                 websocket=self.websocket,

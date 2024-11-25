@@ -1,17 +1,19 @@
 from abc import ABC, abstractmethod
 from functools import cache
+
+from fluctlight.agent_catalog.catalog_manager import get_catalog_manager
 from fluctlight.data_model.interface import IMessage
 from fluctlight.intent.intent_agent import IntentAgent
 from fluctlight.intent.message_intent import (
     DEFAULT_CHAT_INTENT,
     UNKNOWN_INTENT,
     MessageIntent,
-    get_message_intent_by_emoji,
     get_leading_emoji,
+    get_message_intent_by_emoji,
 )
 from fluctlight.logger import get_logger
-from fluctlight.settings import LLM_INTENT_MATCHING, CHAR_AGENT_MATCHING
-from fluctlight.agent_catalog.catalog_manager import get_catalog_manager
+from fluctlight.settings import CHAR_AGENT_MATCHING, LLM_INTENT_MATCHING
+
 logger = get_logger(__name__)
 
 
@@ -44,7 +46,7 @@ class IntentMatcher(ABC):
         """
         if message.thread_message_id in self.intent_by_thread:
             return self.intent_by_thread[message.thread_message_id]
-        
+
         if not message.text:
             message_intent = DEFAULT_CHAT_INTENT
         else:
@@ -53,7 +55,7 @@ class IntentMatcher(ABC):
                 message_intent = self.get_char_agent_intent(message.text)
             if LLM_INTENT_MATCHING and message_intent.unknown:
                 message_intent = self.parse_intent(message.text)
-        
+
         if message_intent.unknown:
             message_intent = DEFAULT_CHAT_INTENT
 
@@ -68,17 +70,12 @@ class IntentMatcher(ABC):
                 chars_map[char_id] = char_id
                 chars_map[character.name] = char_id
             self._chars_map = chars_map
-        return self._chars_map 
+        return self._chars_map
 
     def get_char_agent_intent(self, text: str) -> MessageIntent:
         emoji = get_leading_emoji(text)
         chars_map = self.get_char_emoji_map()
         if emoji in chars_map:
-            return MessageIntent(
-                key="CHAR",
-                metadata={
-                    "char_id": chars_map[emoji]
-                }
-            )
+            return MessageIntent(key="CHAR", metadata={"char_id": chars_map[emoji]})
         else:
             return UNKNOWN_INTENT

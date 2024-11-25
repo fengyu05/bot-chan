@@ -27,7 +27,8 @@ def config_default_bool(key: str, default_value: bool = False) -> bool:
 ENV = config_default("ENV", "dev")
 APP_NAME = config_default("APP_NAME", "botchan")
 LOG_LEVEL = config_default("LOG_LEVEL", "INFO")
-DEBUG_MODE = config_default_bool("DEBUG_MODE", False)
+DEBUG_MODE = config_default_bool("DEBUG_MODE", False)  # For debug print
+TEST_MODE = config_default_bool("TEST_MODE", False)  # For unit test
 APP_PORT = config_default_int("APP_PORT", 3000)
 
 BOT_CLIENT = config_default("BOT_CLIENT", "SLACK").upper()

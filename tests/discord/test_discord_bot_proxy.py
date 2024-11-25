@@ -1,5 +1,5 @@
 # pylint: disable=redefined-outer-name,protected-access
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from discord import DMChannel, Message, TextChannel, Thread

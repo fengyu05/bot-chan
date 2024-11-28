@@ -38,6 +38,4 @@ class TestTaskGraphAgent(unittest.TestCase):
 
 # Run the tests
 if __name__ == "__main__":
-    # Set the environment variable
-    # os.environ["RUN_INTEGRATION_TESTS"] = "1"
     unittest.main()

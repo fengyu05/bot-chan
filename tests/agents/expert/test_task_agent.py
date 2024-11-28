@@ -51,7 +51,7 @@ class TestTaskAgent(unittest.TestCase):
                 task_graph=self.task_graph,
             )
 
-        responses = agent.process_message(message_event=self.message)
+        agent.process_message(message_event=self.message)
         task1.process.assert_called_once_with(message=self.intake_message)
         task2.process.assert_called_once_with(
             message=self.intake_message, poem_translation="output_task1"

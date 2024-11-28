@@ -22,4 +22,3 @@ repos:
         name: "ruff full check"
         types_or: [ python, pyi ]
         args: [check, --fix]
-        stages: [manual]

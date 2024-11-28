@@ -111,7 +111,7 @@ def create_inventory() -> Inventory:
 
 def guide_to_buy_product_config() -> WorkflowNodeConfig:
     return WorkflowNodeConfig(
-        instruction="""Take user input message, identify the user's intent. 
+        instruction="""Take user input message, identify the user's intent.
 If the intent is not buy shoe, then respond by guiding the user to buy shoe based on the inventory.
 
 History messages:
@@ -139,13 +139,13 @@ UserIntent: {{guide_to_buy_product.user_intent}}
 
 def product_interests_config() -> WorkflowNodeConfig:
     return WorkflowNodeConfig(
-        instruction="""Take users input, match with the below inventory. 
+        instruction="""Take users input, match with the below inventory.
 If the user does not mention information related to the products in the inventory, it should return false.
 
-User input: 
-{{guide_to_buy_product.user_query}} 
+User input:
+{{guide_to_buy_product.user_query}}
 
-Inventory: 
+Inventory:
 {{inventory.all_product_desc}}
 """,
         input_schema={
@@ -155,11 +155,11 @@ Inventory:
         output_schema=ProductMatch,
         loop_message=WorkflowNodeLoopMessage(
             mode="text",
-            message="""Please select from the following inventory: 
+            message="""Please select from the following inventory:
 {{inventory.all_product_desc}}
 """,
         ),
-        success_criteria="""Determine whether the product information described below is consistent with the data defined by the inventory. 
+        success_criteria="""Determine whether the product information described below is consistent with the data defined by the inventory.
 If it is consistent, return True; otherwise, return False.
 
 Product:
@@ -179,8 +179,8 @@ Product:
 
 def product_specs_config() -> WorkflowNodeConfig:
     return WorkflowNodeConfig(
-        instruction="""You seems to be interested in {{product_interests.product.product_id_and_name}}. 
-The product has specs {{product_interests.product.all_spec_in_json}}. 
+        instruction="""You seems to be interested in {{product_interests.product.product_id_and_name}}.
+The product has specs {{product_interests.product.all_spec_in_json}}.
 
 How do you want your order.
 """,
@@ -230,8 +230,6 @@ def create_shopping_assisist_task_agent() -> TaskAgent:
                 instruction="Take users input, match with the below inventors. User input: {message.text} \n Inventory: {inventory.all_product_desc} ",
                 input_schema={"message": IntakeMessage},
                 output_schema=ProductMatch,
-                loop_message="Please select from the following inventory: {inventory.all_product_desc}",
-                success_criteria=lambda x: x.match == True,
             ),
             TaskConfig(
                 task_key="product_specs",

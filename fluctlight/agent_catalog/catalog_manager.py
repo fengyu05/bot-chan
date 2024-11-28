@@ -7,6 +7,7 @@ from typing import cast
 
 import yaml
 from langchain.text_splitter import CharacterTextSplitter
+from llama_index import SimpleDirectoryReader
 from readerwriterlock import rwlock
 
 from fluctlight.data_model.interface.character import Character
@@ -90,7 +91,6 @@ class CatalogManager(Singleton):
             return character_name
 
     def load_data(self, character_name: str, data_path: Path):
-        ## TODO: replace llamda_index directory reader
         loader = SimpleDirectoryReader(data_path.absolute().as_posix())
         documents = loader.load_data()
         text_splitter = CharacterTextSplitter(

@@ -7,7 +7,6 @@ from langchain_community.chat_models import ChatOpenAI
 from fluctlight.agent_catalog.catalog_manager import get_catalog_manager
 from fluctlight.agents.character.base import CharacterAgent
 from fluctlight.agents.message_intent_agent import MessageIntentAgent
-from fluctlight.constants import GPT_4O
 from fluctlight.data_model.interface import IMessage
 from fluctlight.data_model.interface.character import Character
 from fluctlight.embedding.chroma import get_chroma

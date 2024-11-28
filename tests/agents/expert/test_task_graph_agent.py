@@ -6,12 +6,14 @@ from fluctlight.agents.expert.shopping_assist import (
 )
 from fluctlight.data_model.interface.channel import IChannel
 from fluctlight.data_model.interface.message import IMessage
+from tests.intergation_test_utils import skip_integration_tests
 
 
 class TestTaskGraphAgent(unittest.TestCase):
     def setUp(self):
         self.agent = create_shopping_assist_task_graph_agent()
 
+    @skip_integration_tests
     def test_process_message(self):
         msgs = [
             "Hello",
@@ -38,4 +40,6 @@ class TestTaskGraphAgent(unittest.TestCase):
 
 # Run the tests
 if __name__ == "__main__":
+    # Set the environment variable
+    # os.environ["RUN_INTEGRATION_TESTS"] = "1"
     unittest.main()

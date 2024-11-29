@@ -75,8 +75,7 @@ class CatalogManager(Singleton):
 
             character_id = yaml_content["character_id"]
             character_name = yaml_content["character_name"]
-            voice_id_env = os.getenv(character_id.upper() + "_VOICE_ID")
-            voice_id = voice_id_env or str(yaml_content["voice_id"])
+            voice_id = yaml_content.get("voice_id", None)
             order = yaml_content.get("order", 10**6)
             self.characters[character_id] = Character(
                 character_id=character_id,
@@ -86,10 +85,11 @@ class CatalogManager(Singleton):
                 source="local",
                 location="repo",
                 voice_id=voice_id,
-                author_name=yaml_content.get("author_name", ""),
+                author_name=yaml_content.get("author_name", "unknown"),
                 visibility=yaml_content["visibility"],
-                tts=yaml_content["text_to_speech_use"],
+                tts=yaml_content.get("text_to_speech_use", None),
                 order=order,
+                task_config=yaml_content.get("task_config", None),
             )
 
             return character_name

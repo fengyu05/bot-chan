@@ -15,7 +15,11 @@ from fluctlight.database.connection import get_db
 from fluctlight.database.models.character import Character as CharacterModel
 from fluctlight.embedding.chroma import get_chroma
 from fluctlight.logger import get_logger
-from fluctlight.settings import CHAR_CATALOG_DIR, OVERWRITE_CHROMA
+from fluctlight.settings import (
+    CHAR_CATALOG_DIR,
+    OVERWRITE_CHROMA,
+    CHROMA_DB_COLLECTION_NAME,
+)
 from fluctlight.utt.singleton import Singleton
 
 logger = get_logger(__name__)
@@ -43,7 +47,7 @@ class CatalogManager(Singleton):
             self.db.persist()
 
         logger.info(
-            f"Total document load: {self.db._client.get_collection('llm').count()}"
+            f"Total document load: {self.db._client.get_collection(CHROMA_DB_COLLECTION_NAME).count()}"
         )
         self.run_load_sql_db_thread = True
         self.load_sql_db_thread = threading.Thread(target=self.load_sql_db_loop)

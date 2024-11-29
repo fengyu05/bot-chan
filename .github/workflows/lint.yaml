@@ -3,7 +3,7 @@ name: Lint Code with Ruff
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
 
 jobs:

@@ -118,14 +118,12 @@ class RagIntentMatcher(IntentMatcher):
     def refine_intent_node(self, state: GraphState) -> GraphState:
         logger.debug("refine_intent", state=state)
         messages = state["messages"]
-        question = messages[0].content
         intent_candidate = state["intent_candidate"]
         intent_json_payload = state["intent_json_payload"]
         assert intent_json_payload, "intent_json_payload must present"
         output = self.refine_intent_chain.invoke(
             {
                 "messages": [
-                    # HumanMessage(content=question),
                     HumanMessage(content=intent_json_payload),
                 ]
             }

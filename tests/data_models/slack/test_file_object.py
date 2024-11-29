@@ -148,18 +148,18 @@ def test_create_file_object():
     assert file_object.pretty_type == "QuickTime Movie"
     assert file_object.user == "U0502429A8N"
     assert file_object.user_team == "T050B663C4C"
-    assert file_object.editable == False
+    assert not file_object.editable
     assert file_object.size == 43485
     assert file_object.mode == "hosted"
-    assert file_object.is_external == False
+    assert not file_object.is_external
     assert file_object.external_type == ""
-    assert file_object.is_public == False
-    assert file_object.public_url_shared == False
-    assert file_object.display_as_bot == False
+    assert not file_object.is_public
+    assert not file_object.public_url_shared
+    assert not file_object.display_as_bot
     assert file_object.username == ""
     assert file_object.subtype == "slack_audio"
     assert file_object.transcription.status == "processing"
-    assert file_object.transcription.preview == None
+    assert file_object.transcription.preview is None
     assert (
         file_object.url_private
         == "https://files.slack.com/files-tmb/T050B663C4C-F07BYSPHHMM-4907f4fdaf/audio_message_audio.mp4"
@@ -284,5 +284,5 @@ def test_create_file_object():
         file_object.permalink_public
         == "https://slack-files.com/T050B663C4C-F07BYSPHHMM-862af09b80"
     )
-    assert file_object.has_rich_preview == False
+    assert not file_object.has_rich_preview
     assert file_object.file_access == "visible"

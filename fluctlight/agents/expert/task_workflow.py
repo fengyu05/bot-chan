@@ -7,7 +7,7 @@ from jinja2 import Template
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langsmith import traceable
-from openai.types.chat import ChatCompletion, ParsedChatCompletion
+from openai.types.chat import ParsedChatCompletion
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 from pydantic import BaseModel
 

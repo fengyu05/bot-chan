@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from functools import cache
 
 from fluctlight.agent_catalog.catalog_manager import get_catalog_manager
 from fluctlight.data_model.interface import IMessage

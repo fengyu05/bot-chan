@@ -1,6 +1,6 @@
 import asyncio
 from dataclasses import field
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from langchain.schema import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from pydantic.dataclasses import dataclass

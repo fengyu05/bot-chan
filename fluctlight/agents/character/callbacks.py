@@ -7,6 +7,9 @@ from fastapi import WebSocket
 from langchain.callbacks.base import AsyncCallbackHandler
 
 from fluctlight.audio.text_to_speech.base import TextToSpeech
+from fluctlight.utt.timed import get_timer
+
+timer = get_timer()
 
 
 class AsyncCallbackTextHandler(AsyncCallbackHandler):

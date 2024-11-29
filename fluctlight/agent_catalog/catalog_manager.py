@@ -7,7 +7,7 @@ from typing import cast
 
 import yaml
 from langchain.text_splitter import CharacterTextSplitter
-from llama_index import SimpleDirectoryReader
+from llama_index.core import SimpleDirectoryReader
 from readerwriterlock import rwlock
 
 from fluctlight.data_model.interface.character import Character

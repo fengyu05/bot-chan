@@ -8,8 +8,10 @@ services:
     environment:
       - LOG_LEVEL=info
       - BOT_CLIENT=slack
+      #- OVERWRITE_CHROMA=true
     volumes:
-      - './data/chars_catalog:/chars_catalog'
+      - './data/chars_catalog:/app_data/chars_catalog'
+      - './data/chroma.db:/app_data/chroma.db'
     ports:
       - 3000:3000
 
@@ -23,7 +25,8 @@ services:
       - LOG_LEVEL=info
       - BOT_CLIENT=discord
     volumes:
-      - './data/chars_catalog:/chars_catalog'
+      - './data/chars_catalog:/app_data/chars_catalog'
+      - './data/chroma.db:/app_data/chroma.db'
     ports:
       - 3000:3000
 
@@ -37,7 +40,8 @@ services:
       - DEBUG_MODE=true
       - LOG_LEVEL=debug
     volumes:
-      - './data/chars_catalog:/chars_catalog'
+      - './data/chars_catalog:/app_data/chars_catalog'
+      - './data/chroma.db:/app_data/chroma.db'
     ports:
       - 3000:3000
 
@@ -52,7 +56,8 @@ services:
       - SQLALCHEMY_DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
       - USE_SQL_CHAR_DB=true
     volumes:
-      - './data/chars_catalog:/chars_catalog'
+      - './data/chars_catalog:/app_data/chars_catalog'
+      - './data/chroma.db:/app_data/chroma.db'
       - './alembic:/app/home/alembic'
     ports:
       - "8000:8000"

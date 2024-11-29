@@ -87,7 +87,9 @@ SQLALCHEMY_DATABASE_URL = config_default("SQLALCHEMY_DATABASE_URL")
 
 # Override Chroma DB
 OVERWRITE_CHROMA = config_default_bool("OVERWRITE_CHROMA", False)
-CHAR_CATALOG_DIR = config_default("CHAR_CATALOG_DIR", "/chars_catalog")
+CHAR_CATALOG_DIR = config_default("CHAR_CATALOG_DIR", "/app_data/chars_catalog")
+CHROMA_DB_DIR = config_default("CHROMA_DB_DIR", "/app_data/chroma.db")
+CHROMA_DB_COLLECTION_NAME = config_default("CHROMA_DB_COLLECTION_NAME", "characters")
 
 
 # Setting methods

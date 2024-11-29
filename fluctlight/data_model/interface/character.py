@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -10,38 +8,39 @@ class Character(BaseModel):
     llm_user_prompt: str
     source: str = ""
     location: str = ""
-    voice_id: str = ""
+    voice_id: str | None = None
     author_name: str = ""
     author_id: str = ""
     visibility: str = ""
-    tts: str | None = ""
+    tts: str | None = None
     order: int = 10**9  # display order on the website
     data: dict | None = None
+    task_config: str | None = None
 
 
 class CharacterRequest(BaseModel):
     name: str
-    system_prompt: Optional[str] = None
-    user_prompt: Optional[str] = None
-    tts: Optional[str] = None
-    voice_id: Optional[str] = None
-    visibility: Optional[str] = None
-    data: Optional[dict] = None
-    avatar_id: Optional[str] = None
-    background_text: Optional[str] = None
+    system_prompt: str | None = None
+    user_prompt: str | None = None
+    tts: str | None = None
+    voice_id: str | None = None
+    visibility: str | None = None
+    data: dict | None = None
+    avatar_id: str | None = None
+    background_text: str | None = None
 
 
 class EditCharacterRequest(BaseModel):
     id: str
-    name: Optional[str] = None
-    system_prompt: Optional[str] = None
-    user_prompt: Optional[str] = None
-    tts: Optional[str] = None
-    voice_id: Optional[str] = None
-    visibility: Optional[str] = None
-    data: Optional[dict] = None
-    avatar_id: Optional[str] = None
-    background_text: Optional[str] = None
+    name: str | None = None
+    system_prompt: str | None = None
+    user_prompt: str | None = None
+    tts: str | None = None
+    voice_id: str | None = None
+    visibility: str | None = None
+    data: dict | None = None
+    avatar_id: str | None = None
+    background_text: str | None = None
 
 
 class DeleteCharacterRequest(BaseModel):

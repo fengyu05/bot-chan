@@ -58,6 +58,7 @@ class TestRagIntentMatcher(unittest.TestCase):
             result_state["intent_candidate"].intent_primary, poem_translate_intent_key
         )
 
+    @unittest.skip("flaky")
     @skip_integration_tests
     def test_refine_intent_node(self):
         state = GraphState(

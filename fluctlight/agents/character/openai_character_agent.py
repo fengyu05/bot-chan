@@ -13,6 +13,7 @@ from fluctlight.embedding.chroma import get_chroma
 from fluctlight.intent.message_intent import MessageIntent
 from fluctlight.logger import get_logger
 from fluctlight.utt.emoji import strip_leading_emoji
+from fluctlight.agents.expert.task_agent import TaskAgent
 
 logger = get_logger(__name__)
 
@@ -65,14 +66,28 @@ class OpenAICharacterAgent(CharacterAgent, MessageIntentAgent):
         char_id = message_intent.get_metadata("char_id")
         character = self.catalog_manager.get_character(character_id=char_id)
         assert character, f"Character doesn't exisit, char_id={char_id}"
-        response_text = self.chat(
-            history=self.get_history(
-                thread_id=message.thread_message_id, character=character
-            ),
-            user_input=strip_leading_emoji(message.text),
-            character=character,
-        )
-        return [response_text]
+        output = []
+        if character.task_config:
+            output.append("I'm a task agent")
+            response_text = self.task_agent_dispatch(
+                task_agent=None,  # TODO: construct a task agent from task_config
+            )
+        else:
+            response_text = self.chat(
+                history=self.get_history(
+                    thread_id=message.thread_message_id, character=character
+                ),
+                user_input=strip_leading_emoji(message.text),
+                character=character,
+            )
+            output.append(response_text)
+        return output
+
+    def task_agent_dispatch(
+        self,
+        task_agent: TaskAgent,  # pylint: disable=W0613:unused-argument
+    ) -> str:
+        return "Not implement yet"
 
     def get_history(self, thread_id: str, character: Character) -> list[BaseMessage]:
         if thread_id not in self.history_buffer:

@@ -19,3 +19,5 @@ api-server: requirements.txt ## start app server
 	docker compose up --build api
 
 test: docker-test  ## Test
+
+test-int: docker-test-int  ## Intergation test

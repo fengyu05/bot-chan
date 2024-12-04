@@ -15,6 +15,7 @@ services:
     ports:
       - 3000:3000
 
+
   server-discord:
     build:
       context: ./
